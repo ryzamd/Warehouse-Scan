@@ -1,8 +1,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.SCAN_DEVICE" />
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.camera.autofocus" />
     <application
         android:label="warehouse_scan"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:enableOnBackInvokedCallback="true">
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -30,6 +35,24 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+    
+        <receiver android:name=".ScanReceiver" android:enabled="true" android:exported="true">
+            <intent-filter>
+                <!--  Urovo Scanner  -->
+                <action android:name="urovo.rcv.message.ACTION" />
+                <!--  Unitech Scanner  -->
+                <action android:name="unitech.scanservice.data" />
+                <!--  Zebra/Symbol Scanner  -->
+                <action android:name="com.symbol.datawedge.api.NOTIFICATION_ACTION" />
+                <!--  DataWedge Scanner  -->
+                <!-- <action android:name="com.ubx.datawedge.action" /> -->
+                <action android:name="urovo.rcv.message.ACTION" />
+                <action android:name="android.intent.action.DECODE_DATA" />
+                <action android:name="scanner.action" />
+                <action android:name="android.intent.ACTION_DECODE_DATA" />
+                <action android:name="com.android.server.scannerservice.broadcast" />
+            </intent-filter>
+        </receiver>
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and
