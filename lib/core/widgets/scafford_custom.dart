@@ -1,8 +1,8 @@
 // lib/common/widgets/custom_scaffold.dart
 import 'package:flutter/material.dart';
 import 'package:warehouse_scan/core/widgets/navbar_custom.dart';
+import '../../features/auth/login/domain/entities/user_entity.dart';
 import '../constants/app_colors.dart';
-import '../repositories/warehouse_repository.dart';
 
 
 class CustomScaffold extends StatelessWidget {

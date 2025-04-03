@@ -15,6 +15,12 @@ import 'package:warehouse_scan/features/auth/login/domain/usecases/user_login.da
 import 'package:warehouse_scan/features/auth/login/domain/usecases/validate_token.dart';
 import 'package:warehouse_scan/features/auth/login/presentation/bloc/login_bloc.dart';
 
+import '../../features/process/data/datasources/processing_remote_datasource.dart';
+import '../../features/process/data/repositories/processing_repository_impl.dart';
+import '../../features/process/domain/repositories/processing_repository.dart';
+import '../../features/process/domain/usecases/get_processing_items.dart';
+import '../../features/process/presentation/bloc/processing_bloc.dart';
+
 final sl = GetIt.instance;
 
 Future<void> init() async {
@@ -46,7 +52,7 @@ Future<void> init() async {
   // Register the individual Dio instance
   sl.registerLazySingleton<Dio>(() => dioClient.dio);
   
-  // Features - Login
+  // ======= Login Page ======== //
   // BLoC
   sl.registerFactory(
     () => LoginBloc(
@@ -81,4 +87,32 @@ Future<void> init() async {
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton(() => sharedPreferences);
   sl.registerLazySingleton(() => InternetConnectionChecker());
+
+  // ======= End Login Page ======== //
+
+  // ======= Process Page ======== //
+  // BLoC
+  sl.registerFactory(
+    () => ProcessingBloc(
+      getProcessingItems: sl(),
+    ),
+  );
+
+  // Use cases
+  sl.registerLazySingleton(() => GetProcessingItems(sl()));
+
+  // Repository
+  sl.registerLazySingleton<ProcessingRepository>(
+    () => ProcessingRepositoryImpl(
+      remoteDataSource: sl(),
+      networkInfo: sl(),
+    ),
+  );
+
+  // Data sources
+  sl.registerLazySingleton<ProcessingRemoteDataSource>(
+    () => ProcessingRemoteDataSourceImpl(dio: sl(), useMockData: false),
+  );
+
+  // ======= End Process Page ======== //
 }
