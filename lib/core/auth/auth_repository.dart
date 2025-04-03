@@ -4,38 +4,13 @@ import 'dart:math';
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import '../../features/auth/login/data/models/user_model.dart';
+import '../../features/auth/login/domain/entities/user_entity.dart';
 import '../constants/api_constants.dart';
 import '../errors/failures.dart';
 import '../network/dio_client.dart';
 import '../services/secure_storage_service.dart';
 
-class UserEntity {
-  final String userId;
-  final String name;
-  final String token;
-
-  UserEntity({
-    required this.userId,
-    required this.name,
-    required this.token,
-  });
-}
-
-class UserModel extends UserEntity {
-  UserModel({
-    required super.userId,
-    required super.name,
-    required super.token,
-  });
-
-  factory UserModel.fromJson(Map<String, dynamic> json) {
-    return UserModel(
-      userId: json['userID'],
-      name: json['name'],
-      token: json['token'],
-    );
-  }
-}
 
 class AuthRepository {
   final SecureStorageService _secureStorage;
