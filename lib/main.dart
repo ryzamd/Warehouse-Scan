@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:warehouse_scan/core/constants/app_colors.dart';
 import 'package:warehouse_scan/core/constants/app_routes.dart';
 import 'package:warehouse_scan/core/services/exit_confirmation_service.dart';
 import 'package:warehouse_scan/features/auth/login/domain/entities/user_entity.dart';
 import 'package:warehouse_scan/features/auth/login/presentation/pages/login_page.dart';
+import 'package:warehouse_scan/features/process/presentation/bloc/processing_bloc.dart';
+import 'package:warehouse_scan/features/process/presentation/pages/process_page.dart';
 import 'core/di/dependencies.dart' as di;
 
 void main() async {
@@ -73,30 +76,11 @@ class _MyAppState extends State<MyApp> {
           case AppRoutes.login:
             return MaterialPageRoute(builder: (_) => const LoginPage());
           case AppRoutes.processing:
-            // Temporary placeholder route
             final args = settings.arguments as UserEntity;
             return MaterialPageRoute(
-              builder: (context) => Scaffold(
-                appBar: AppBar(title: Text('Processing - ${args.name}')),
-                body: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text('Welcome, ${args.name}!'),
-                      const SizedBox(height: 20),
-                      Text('User ID: ${args.userId}'),
-                      const SizedBox(height: 20),
-                      Text('Role: ${args.role.toString()}'),
-                      const SizedBox(height: 40),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context).pushReplacementNamed(AppRoutes.login);
-                        },
-                        child: const Text('Logout'),
-                      ),
-                    ],
-                  ),
-                ),
+              builder: (context) => BlocProvider(
+                create: (context) => di.sl<ProcessingBloc>(),
+                child: ProcessingPage(user: args),
               ),
             );
           default:

@@ -1,7 +1,7 @@
 // lib/common/widgets/custom_navbar.dart
 import 'package:flutter/material.dart';
+import '../../features/auth/login/domain/entities/user_entity.dart';
 import '../constants/app_routes.dart';
-import '../repositories/warehouse_repository.dart';
 
 class CustomNavBar extends StatelessWidget {
   final int currentIndex;
