@@ -11,7 +11,7 @@ class BackButtonService {
 
   // Event channel để nhận sự kiện từ native
   static const EventChannel _eventChannel = EventChannel(
-    'com.example.architecture_scan_app/back_button',
+    'com.example.warehouse_scan/back_button',
   );
 
   // Stream subscription để lắng nghe sự kiện
