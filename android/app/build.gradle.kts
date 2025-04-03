@@ -7,8 +7,8 @@ plugins {
 
 android {
     namespace = "com.example.warehouse_scan"
-    compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    compileSdk = 35
+    ndkVersion = "27.0.12077973"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -41,4 +41,16 @@ android {
 
 flutter {
     source = "../.."
+}
+
+tasks.withType<JavaCompile> {
+    options.isFork = true
+    options.isIncremental = true
+}
+
+tasks.register("cleanBuild") {
+    doLast {
+        delete(buildDir)
+    }
+    finalizedBy("clean")
 }
