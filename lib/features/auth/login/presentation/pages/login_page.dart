@@ -66,9 +66,10 @@ class _LoginPageState extends State<LoginPage> {
       child: BlocListener<LoginBloc, LoginState>(
         listener: (context, state) {
           if (state is LoginSuccess) {
-            Navigator.pushReplacementNamed(
+            Navigator.pushNamedAndRemoveUntil(
               context,
               AppRoutes.processing,
+              (route) => false,
               arguments: state.user,
             );
           } else if (state is LoginFailure) {
