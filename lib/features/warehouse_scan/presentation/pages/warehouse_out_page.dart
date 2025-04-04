@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:warehouse_scan/core/constants/key_code_constants.dart';
+import 'package:warehouse_scan/core/widgets/error_dialog.dart';
 import 'package:warehouse_scan/core/widgets/loading_dialog.dart';
 import 'package:warehouse_scan/core/widgets/scafford_custom.dart';
 import 'package:warehouse_scan/features/auth/login/domain/entities/user_entity.dart';
@@ -31,13 +32,11 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
   final TextEditingController _quantityController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
   
-  bool _cameraActive = true;
+  bool _cameraActive = false; // Camera mặc định tắt
   bool _torchEnabled = false;
-  DateTime? _lastSnackbarTime;
-  String? _lastSnackbarMessage;
   double _maxQuantity = 0;
   String _currentCode = '';
-  String _currentStaff = '';
+  String _currentMaterialName = '';
 
   @override
   void initState() {
@@ -102,13 +101,17 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
 
       // Initialize scanner in BLoC
       context.read<WarehouseOutBloc>().add(InitializeScanner(_controller!));
+      
+      // Make sure camera is stopped if _cameraActive is false
+      if (!_cameraActive && _controller != null) {
+        _controller!.stop();
+      }
     } catch (e) {
       debugPrint("QR DEBUG: ⚠️ Camera initialization error: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Camera initialization error: $e"),
-          backgroundColor: Colors.red,
-        ),
+      ErrorDialog.show(
+        context,
+        title: 'Camera Error',
+        message: "Camera initialization error: $e",
       );
     }
   }
@@ -150,7 +153,7 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
 
   Future<void> _toggleTorch() async {
     debugPrint("QR DEBUG: Toggle torch button pressed");
-    if (_controller != null) {
+    if (_controller != null && _cameraActive) {
       await _controller!.toggleTorch();
       setState(() {
         _torchEnabled = !_torchEnabled;
@@ -160,30 +163,16 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
 
   Future<void> _switchCamera() async {
     debugPrint("QR DEBUG: Switch camera button pressed");
-    if (_controller != null) {
+    if (_controller != null && _cameraActive) {
       await _controller!.switchCamera();
     }
   }
 
-  void _showSnackbar(String message, {Color backgroundColor = Colors.blue}) {
-    final now = DateTime.now();
-    if (_lastSnackbarTime != null &&
-        now.difference(_lastSnackbarTime!).inSeconds < 2 &&
-        _lastSnackbarMessage == message) {
-      return;
-    }
-
-    _lastSnackbarTime = now;
-    _lastSnackbarMessage = message;
-
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: backgroundColor,
-        duration: const Duration(seconds: 1),
-      ),
-    );
+  void _clearData() {
+    setState(() {
+      _resetForm();
+    });
+    context.read<WarehouseOutBloc>().add(ClearScannedData());
   }
 
   void _validateQuantity(String value) {
@@ -226,7 +215,7 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
     _quantityController.clear();
     _addressController.clear();
     _currentCode = '';
-    _currentStaff = '';
+    _currentMaterialName = '';
     _maxQuantity = 0;
   }
 
@@ -251,7 +240,6 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
       }
 
       debugPrint("QR DEBUG: ✅ QR value success: $rawValue");
-      _showSnackbar("Scanned QR: $rawValue");
 
       if (mounted) {
         context.read<WarehouseOutBloc>().add(ScanBarcode(rawValue));
@@ -266,7 +254,7 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
     return BlocConsumer<WarehouseOutBloc, WarehouseOutState>(
       listener: (context, state) {
         if (state is WarehouseOutProcessing) {
-          LoadingDialog.show(context, message: 'Getting material info...');
+          LoadingDialog.show(context);
         } else if (state is MaterialInfoLoaded) {
           // Hide loading dialog
           if (Navigator.of(context).canPop()) {
@@ -276,12 +264,12 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
           // Update local state for form
           setState(() {
             _currentCode = state.material.code;
-            _currentStaff = state.material.staff;
+            _currentMaterialName = state.material.mName;
             _maxQuantity = state.material.mQty;
           });
           
         } else if (state is WarehouseOutProcessingRequest) {
-          LoadingDialog.show(context, message: 'Processing warehouse-out data...');
+          LoadingDialog.show(context);
         } else if (state is WarehouseOutSuccess) {
           // Hide loading dialog
           if (Navigator.of(context).canPop()) {
@@ -290,7 +278,7 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
           
           // Show success message
           SuccessOutDialog.show(
-            context, 
+            context,
             onDismiss: () {
               // Reset form
               _resetForm();
@@ -304,21 +292,44 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
             Navigator.of(context).pop();
           }
           
-          // Show error message
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message),
-              backgroundColor: Colors.red,
-              duration: const Duration(seconds: 2),
-            ),
+          // Show error message using ErrorDialog
+          ErrorDialog.show(
+            context,
+            title: 'Error',
+            message: state.message,
           );
         }
       },
       builder: (context, state) {
         return CustomScaffold(
-          title: 'WAREHOUSE OUT',
+          title: 'EXPORT PAGE',
           user: widget.user,
           currentIndex: 1,
+          // Add camera control buttons to the AppBar
+          actions: [
+            IconButton(
+              icon: Icon(
+                _torchEnabled ? Icons.flash_on : Icons.flash_off,
+                color: _torchEnabled ? Colors.yellow : Colors.white,
+              ),
+              onPressed: _toggleTorch,
+            ),
+            IconButton(
+              icon: const Icon(Icons.flip_camera_ios, color: Colors.white),
+              onPressed: _switchCamera,
+            ),
+            IconButton(
+              icon: Icon(
+                _cameraActive ? Icons.stop : Icons.play_arrow,
+                color: _cameraActive ? Colors.red : Colors.white,
+              ),
+              onPressed: _toggleCamera,
+            ),
+            IconButton(
+              icon: const Icon(Icons.delete, color: Colors.white),
+              onPressed: _clearData,
+            ),
+          ],
           body: KeyboardListener(
             focusNode: _focusNode,
             autofocus: true,
@@ -349,7 +360,8 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
 
                 // Material Info and Form
                 Expanded(
-                  child: SingleChildScrollView(
+                  child: Container(
+                    height: 300,
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Form(
                       key: _formKey,
@@ -358,74 +370,36 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
                         children: [
                           // Table-like layout for info
                           _buildInfoTable(),
-                          
-                          const SizedBox(height: 20),
-                          
-                          // Save button
-                          Center(
-                            child: _currentCode.isNotEmpty
-                                ? ElevatedButton(
-                                    onPressed: _submitForm,
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.green,
-                                      foregroundColor: Colors.white,
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 32,
-                                        vertical: 12,
-                                      ),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                    child: const Text(
-                                      'Save',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  )
-                                : const Text(
-                                    'Scan QR code to load material data',
-                                    style: TextStyle(
-                                      color: Colors.blue,
-                                      fontStyle: FontStyle.italic,
-                                    ),
-                                  ),
-                          ),
                         ],
                       ),
                     ),
                   ),
                 ),
-                
-                // Camera controls
-                Container(
-                  margin: const EdgeInsets.only(bottom: 20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      IconButton(
-                        icon: Icon(
-                          _torchEnabled ? Icons.flash_on : Icons.flash_off,
-                          color: _torchEnabled ? Colors.yellow : Colors.grey,
-                        ),
-                        onPressed: _cameraActive ? _toggleTorch : null,
+
+                Center(
+                  child: ElevatedButton(
+                    onPressed: _submitForm,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green.shade600,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 32,
+                        vertical: 12,
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.flip_camera_ios),
-                        onPressed: _cameraActive ? _switchCamera : null,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                      IconButton(
-                        icon: Icon(
-                          _cameraActive ? Icons.stop : Icons.play_arrow,
-                          color: _cameraActive ? Colors.red : Colors.green,
-                        ),
-                        onPressed: _toggleCamera,
+                    ),
+                    child: const Text(
+                      'Save',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white
                       ),
-                    ],
+                    ),
                   ),
                 ),
+                const SizedBox(height: 10),
               ],
             ),
           ),
@@ -442,10 +416,11 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
         border: Border.all(color: Colors.grey.shade300),
       ),
       child: Column(
+        spacing: 5,
         children: [
           _buildTableRow('ID', _currentCode),
           _buildDivider(),
-          _buildTableRow('Material Name', _currentStaff),
+          _buildTableRow('Material Name', _currentMaterialName),
           _buildDivider(),
           _buildQuantityRow(),
           _buildDivider(),
@@ -459,6 +434,7 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
     return Row(
       children: [
         Container(
+          height: 70,
           width: 72,
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
           decoration: BoxDecoration(
@@ -481,11 +457,11 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
         // Value side (right)
         Expanded(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Text(
               value.isEmpty ? 'No Scan data' : value,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 12,
                 fontWeight: FontWeight.w500,
                 color: value.isEmpty ? Colors.black : Colors.black87,
               ),
@@ -500,8 +476,9 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
     return Row(
       children: [
         Container(
+          height: 72,
           width: 72,
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
             color: Colors.blue.shade600,
             borderRadius: const BorderRadius.only(
@@ -522,18 +499,18 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
         // Value side with text field
         Expanded(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
             child: TextFormField(
               controller: _quantityController,
               keyboardType: TextInputType.number,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
               decoration: InputDecoration(
                 hintText: 'Enter quantity',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
                 ),
                 helperText: _maxQuantity > 0 ? 'Max: $_maxQuantity' : null,
               ),
@@ -566,8 +543,9 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
     return Row(
       children: [
         Container(
+          height: 70,
           width: 72,
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
             color: Colors.blue.shade600,
             borderRadius: const BorderRadius.only(
@@ -588,10 +566,14 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
         // Value side with text field
         Expanded(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: TextFormField(
               controller: _addressController,
               keyboardType: TextInputType.text,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
               decoration: InputDecoration(
                 hintText: 'Enter address',
                 border: OutlineInputBorder(

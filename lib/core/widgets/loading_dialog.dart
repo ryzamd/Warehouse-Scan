@@ -2,19 +2,17 @@
 import 'package:flutter/material.dart';
 
 class LoadingDialog extends StatelessWidget {
-  final String message;
   
   const LoadingDialog({
     super.key,
-    this.message = 'Loading...',
   });
   
   // Show loading dialog
-  static void show(BuildContext context, {String message = 'Loading...'}) {
+  static void show(BuildContext context) {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => LoadingDialog(message: message),
+      builder: (context) => LoadingDialog(),
     );
   }
   
@@ -26,13 +24,15 @@ class LoadingDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const CircularProgressIndicator(),
-          const SizedBox(height: 16),
-          Text(message),
-        ],
+      content: const SizedBox(
+        height: 100,
+        width: 100,
+        child: Center(
+          child: CircularProgressIndicator(
+            strokeWidth: 4,
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+          ),
+        ),
       ),
     );
   }

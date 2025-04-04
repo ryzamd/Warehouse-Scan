@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:warehouse_scan/core/constants/key_code_constants.dart';
+import 'package:warehouse_scan/core/widgets/error_dialog.dart';
 import 'package:warehouse_scan/core/widgets/loading_dialog.dart';
 import 'package:warehouse_scan/core/widgets/scafford_custom.dart';
 import 'package:warehouse_scan/features/auth/login/domain/entities/user_entity.dart';
@@ -27,10 +28,8 @@ class _WarehouseInPageState extends State<WarehouseInPage> with WidgetsBindingOb
   MobileScannerController? _controller;
   final FocusNode _focusNode = FocusNode();
   
-  bool _cameraActive = true;
+  bool _cameraActive = false; // Camera mặc định tắt
   bool _torchEnabled = false;
-  DateTime? _lastSnackbarTime;
-  String? _lastSnackbarMessage;
 
   @override
   void initState() {
@@ -93,13 +92,17 @@ class _WarehouseInPageState extends State<WarehouseInPage> with WidgetsBindingOb
 
       // Initialize scanner in BLoC
       context.read<WarehouseInBloc>().add(InitializeScanner(_controller!));
+      
+      // Make sure camera is stopped if _cameraActive is false
+      if (!_cameraActive && _controller != null) {
+        _controller!.stop();
+      }
     } catch (e) {
       debugPrint("QR DEBUG: ⚠️ Camera initialization error: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Camera initialization error: $e"),
-          backgroundColor: Colors.red,
-        ),
+      ErrorDialog.show(
+        context,
+        title: 'Camera Error',
+        message: "Camera initialization error: $e",
       );
     }
   }
@@ -141,7 +144,7 @@ class _WarehouseInPageState extends State<WarehouseInPage> with WidgetsBindingOb
 
   Future<void> _toggleTorch() async {
     debugPrint("QR DEBUG: Toggle torch button pressed");
-    if (_controller != null) {
+    if (_controller != null && _cameraActive) {
       await _controller!.toggleTorch();
       setState(() {
         _torchEnabled = !_torchEnabled;
@@ -151,30 +154,13 @@ class _WarehouseInPageState extends State<WarehouseInPage> with WidgetsBindingOb
 
   Future<void> _switchCamera() async {
     debugPrint("QR DEBUG: Switch camera button pressed");
-    if (_controller != null) {
+    if (_controller != null && _cameraActive) {
       await _controller!.switchCamera();
     }
   }
 
-  void _showSnackbar(String message, {Color backgroundColor = Colors.blue}) {
-    final now = DateTime.now();
-    if (_lastSnackbarTime != null &&
-        now.difference(_lastSnackbarTime!).inSeconds < 2 &&
-        _lastSnackbarMessage == message) {
-      return;
-    }
-
-    _lastSnackbarTime = now;
-    _lastSnackbarMessage = message;
-
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: backgroundColor,
-        duration: const Duration(seconds: 1),
-      ),
-    );
+  void _clearData() {
+    context.read<WarehouseInBloc>().add(ClearScannedData());
   }
 
   void _onDetect(BarcodeCapture capture) {
@@ -198,7 +184,6 @@ class _WarehouseInPageState extends State<WarehouseInPage> with WidgetsBindingOb
       }
 
       debugPrint("QR DEBUG: ✅ QR value success: $rawValue");
-      _showSnackbar("Scanned QR: $rawValue");
 
       if (mounted) {
         context.read<WarehouseInBloc>().add(ScanBarcode(rawValue));
@@ -213,7 +198,7 @@ class _WarehouseInPageState extends State<WarehouseInPage> with WidgetsBindingOb
     return BlocConsumer<WarehouseInBloc, WarehouseInState>(
       listener: (context, state) {
         if (state is WarehouseInProcessing) {
-          LoadingDialog.show(context, message: 'Processing Warehouse-In data...');
+          LoadingDialog.show(context);
         } else if (state is WarehouseInSuccess) {
           // Hide loading dialog
           if (Navigator.of(context).canPop()) {
@@ -222,10 +207,7 @@ class _WarehouseInPageState extends State<WarehouseInPage> with WidgetsBindingOb
           
           // Show success message
           SuccessImportDialog.show(context,
-            onDismiss: () {
-              // Clear scanned data
-              context.read<WarehouseInBloc>().add(ClearScannedData());
-            }
+            onDismiss: () => _clearData(),
           );
         } else if (state is WarehouseInError) {
           // Hide loading dialog
@@ -233,19 +215,18 @@ class _WarehouseInPageState extends State<WarehouseInPage> with WidgetsBindingOb
             Navigator.of(context).pop();
           }
           
-          // Show error message
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('Failed import'),
-              backgroundColor: Colors.red,
-              duration: const Duration(seconds: 2),
-            ),
+          // Show error message using ErrorDialog
+          ErrorDialog.show(
+            context,
+            title: 'ERROR',
+            message: state.message,
+            onDismiss: () => _clearData(),
           );
         }
       },
       builder: (context, state) {
         return CustomScaffold(
-          title: 'WAREHOUSE IN',
+          title: 'IMPORT PAGE',
           user: widget.user,
           currentIndex: 1,
           body: KeyboardListener(
@@ -277,9 +258,8 @@ class _WarehouseInPageState extends State<WarehouseInPage> with WidgetsBindingOb
                 ),
 
                 // App Instructions
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                  child: Text(
+                Center(
+                  child: const Text(
                     'Scan QR code to process warehouse-in materials',
                     style: TextStyle(
                       fontSize: 14,
@@ -293,29 +273,43 @@ class _WarehouseInPageState extends State<WarehouseInPage> with WidgetsBindingOb
                 // Empty space
                 const Spacer(),
                 
-                // Camera controls
+                // Camera controls with enhanced visibility
                 Container(
                   margin: const EdgeInsets.only(bottom: 20),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      IconButton(
+                      _buildEnhancedButton(
                         icon: Icon(
                           _torchEnabled ? Icons.flash_on : Icons.flash_off,
-                          color: _torchEnabled ? Colors.yellow : Colors.grey,
+                          color: _torchEnabled ? Colors.yellow : Colors.white,
+                          size: 28,
                         ),
                         onPressed: _cameraActive ? _toggleTorch : null,
+                        label: 'Flash',
+                        color: _torchEnabled ? Colors.amber.shade700 : Colors.blueGrey.shade700,
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.flip_camera_ios),
+                      const SizedBox(width: 16),
+                      _buildEnhancedButton(
+                        icon: const Icon(
+                          Icons.flip_camera_ios,
+                          color: Colors.white,
+                          size: 28,
+                        ),
                         onPressed: _cameraActive ? _switchCamera : null,
+                        label: 'Flip',
+                        color: Colors.blue.shade700,
                       ),
-                      IconButton(
+                      const SizedBox(width: 16),
+                      _buildEnhancedButton(
                         icon: Icon(
                           _cameraActive ? Icons.stop : Icons.play_arrow,
-                          color: _cameraActive ? Colors.red : Colors.green,
+                          color: Colors.white,
+                          size: 28,
                         ),
                         onPressed: _toggleCamera,
+                        label: _cameraActive ? 'Stop' : 'Start',
+                        color: _cameraActive ? Colors.red.shade700 : Colors.green.shade700,
                       ),
                     ],
                   ),
@@ -325,6 +319,53 @@ class _WarehouseInPageState extends State<WarehouseInPage> with WidgetsBindingOb
           ),
         );
       },
+    );
+  }
+  
+  // Helper method to build enhanced camera control buttons
+  Widget _buildEnhancedButton({
+    required Widget icon,
+    required VoidCallback? onPressed,
+    required String label,
+    required Color color,
+  }) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 56,
+          height: 56,
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(28),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.3),
+                spreadRadius: 1,
+                blurRadius: 5,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: onPressed,
+              borderRadius: BorderRadius.circular(28),
+              child: Center(child: icon),
+            ),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: onPressed == null ? Colors.grey : Colors.black87,
+          ),
+        ),
+      ],
     );
   }
 }
