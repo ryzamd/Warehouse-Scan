@@ -27,7 +27,7 @@ class SuccessImportDialog extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           const Icon(
-            Icons.check_circle_outline,
+            Icons.favorite,
             color: Colors.green,
             size: 64,
           ),

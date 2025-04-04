@@ -90,7 +90,7 @@ class WarehouseInBloc extends Bloc<WarehouseInEvent, WarehouseInState> {
         (failure) {
           debugPrint('Warehouse in processing failed: ${failure.message}');
           emit(WarehouseInError(
-            message: 'Failed import',
+            message: 'Data has already been stored.',
             previousState: state,
           ));
         },
@@ -102,7 +102,7 @@ class WarehouseInBloc extends Bloc<WarehouseInEvent, WarehouseInState> {
     } catch (e) {
       debugPrint('Error processing warehouse in: $e');
       emit(WarehouseInError(
-        message: 'Failed import',
+        message: 'Data has already been stored.',
         previousState: state,
       ));
     }
