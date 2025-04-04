@@ -64,25 +64,31 @@ class _LoginPageState extends State<LoginPage> {
     return BlocProvider(
       create: (context) => di.sl<LoginBloc>(),
       child: BlocListener<LoginBloc, LoginState>(
-        listener: (context, state) {
-          if (state is LoginSuccess) {
-            Navigator.pushNamedAndRemoveUntil(
+      listener: (context, state) {
+        if (state is LoginSuccess) {
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            AppRoutes.processing,
+            (route) => false,
+            arguments: state.user,
+          );
+        } else if (state is LoginFailure) {
+          // Đảm bảo rằng context vẫn hợp lệ trước khi hiển thị dialog
+          if (context.mounted) {
+            ErrorDialog.show(
               context,
-              AppRoutes.processing,
-              (route) => false,
-              arguments: state.user,
-            );
-          } else if (state is LoginFailure) {
-            showDialog(
-              context: context,
-              builder: (context) => ErrorDialog(
-                title: 'Login Failed',
-                message: state.message,
-                onDismiss: () => Navigator.pop(context),
-              ),
+              title: 'Login Failed',
+              message: state.message,
+              onDismiss: () {
+                // Reset state của LoginBloc sau khi đóng dialog
+                if (context.mounted) {
+                  context.read<LoginBloc>().add(ResetLoginStateEvent());
+                }
+              },
             );
           }
-        },
+        }
+      },
         child: Scaffold(
           resizeToAvoidBottomInset: false,
           body: Container(

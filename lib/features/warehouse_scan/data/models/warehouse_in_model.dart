@@ -1,11 +1,11 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:warehouse_scan/features/process/domain/entities/processing_item_entity.dart';
+import '../../domain/entities/warehouse_in_entity.dart';
 
-part 'processing_item_model.g.dart';
+part 'warehouse_in_model.g.dart';
 
 @JsonSerializable()
-class ProcessingItemModel extends ProcessingItemEntity {
-  const ProcessingItemModel({
+class WarehouseInModel extends WarehouseInEntity {
+  const WarehouseInModel({
     required super.mwhId,
     required super.mName,
     required super.mDate,
@@ -17,11 +17,9 @@ class ProcessingItemModel extends ProcessingItemEntity {
     required super.mItemcode,
     required super.cDate,
     required super.code,
-    required super.qcQtyIn,
-    required super.qcQtyOut,
-    required super.zcWarehouseQtyInt,
-    required super.zcWarehouseQtyOut,
+    required super.staff,
     required super.qtyState,
+    required super.inWarehouse,
   });
 
   @JsonKey(name: 'mwh_id', defaultValue: 0)
@@ -39,7 +37,7 @@ class ProcessingItemModel extends ProcessingItemEntity {
   @JsonKey(name: 'm_prjcode', defaultValue: '')
   String get getMPrjcode => mPrjcode;
 
-  @JsonKey(name: 'm_qty', defaultValue: 0.0)
+  @JsonKey(name: 'm_qty', defaultValue: 0.0, fromJson: _qtyFromJson)
   double get getMQty => mQty;
 
   @JsonKey(name: 'm_unit', defaultValue: '')
@@ -57,11 +55,32 @@ class ProcessingItemModel extends ProcessingItemEntity {
   @JsonKey(defaultValue: '')
   String get getCode => code;
 
-  @JsonKey(name: 'qty_state', defaultValue: '')
+  @JsonKey(defaultValue: '')
+  String get getStaff => staff;
+
+  @JsonKey(defaultValue: '')
   String get getQtyState => qtyState;
 
-  factory ProcessingItemModel.fromJson(Map<String, dynamic> json) =>
-      _$ProcessingItemModelFromJson(json);
+  @JsonKey(name: 'in_warehouse', defaultValue: '')
+  String get getInWarehouse => inWarehouse;
 
-  Map<String, dynamic> toJson() => _$ProcessingItemModelToJson(this);
+  factory WarehouseInModel.fromJson(Map<String, dynamic> json) =>
+      _$WarehouseInModelFromJson(json);
+
+  Map<String, dynamic> toJson() => _$WarehouseInModelToJson(this);
+  
+  // Helper method to handle quantity conversion
+  static double _qtyFromJson(dynamic value) {
+    if (value == null) return 0.0;
+    if (value is int) return value.toDouble();
+    if (value is double) return value;
+    if (value is String) {
+      try {
+        return double.parse(value);
+      } catch (_) {
+        return 0.0;
+      }
+    }
+    return 0.0;
+  }
 }

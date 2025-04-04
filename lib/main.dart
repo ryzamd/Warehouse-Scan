@@ -3,11 +3,16 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:warehouse_scan/core/constants/app_colors.dart';
 import 'package:warehouse_scan/core/constants/app_routes.dart';
+import 'package:warehouse_scan/core/constants/enum.dart';
 import 'package:warehouse_scan/core/services/exit_confirmation_service.dart';
 import 'package:warehouse_scan/features/auth/login/domain/entities/user_entity.dart';
 import 'package:warehouse_scan/features/auth/login/presentation/pages/login_page.dart';
 import 'package:warehouse_scan/features/process/presentation/bloc/processing_bloc.dart';
 import 'package:warehouse_scan/features/process/presentation/pages/process_page.dart';
+import 'package:warehouse_scan/features/warehouse_scan/presentation/bloc/warehouse_in/warehouse_in_bloc.dart';
+import 'package:warehouse_scan/features/warehouse_scan/presentation/bloc/warehouse_out/warehouse_out_bloc.dart';
+import 'package:warehouse_scan/features/warehouse_scan/presentation/pages/warehouse_in_page.dart';
+import 'package:warehouse_scan/features/warehouse_scan/presentation/pages/warehouse_out_page.dart';
 import 'core/di/dependencies.dart' as di;
 
 void main() async {
@@ -73,8 +78,10 @@ class _MyAppState extends State<MyApp> {
       initialRoute: AppRoutes.login,
       onGenerateRoute: (settings) {
         switch (settings.name) {
+          
           case AppRoutes.login:
             return MaterialPageRoute(builder: (_) => const LoginPage());
+
           case AppRoutes.processing:
             final args = settings.arguments as UserEntity;
             return MaterialPageRoute(
@@ -83,6 +90,25 @@ class _MyAppState extends State<MyApp> {
                 child: ProcessingPage(user: args),
               ),
             );
+
+          case AppRoutes.scan:
+            final args = settings.arguments as UserEntity;
+            if (args.role == UserRole.warehouseIn) {
+              return MaterialPageRoute(
+                builder: (context) => BlocProvider(
+                  create: (context) => di.sl<WarehouseInBloc>(param1: args),
+                  child: WarehouseInPage(user: args),
+                ),
+              );
+            } else {
+              return MaterialPageRoute(
+                builder: (context) => BlocProvider(
+                  create: (context) => di.sl<WarehouseOutBloc>(param1: args),
+                  child: WarehouseOutPage(user: args),
+                ),
+              );
+          }
+
           default:
             return MaterialPageRoute(builder: (_) => const LoginPage());
         }

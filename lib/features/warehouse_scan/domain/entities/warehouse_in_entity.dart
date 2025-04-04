@@ -1,6 +1,7 @@
+// lib/features/warehouse_scan/domain/entities/warehouse_in_entity.dart
 import 'package:equatable/equatable.dart';
 
-class ProcessingItemEntity extends Equatable {
+class WarehouseInEntity extends Equatable {
   final int mwhId;
   final String mName;
   final String mDate;
@@ -12,13 +13,11 @@ class ProcessingItemEntity extends Equatable {
   final String mItemcode;
   final String cDate;
   final String code;
-  final int qcQtyIn;
-  final int qcQtyOut;
-  final int zcWarehouseQtyInt;
-  final int zcWarehouseQtyOut;
+  final String staff;
   final String qtyState;
+  final String inWarehouse;
 
-  const ProcessingItemEntity({
+  const WarehouseInEntity({
     required this.mwhId,
     required this.mName,
     required this.mDate,
@@ -30,11 +29,9 @@ class ProcessingItemEntity extends Equatable {
     required this.mItemcode,
     required this.cDate,
     required this.code,
-    required this.qcQtyIn,
-    required this.qcQtyOut,
-    required this.zcWarehouseQtyInt,
-    required this.zcWarehouseQtyOut,
+    required this.staff,
     required this.qtyState,
+    required this.inWarehouse,
   });
 
   @override
@@ -50,10 +47,8 @@ class ProcessingItemEntity extends Equatable {
         mItemcode,
         cDate,
         code,
-        qcQtyIn,
-        qcQtyOut,
-        zcWarehouseQtyInt,
-        zcWarehouseQtyOut,
+        staff,
         qtyState,
+        inWarehouse,
       ];
 }

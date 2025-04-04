@@ -44,3 +44,5 @@ class CheckToken extends LoginEvent {
   @override
   List<Object> get props => [token];
 }
+
+class ResetLoginStateEvent extends LoginEvent {}

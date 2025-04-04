@@ -13,6 +13,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   LoginBloc({required this.userLogin, required this.validateToken})
     : super(LoginInitial()) {
     on<LoginButtonPressed>(_onLoginButtonPressed);
+    on<ResetLoginStateEvent>(_onResetLoginState);
     on<CheckToken>(_onCheckToken);
   }
 
@@ -21,6 +22,10 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     LoginButtonPressed event,
     Emitter<LoginState> emit,
   ) async {
+
+    // code tạm thời để logout trước khi login lại
+    await di.sl<AuthRepository>().logout();
+
     // Show loading state
     emit(LoginLoading());
 
@@ -56,5 +61,9 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       (failure) => emit(LoginInitial()),
       (user) => emit(LoginSuccess(user: user)),
     );
+  }
+
+  void _onResetLoginState(ResetLoginStateEvent event, Emitter<LoginState> emit) {
+    emit(LoginInitial());
   }
 }
