@@ -16,6 +16,11 @@ import 'package:warehouse_scan/features/auth/login/domain/usecases/user_login.da
 import 'package:warehouse_scan/features/auth/login/domain/usecases/validate_token.dart';
 import 'package:warehouse_scan/features/auth/login/presentation/bloc/login_bloc.dart';
 
+import '../../features/auth/logout/data/datasources/logout_datasource.dart';
+import '../../features/auth/logout/data/repositories/logout_repository_impl.dart';
+import '../../features/auth/logout/domain/repositories/logout_repository.dart';
+import '../../features/auth/logout/domain/usecases/logout_usecase.dart';
+import '../../features/auth/logout/presentation/bloc/logout_bloc.dart';
 import '../../features/process/data/datasources/processing_remote_datasource.dart';
 import '../../features/process/data/repositories/processing_repository_impl.dart';
 import '../../features/process/domain/repositories/processing_repository.dart';
@@ -183,6 +188,28 @@ Future<void> init() async {
       processWarehouseOut: sl(),
       connectionChecker: sl(),
       currentUser: user,
+    ),
+  );
+
+  // ======= Logout ======== //
+  sl.registerLazySingleton<LogoutDataSource>(
+    () => LogoutDataSourceImpl(
+      sharedPreferences: sl(),
+      dioClient: sl(),
+    ),
+  );
+
+  sl.registerLazySingleton<LogoutRepository>(
+    () => LogoutRepositoryImpl(
+      dataSource: sl(),
+    ),
+  );
+
+  sl.registerLazySingleton(() => LogoutUseCase(sl()));
+
+  sl.registerFactory(
+    () => LogoutBloc(
+      logoutUseCase: sl(),
     ),
   );
 }

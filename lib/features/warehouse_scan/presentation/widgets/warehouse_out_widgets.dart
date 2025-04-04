@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 
 class ConfirmationDialog extends StatelessWidget {
+  static bool _isShowing = false;
+  
   final VoidCallback onConfirm;
   final VoidCallback onCancel;
 
@@ -10,6 +12,36 @@ class ConfirmationDialog extends StatelessWidget {
     required this.onConfirm,
     required this.onCancel,
   });
+  
+  // Add a static show method for consistency
+  static void show(
+    BuildContext context, {
+    required VoidCallback onConfirm,
+    required VoidCallback onCancel,
+  }) {
+    // Only show if no dialog is currently visible
+    if (!_isShowing && context.mounted) {
+      _isShowing = true;
+      
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => ConfirmationDialog(
+          onConfirm: () {
+            _isShowing = false;
+            onConfirm();
+          },
+          onCancel: () {
+            _isShowing = false;
+            onCancel();
+          },
+        ),
+      ).then((_) {
+        // Ensure flag is reset when dialog is dismissed
+        _isShowing = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +60,10 @@ class ConfirmationDialog extends StatelessWidget {
       ),
       actions: [
         TextButton(
-          onPressed: onCancel,
+          onPressed: () {
+            Navigator.pop(context);
+            onCancel();
+          },
           child: const Text(
             'Cancel',
             style: TextStyle(
@@ -38,7 +73,10 @@ class ConfirmationDialog extends StatelessWidget {
           ),
         ),
         TextButton(
-          onPressed: onConfirm,
+          onPressed: () {
+            Navigator.pop(context);
+            onConfirm();
+          },
           style: TextButton.styleFrom(
             foregroundColor: Colors.white,
             backgroundColor: Colors.green,
@@ -64,6 +102,8 @@ class ConfirmationDialog extends StatelessWidget {
 }
 
 class SuccessOutDialog extends StatelessWidget {
+  static bool _isShowing = false;
+  
   final VoidCallback onDismiss;
 
   const SuccessOutDialog({
@@ -72,11 +112,19 @@ class SuccessOutDialog extends StatelessWidget {
   });
 
   static void show(BuildContext context, {required VoidCallback onDismiss}) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => SuccessOutDialog(onDismiss: onDismiss),
-    );
+    // Only show if no dialog is currently visible
+    if (!_isShowing && context.mounted) {
+      _isShowing = true;
+      
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => SuccessOutDialog(onDismiss: onDismiss),
+      ).then((_) {
+        // Ensure flag is reset when dialog is dismissed
+        _isShowing = false;
+      });
+    }
   }
 
   @override
@@ -111,6 +159,7 @@ class SuccessOutDialog extends StatelessWidget {
       actions: [
         TextButton(
           onPressed: () {
+            _isShowing = false;
             Navigator.pop(context);
             onDismiss();
           },

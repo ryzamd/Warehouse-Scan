@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 
 class ErrorDialog extends StatelessWidget {
+  static bool _isShowing = false;
+  
   final String title;
   final String message;
   final VoidCallback? onDismiss;
@@ -20,8 +22,10 @@ class ErrorDialog extends StatelessWidget {
     String message = 'An error occurred.',
     VoidCallback? onDismiss,
   }) {
-    // Kiểm tra context có valid không trước khi hiển thị dialog
-    if (context.mounted) {
+    // Only show if no dialog is currently showing and context is valid
+    if (!_isShowing && context.mounted) {
+      _isShowing = true;
+      
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -30,14 +34,16 @@ class ErrorDialog extends StatelessWidget {
           message: message,
           onDismiss: onDismiss,
         ),
-      );
+      ).then((_) {
+        // Make sure flag is reset when dialog is closed
+        _isShowing = false;
+      });
     }
   }
   
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      // Ngăn việc back bằng nút back của hệ thống nếu không có xử lý
       canPop: true,
       onPopInvokedWithResult: (didPop, result) {
         if (!didPop && onDismiss != null) {
@@ -56,9 +62,8 @@ class ErrorDialog extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () {
-              // Đơn giản hóa logic - chỉ pop dialog trong mọi trường hợp
               Navigator.of(context).pop();
-              // Gọi callback sau khi đã pop dialog
+              _isShowing = false;
               if (onDismiss != null) {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   onDismiss!();

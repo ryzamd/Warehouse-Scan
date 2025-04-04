@@ -7,6 +7,7 @@ import 'package:warehouse_scan/core/constants/enum.dart';
 import 'package:warehouse_scan/core/services/exit_confirmation_service.dart';
 import 'package:warehouse_scan/features/auth/login/domain/entities/user_entity.dart';
 import 'package:warehouse_scan/features/auth/login/presentation/pages/login_page.dart';
+import 'package:warehouse_scan/features/auth/logout/presentation/pages/profile_page.dart';
 import 'package:warehouse_scan/features/process/presentation/bloc/processing_bloc.dart';
 import 'package:warehouse_scan/features/process/presentation/pages/process_page.dart';
 import 'package:warehouse_scan/features/warehouse_scan/presentation/bloc/warehouse_in/warehouse_in_bloc.dart';
@@ -109,6 +110,12 @@ class _MyAppState extends State<MyApp> {
               );
           }
 
+          case AppRoutes.profile:
+            final args = settings.arguments as UserEntity;
+            return MaterialPageRoute(
+              builder: (context) => ProfilePage(user: args),
+          );
+          
           default:
             return MaterialPageRoute(builder: (_) => const LoginPage());
         }

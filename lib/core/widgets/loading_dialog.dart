@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 
 class LoadingDialog extends StatelessWidget {
+  static bool _isShowing = false;
   
   const LoadingDialog({
     super.key,
@@ -9,23 +10,34 @@ class LoadingDialog extends StatelessWidget {
   
   // Show loading dialog
   static void show(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => LoadingDialog(),
-    );
+    // Only show if no loading dialog is already visible
+    if (!_isShowing && context.mounted) {
+      _isShowing = true;
+      
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const LoadingDialog(),
+      ).then((_) {
+        // Ensure flag is reset when dialog is dismissed
+        _isShowing = false;
+      });
+    }
   }
   
   // Hide loading dialog
   static void hide(BuildContext context) {
-    Navigator.of(context).pop();
+    if (_isShowing && context.mounted) {
+      Navigator.of(context).pop();
+      _isShowing = false;
+    }
   }
   
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       content: const SizedBox(
-        height: 100,
+        height: 150,
         width: 100,
         child: Center(
           child: CircularProgressIndicator(
