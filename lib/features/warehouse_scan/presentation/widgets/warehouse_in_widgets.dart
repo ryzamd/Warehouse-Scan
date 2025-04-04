@@ -2,6 +2,9 @@
 import 'package:flutter/material.dart';
 
 class SuccessImportDialog extends StatelessWidget {
+  // Static flag to track if a dialog is currently showing
+  static bool _isShowing = false;
+  
   final VoidCallback onDismiss;
 
   const SuccessImportDialog({
@@ -10,11 +13,19 @@ class SuccessImportDialog extends StatelessWidget {
   });
 
   static void show(BuildContext context, {required VoidCallback onDismiss}) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => SuccessImportDialog(onDismiss: onDismiss),
-    );
+    // Only show if no dialog is currently visible
+    if (!_isShowing && context.mounted) {
+      _isShowing = true;
+      
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => SuccessImportDialog(onDismiss: onDismiss),
+      ).then((_) {
+        // Ensure flag is reset when dialog is dismissed
+        _isShowing = false;
+      });
+    }
   }
 
   @override
@@ -49,6 +60,7 @@ class SuccessImportDialog extends StatelessWidget {
       actions: [
         TextButton(
           onPressed: () {
+            _isShowing = false;
             Navigator.pop(context);
             onDismiss();
           },

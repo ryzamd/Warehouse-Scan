@@ -221,7 +221,7 @@ class WarehouseOutBloc extends Bloc<WarehouseOutEvent, WarehouseOutState> {
       
       if (quantity > event.maxQuantity) {
         emit(currentState.copyWith(
-          quantityError: 'Quantity exceeds available amount',
+          quantityError: 'Quantity invalid',
           quantityExceeded: true,
         ));
         return;

@@ -188,25 +188,21 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
-      // Show confirmation dialog
-      showDialog(
-        context: context,
-        builder: (dialogContext) => ConfirmationDialog(
-          onConfirm: () {
-            Navigator.pop(dialogContext);
-            // Submit form data
-            context.read<WarehouseOutBloc>().add(
-              ProcessWarehouseOutEvent(
-                code: _currentCode,
-                address: _addressController.text,
-                quantity: double.tryParse(_quantityController.text) ?? 0,
-              ),
-            );
-          },
-          onCancel: () {
-            Navigator.pop(dialogContext);
-          },
-        ),
+      ConfirmationDialog.show(
+        context,
+        onConfirm: () {
+          // Submit form data
+          context.read<WarehouseOutBloc>().add(
+            ProcessWarehouseOutEvent(
+              code: _currentCode,
+              address: _addressController.text,
+              quantity: double.tryParse(_quantityController.text) ?? 0,
+            ),
+          );
+        },
+        onCancel: () {
+          Navigator.of(context).pop(); // Close the dialog
+        },
       );
     }
   }
@@ -360,8 +356,7 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
 
                 // Material Info and Form
                 Expanded(
-                  child: Container(
-                    height: 300,
+                  child:  SingleChildScrollView(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Form(
                       key: _formKey,
@@ -526,7 +521,7 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
                   return 'Quantity must be greater than 0';
                 }
                 if (quantity > _maxQuantity) {
-                  return 'Quantity exceeds available amount';
+                  return 'Quantity invalid';
                 }
                 return null;
               },
