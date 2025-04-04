@@ -141,7 +141,7 @@ class ProcessingBloc extends Bloc<ProcessingEvent, ProcessingState> {
       final sortColumn = event.column;
       final ascending =
           sortColumn == currentState.sortColumn
-              ? !currentState.ascending
+              ? currentState.ascending
               : event.ascending;
 
       _sortItems(sortedItems, sortColumn, ascending);
@@ -198,40 +198,35 @@ class ProcessingBloc extends Bloc<ProcessingEvent, ProcessingState> {
 
   void _sortItemsByDate(List<ProcessingItemEntity> items, bool ascending) {
     items.sort((a, b) {
-      if (a.mDate == null || b.mDate == null) return 0;
+      if (a.mDate.isEmpty || b.mDate.isEmpty) return 0;
       return ascending
-          ? a.mDate!.compareTo(b.mDate!)
-          : b.mDate!.compareTo(a.mDate!);
+          ? a.mDate.compareTo(b.mDate)
+          : b.mDate.compareTo(a.mDate);
     });
   }
 
   void _sortItemsByName(List<ProcessingItemEntity> items, bool ascending) {
     items.sort((a, b) {
-      if (a.mName == null || b.mName == null) return 0;
+      if (a.mName.isEmpty || b.mName.isEmpty) return 0;
       return ascending
-          ? a.mName!.compareTo(b.mName!)
-          : b.mName!.compareTo(a.mName!);
+          ? a.mName.compareTo(b.mName)
+          : b.mName.compareTo(a.mName);
     });
   }
 
   void _sortItemsByProject(List<ProcessingItemEntity> items, bool ascending) {
     items.sort((a, b) {
-      if (a.mPrjcode == null || b.mPrjcode == null) return 0;
+      if (a.mPrjcode.isEmpty || b.mPrjcode.isEmpty) return 0;
       return ascending
-          ? a.mPrjcode!.compareTo(b.mPrjcode!)
-          : b.mPrjcode!.compareTo(a.mPrjcode!);
+          ? a.mPrjcode.compareTo(b.mPrjcode)
+          : b.mPrjcode.compareTo(a.mPrjcode);
     });
   }
 
   void _sortItemsByQty(List<ProcessingItemEntity> items, bool ascending) {
-    items.sort((a, b) {
-      if (a.zcWarehouseQtyInt != null && b.zcWarehouseQtyInt != null) {
-        return ascending
-            ? a.zcWarehouseQtyInt!.compareTo(b.zcWarehouseQtyInt!)
-            : b.zcWarehouseQtyInt!.compareTo(a.zcWarehouseQtyInt!);
-      }
-      return 0;
-    });
+    items.sort((a, b) => ascending
+        ? a.zcWarehouseQtyInt.compareTo(b.zcWarehouseQtyInt)
+        : b.zcWarehouseQtyInt.compareTo(a.zcWarehouseQtyInt));
   }
 
   List<ProcessingItemEntity> _filterItems(
@@ -246,31 +241,31 @@ class ProcessingBloc extends Bloc<ProcessingEvent, ProcessingState> {
 
     return items.where((item) {
       // Search by name
-      if (item.mName != null && item.mName!.toLowerCase().contains(lowercaseQuery)) {
+      if (item.mName.isEmpty && item.mName.toLowerCase().contains(lowercaseQuery)) {
         return true;
       }
 
       // Search by project code
-      if (item.mPrjcode != null && item.mPrjcode!.toLowerCase().contains(lowercaseQuery)) {
+      if (item.mPrjcode.isEmpty && item.mPrjcode.toLowerCase().contains(lowercaseQuery)) {
         return true;
       }
 
       // Search by date
-      if (item.mDate != null && item.mDate!.toLowerCase().contains(lowercaseQuery)) {
+      if (item.mDate.isEmpty && item.mDate.toLowerCase().contains(lowercaseQuery)) {
         return true;
       }
 
       // Search by quantity
-      if (item.mQty != null && item.mQty.toString().contains(lowercaseQuery)) {
+      if (item.mQty.isNaN && item.mQty.toString().contains(lowercaseQuery)) {
         return true;
       }
 
       // Search by warehouse quantity in or out
-      if (item.zcWarehouseQtyInt != null && item.zcWarehouseQtyInt.toString().contains(lowercaseQuery)) {
+      if (item.zcWarehouseQtyInt.toString().contains(lowercaseQuery)) {
         return true;
       }
 
-      if (item.zcWarehouseQtyOut != null && item.zcWarehouseQtyOut.toString().contains(lowercaseQuery)) {
+      if (item.zcWarehouseQtyOut.toString().contains(lowercaseQuery)) {
         return true;
       }
 

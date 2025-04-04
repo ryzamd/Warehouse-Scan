@@ -10,6 +10,7 @@ import 'package:warehouse_scan/core/network/token_interceptor.dart';
 import 'package:warehouse_scan/core/services/secure_storage_service.dart';
 import 'package:warehouse_scan/features/auth/login/data/data_sources/login_remote_datasource.dart';
 import 'package:warehouse_scan/features/auth/login/data/repositories/user_repository_impl.dart';
+import 'package:warehouse_scan/features/auth/login/domain/entities/user_entity.dart';
 import 'package:warehouse_scan/features/auth/login/domain/repositories/user_repository.dart';
 import 'package:warehouse_scan/features/auth/login/domain/usecases/user_login.dart';
 import 'package:warehouse_scan/features/auth/login/domain/usecases/validate_token.dart';
@@ -20,6 +21,18 @@ import '../../features/process/data/repositories/processing_repository_impl.dart
 import '../../features/process/domain/repositories/processing_repository.dart';
 import '../../features/process/domain/usecases/get_processing_items.dart';
 import '../../features/process/presentation/bloc/processing_bloc.dart';
+
+import 'package:warehouse_scan/features/warehouse_scan/data/datasources/warehouse_in_datasource.dart';
+import 'package:warehouse_scan/features/warehouse_scan/data/datasources/warehouse_out_datasource.dart';
+import 'package:warehouse_scan/features/warehouse_scan/data/repositories/warehouse_in_repository_impl.dart';
+import 'package:warehouse_scan/features/warehouse_scan/data/repositories/warehouse_out_repository_impl.dart';
+import 'package:warehouse_scan/features/warehouse_scan/domain/repositories/warehouse_in_repository.dart';
+import 'package:warehouse_scan/features/warehouse_scan/domain/repositories/warehouse_out_repository.dart';
+import 'package:warehouse_scan/features/warehouse_scan/domain/usecases/get_material_info.dart';
+import 'package:warehouse_scan/features/warehouse_scan/domain/usecases/process_warehouse_in.dart';
+import 'package:warehouse_scan/features/warehouse_scan/domain/usecases/process_warehouse_out.dart';
+import 'package:warehouse_scan/features/warehouse_scan/presentation/bloc/warehouse_in/warehouse_in_bloc.dart';
+import 'package:warehouse_scan/features/warehouse_scan/presentation/bloc/warehouse_out/warehouse_out_bloc.dart';
 
 final sl = GetIt.instance;
 
@@ -115,4 +128,61 @@ Future<void> init() async {
   );
 
   // ======= End Process Page ======== //
+
+
+  // ======= Warehouse-In ======== //
+  
+  // Data sources
+  sl.registerLazySingleton<WarehouseInDataSource>(
+    () => WarehouseInDataSourceImpl(dio: sl()),
+  );
+  
+  // Repository
+  sl.registerLazySingleton<WarehouseInRepository>(
+    () => WarehouseInRepositoryImpl(
+      dataSource: sl(),
+      networkInfo: sl(),
+    ),
+  );
+  
+  // Use cases
+  sl.registerLazySingleton(() => ProcessWarehouseIn(sl()));
+  
+  // BLoC
+  sl.registerFactoryParam<WarehouseInBloc, UserEntity, void>(
+    (user, _) => WarehouseInBloc(
+      processWarehouseIn: sl(),
+      connectionChecker: sl(),
+      currentUser: user,
+    ),
+  );
+  
+  // ======= Warehouse-Out ======== //
+  
+  // Data sources
+  sl.registerLazySingleton<WarehouseOutDataSource>(
+    () => WarehouseOutDataSourceImpl(dio: sl()),
+  );
+  
+  // Repository
+  sl.registerLazySingleton<WarehouseOutRepository>(
+    () => WarehouseOutRepositoryImpl(
+      dataSource: sl(),
+      networkInfo: sl(),
+    ),
+  );
+  
+  // Use cases
+  sl.registerLazySingleton(() => GetMaterialInfo(sl()));
+  sl.registerLazySingleton(() => ProcessWarehouseOut(sl()));
+  
+  // BLoC
+  sl.registerFactoryParam<WarehouseOutBloc, UserEntity, void>(
+    (user, _) => WarehouseOutBloc(
+      getMaterialInfo: sl(),
+      processWarehouseOut: sl(),
+      connectionChecker: sl(),
+      currentUser: user,
+    ),
+  );
 }

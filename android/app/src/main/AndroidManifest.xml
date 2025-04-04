@@ -2,7 +2,13 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.SCAN_DEVICE" />
     <uses-feature android:name="android.hardware.camera" />
-    <uses-feature android:name="android.hardware.camera.autofocus" />
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
+    
+    <!-- Định nghĩa permission tùy chỉnh cho ScanReceiver -->
+    <permission
+        android:name="com.example.warehouse_scan.SCAN_PERMISSION"
+        android:protectionLevel="signature" />
+    
     <application
         android:label="warehouse_scan"
         android:name="${applicationName}"
@@ -35,8 +41,13 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
-    
-        <receiver android:name=".ScanReceiver" android:enabled="true" android:exported="true">
+            
+        <!-- Cập nhật ScanReceiver với permission -->
+        <receiver
+            android:name=".ScanReceiver"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="com.example.warehouse_scan.SCAN_PERMISSION">
             <intent-filter>
                 <!--  Urovo Scanner  -->
                 <action android:name="urovo.rcv.message.ACTION" />
@@ -45,8 +56,6 @@
                 <!--  Zebra/Symbol Scanner  -->
                 <action android:name="com.symbol.datawedge.api.NOTIFICATION_ACTION" />
                 <!--  DataWedge Scanner  -->
-                <!-- <action android:name="com.ubx.datawedge.action" /> -->
-                <action android:name="urovo.rcv.message.ACTION" />
                 <action android:name="android.intent.action.DECODE_DATA" />
                 <action android:name="scanner.action" />
                 <action android:name="android.intent.ACTION_DECODE_DATA" />

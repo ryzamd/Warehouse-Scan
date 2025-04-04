@@ -177,7 +177,7 @@ class ProcessingDataTable extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
             child: Text(
-              item.mName ?? '',
+              item.mName,
               style: const TextStyle(fontSize: 13),
               textAlign: TextAlign.left,
               maxLines: 3,
@@ -190,7 +190,7 @@ class ProcessingDataTable extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
             child: Text(
-              item.mPrjcode ?? '',
+              item.mPrjcode,
               style: const TextStyle(fontSize: 13),
               textAlign: TextAlign.left,
               maxLines: 3,
@@ -204,8 +204,8 @@ class ProcessingDataTable extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 4.0),
             child: Text(
               userRole == UserRole.warehouseIn
-                ? '${item.zcWarehouseQtyInt ?? 0}'
-                : '${item.zcWarehouseQtyOut ?? 0}',
+                ? '${item.zcWarehouseQtyInt}'
+                : '${item.zcWarehouseQtyOut}',
               style: const TextStyle(fontSize: 13),
               textAlign: TextAlign.center,
             ),
@@ -216,7 +216,7 @@ class ProcessingDataTable extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
             child: Text(
-              _formatDate(item.mDate ?? ''),
+              _formatDate(item.mDate),
               style: const TextStyle(fontSize: 12),
               textAlign: TextAlign.center,
               maxLines: 2,

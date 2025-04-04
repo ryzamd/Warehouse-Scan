@@ -8,12 +8,18 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+
+// Add required Flutter and AndroidX imports
+import androidx.annotation.Keep
 import androidx.annotation.NonNull
-import androidx.core.content.ContextCompat
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodChannel
+import androidx.core.content.ContextCompat
+import io.flutter.plugin.common.MethodCall
+import io.flutter.plugin.common.MethodChannel.MethodCallHandler
+import io.flutter.plugin.common.MethodChannel.Result
 
 class MainActivity : FlutterActivity() {
     private val EVENT_CHANNEL = "com.example.warehouse_scan/scanner"
@@ -77,6 +83,7 @@ class MainActivity : FlutterActivity() {
         }
     }
 
+    @Override
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
@@ -89,11 +96,17 @@ class MainActivity : FlutterActivity() {
             addAction("urovo.rcv.message.ACTION")
             // Add more actions as needed for different scanner devices
         }
-        registerReceiver(scannerReceiver, intentFilter)
+        ContextCompat.registerReceiver(
+            this,
+            scannerReceiver,
+            intentFilter,
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
         
         Log.d("MainActivity", "🚀 MainActivity created and receiver registered")
     }
     
+    @Override
     override fun onDestroy() {
         super.onDestroy()
         try {
@@ -103,7 +116,8 @@ class MainActivity : FlutterActivity() {
         }
     }
 
-    override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
+    @Override
+    override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
 
         // Set up EventChannel for streaming scan data
@@ -155,6 +169,7 @@ class MainActivity : FlutterActivity() {
             })
     }
 
+    @Override
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         Log.d("MainActivity", "🔄 onNewIntent Called with action: ${intent.action}")
@@ -196,7 +211,7 @@ class MainActivity : FlutterActivity() {
     }
 
     @Override
-    public override fun onBackPressed() {
+    override fun onBackPressed() {
         if (backButtonEventSink != null) {
             handler.post {
                 try {

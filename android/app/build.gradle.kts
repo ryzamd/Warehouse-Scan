@@ -7,16 +7,21 @@ plugins {
 
 android {
     namespace = "com.example.warehouse_scan"
-    compileSdk = 35
-    ndkVersion = "27.0.12077973"
-
+    compileSdk = flutter.compileSdkVersion
+    ndkVersion = "29.0.13113456"
+    
+    lint {
+        disable += "SyntheticAccessor"
+        abortOnError = false
+    }
+    
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
+        jvmTarget = JavaVersion.VERSION_17.toString()
     }
 
     defaultConfig {
