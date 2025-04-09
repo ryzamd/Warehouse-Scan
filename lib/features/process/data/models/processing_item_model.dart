@@ -19,8 +19,8 @@ class ProcessingItemModel extends ProcessingItemEntity {
     required super.code,
     required super.qcQtyIn,
     required super.qcQtyOut,
-    required super.zcWarehouseQtyInt,
-    required super.zcWarehouseQtyOut,
+    required super.zcWarehouseQtyImport,
+    required super.zcWarehouseQtyExport,
     required super.qtyState,
   });
 

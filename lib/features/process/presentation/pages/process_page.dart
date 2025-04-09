@@ -6,6 +6,7 @@ import 'package:warehouse_scan/core/widgets/scafford_custom.dart';
 import 'package:warehouse_scan/features/auth/login/domain/entities/user_entity.dart';
 import 'package:warehouse_scan/features/process/presentation/bloc/processing_bloc.dart';
 import 'package:warehouse_scan/features/process/presentation/bloc/processing_event.dart';
+import 'package:warehouse_scan/features/process/presentation/bloc/processing_state.dart';
 import '../widgets/data_table_widget.dart';
 
 class ProcessingPage extends StatefulWidget {
@@ -19,6 +20,8 @@ class ProcessingPage extends StatefulWidget {
 
 class _ProcessingPageState extends State<ProcessingPage> {
   late final TextEditingController _searchController;
+
+
   
   @override
   void initState() {
@@ -29,9 +32,7 @@ class _ProcessingPageState extends State<ProcessingPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       di.sl<AuthRepository>().debugTokenState().then((_) {
         if (mounted) {
-          context.read<ProcessingBloc>().add(
-            GetProcessingItemsEvent(userName: widget.user!.name)
-          );
+          context.read<ProcessingBloc>().loadData();
         }
       });
     });
@@ -41,6 +42,25 @@ class _ProcessingPageState extends State<ProcessingPage> {
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+
+    final currentState = context.read<ProcessingBloc>().state;
+    final DateTime initialDate = currentState is ProcessingLoaded ? currentState.selectedDate : DateTime.now();
+        
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: DateTime(2020),
+      lastDate: DateTime.now(),
+    );
+    
+    if(!context.mounted) return;
+
+    if (picked != null && picked != initialDate) {
+      context.read<ProcessingBloc>().add(SelectDateEvent(selectedDate: picked));
+    }
   }
 
   @override
@@ -54,10 +74,10 @@ class _ProcessingPageState extends State<ProcessingPage> {
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
-            // Search bar
+            
             _buildSearchBar(),
             const SizedBox(height: 8),
-            // Data table
+
             Expanded(
               child: Card(
                 elevation: 8,
@@ -77,21 +97,16 @@ class _ProcessingPageState extends State<ProcessingPage> {
       ),
       actions: [
         IconButton(
+          icon: const Icon(Icons.calendar_month, color: Colors.white),
+          onPressed: () {
+            _selectDate(context);
+          },
+        ),
+        IconButton(
           icon: const Icon(Icons.refresh, color: Colors.white),
           onPressed: () {
-            // Refresh data
-            context.read<ProcessingBloc>().add(
-              RefreshProcessingItemsEvent(userName: widget.user!.name)
-            );
-            
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Refreshing data...'),
-                duration: Duration(seconds: 1),
-              ),
-            );
+            context.read<ProcessingBloc>().refreshData();
           },
-          tooltip: 'Refresh data',
         ),
       ],
     );

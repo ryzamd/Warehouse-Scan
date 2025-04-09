@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:warehouse_scan/features/process/domain/entities/processing_item_entity.dart';
 import 'package:warehouse_scan/features/process/domain/usecases/get_processing_items.dart';
@@ -14,6 +16,7 @@ class ProcessingBloc extends Bloc<ProcessingEvent, ProcessingState> {
     on<RefreshProcessingItemsEvent>(_onRefreshProcessingItems);
     on<SortProcessingItemsEvent>(_onSortProcessingItems);
     on<SearchProcessingItemsEvent>(_onSearchProcessingItems);
+    on<SelectDateEvent>(_onSelectDate);
   }
 
   Future<void> _onGetProcessingItems(
@@ -23,7 +26,7 @@ class ProcessingBloc extends Bloc<ProcessingEvent, ProcessingState> {
     emit(ProcessingLoading());
 
     try {
-      final result = await getProcessingItems(GetProcessingParams(userName: event.userName));
+      final result = await getProcessingItems(GetProcessingParams(date: event.date));
 
       result.fold(
         (failure) => emit(ProcessingError(message: failure.message)),
@@ -38,6 +41,7 @@ class ProcessingBloc extends Bloc<ProcessingEvent, ProcessingState> {
               filteredItems: sortedItems,
               sortColumn: 'date',
               ascending: false,
+              selectedDate: DateTime.now(),
             ),
           );
         },
@@ -59,7 +63,7 @@ class ProcessingBloc extends Bloc<ProcessingEvent, ProcessingState> {
       emit(ProcessingRefreshing(items: existingItems));
 
       try {
-        final result = await getProcessingItems(GetProcessingParams(userName: event.userName));
+        final result = await getProcessingItems(GetProcessingParams(date: event.date));
 
         result.fold(
           (failure) {
@@ -74,6 +78,7 @@ class ProcessingBloc extends Bloc<ProcessingEvent, ProcessingState> {
                 sortColumn: currentState.sortColumn,
                 ascending: currentState.ascending,
                 searchQuery: currentState.searchQuery,
+                selectedDate: DateTime.now(),
               ),
             );
 
@@ -99,6 +104,7 @@ class ProcessingBloc extends Bloc<ProcessingEvent, ProcessingState> {
                 sortColumn: currentState.sortColumn,
                 ascending: currentState.ascending,
                 searchQuery: currentState.searchQuery,
+                selectedDate: DateTime.now(),
               ),
             );
           },
@@ -115,6 +121,7 @@ class ProcessingBloc extends Bloc<ProcessingEvent, ProcessingState> {
             sortColumn: currentState.sortColumn,
             ascending: currentState.ascending,
             searchQuery: currentState.searchQuery,
+            selectedDate: DateTime.now(),
           ),
         );
 
@@ -124,7 +131,7 @@ class ProcessingBloc extends Bloc<ProcessingEvent, ProcessingState> {
       }
     } else {
       // If not in loaded state, initiate a fresh load
-      add(GetProcessingItemsEvent(userName: event.userName));
+      add(GetProcessingItemsEvent(date: event.date));
     }
   }
 
@@ -139,9 +146,8 @@ class ProcessingBloc extends Bloc<ProcessingEvent, ProcessingState> {
       );
 
       final sortColumn = event.column;
-      final ascending =
-          sortColumn == currentState.sortColumn
-              ? currentState.ascending
+      final ascending = sortColumn == currentState.sortColumn
+              ? !currentState.ascending
               : event.ascending;
 
       _sortItems(sortedItems, sortColumn, ascending);
@@ -187,46 +193,32 @@ class ProcessingBloc extends Bloc<ProcessingEvent, ProcessingState> {
   ) {
     if (column == 'date') {
       _sortItemsByDate(items, ascending);
-    } else if (column == 'name') {
-      _sortItemsByName(items, ascending);
-    } else if (column == 'project') {
-      _sortItemsByProject(items, ascending);
-    } else if (column == 'qty') {
-      _sortItemsByQty(items, ascending);
     }
   }
 
   void _sortItemsByDate(List<ProcessingItemEntity> items, bool ascending) {
     items.sort((a, b) {
-      if (a.mDate.isEmpty || b.mDate.isEmpty) return 0;
-      return ascending
-          ? a.mDate.compareTo(b.mDate)
-          : b.mDate.compareTo(a.mDate);
+      // Handle empty dates
+      if (a.mDate.isEmpty) return ascending ? 1 : -1;
+      if (b.mDate.isEmpty) return ascending ? -1 : 1;
+      
+      try {
+        // Compare by date first
+        DateTime dateA = DateTime.parse(a.mDate);
+        DateTime dateB = DateTime.parse(b.mDate);
+        int dateCompare = ascending ? dateA.compareTo(dateB) : dateB.compareTo(dateA);
+        
+        // If dates are the same, use item name as secondary sort key
+        if (dateCompare == 0) {
+          return ascending ? a.mName.compareTo(b.mName) : b.mName.compareTo(a.mName);
+        }
+        
+        return dateCompare;
+      } catch (e) {
+        // Fallback to string comparison if parsing fails
+        return ascending ? a.mDate.compareTo(b.mDate) : b.mDate.compareTo(a.mDate);
+      }
     });
-  }
-
-  void _sortItemsByName(List<ProcessingItemEntity> items, bool ascending) {
-    items.sort((a, b) {
-      if (a.mName.isEmpty || b.mName.isEmpty) return 0;
-      return ascending
-          ? a.mName.compareTo(b.mName)
-          : b.mName.compareTo(a.mName);
-    });
-  }
-
-  void _sortItemsByProject(List<ProcessingItemEntity> items, bool ascending) {
-    items.sort((a, b) {
-      if (a.mPrjcode.isEmpty || b.mPrjcode.isEmpty) return 0;
-      return ascending
-          ? a.mPrjcode.compareTo(b.mPrjcode)
-          : b.mPrjcode.compareTo(a.mPrjcode);
-    });
-  }
-
-  void _sortItemsByQty(List<ProcessingItemEntity> items, bool ascending) {
-    items.sort((a, b) => ascending
-        ? a.zcWarehouseQtyInt.compareTo(b.zcWarehouseQtyInt)
-        : b.zcWarehouseQtyInt.compareTo(a.zcWarehouseQtyInt));
   }
 
   List<ProcessingItemEntity> _filterItems(
@@ -261,15 +253,50 @@ class ProcessingBloc extends Bloc<ProcessingEvent, ProcessingState> {
       }
 
       // Search by warehouse quantity in or out
-      if (item.zcWarehouseQtyInt.toString().contains(lowercaseQuery)) {
+      if (item.zcWarehouseQtyImport.toString().contains(lowercaseQuery)) {
         return true;
       }
 
-      if (item.zcWarehouseQtyOut.toString().contains(lowercaseQuery)) {
+      if (item.zcWarehouseQtyExport.toString().contains(lowercaseQuery)) {
         return true;
       }
 
       return false;
     }).toList();
+  }
+
+  String _formatDateForApi(DateTime date) {
+    return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')} 00:00:00';
+  }
+
+  Future<void> _onSelectDate(
+    SelectDateEvent event,
+    Emitter<ProcessingState> emit,
+  ) async {
+    final currentState = state;
+    
+    if (currentState is ProcessingLoaded) {
+      emit(currentState.copyWith(selectedDate: event.selectedDate));
+      add(RefreshProcessingItemsEvent(date: _formatDateForApi(event.selectedDate)));
+    } else {
+      add(GetProcessingItemsEvent(date: _formatDateForApi(event.selectedDate)));
+    }
+  }
+
+  String get formattedSelectedDate {
+    if (state is ProcessingLoaded) {
+      final date = (state as ProcessingLoaded).selectedDate;
+      return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')} 00:00:00';
+    }
+    final now = DateTime.now();
+    return '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')} 00:00:00';
+  }
+
+  void loadData() {
+    add(GetProcessingItemsEvent(date: formattedSelectedDate));
+  }
+
+  void refreshData() {
+    add(RefreshProcessingItemsEvent(date: formattedSelectedDate));
   }
 }

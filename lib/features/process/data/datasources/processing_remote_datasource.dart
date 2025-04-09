@@ -10,7 +10,7 @@ abstract class ProcessingRemoteDataSource {
   /// Get all processing items from the server with userName
   ///
   /// Throws [ServerException] for all server-related errors
-  Future<List<ProcessingItemModel>> getProcessingItems(String userName);
+  Future<List<ProcessingItemModel>> getProcessingItems(String date);
 }
 
 class ProcessingRemoteDataSourceImpl implements ProcessingRemoteDataSource {
@@ -20,7 +20,7 @@ class ProcessingRemoteDataSourceImpl implements ProcessingRemoteDataSource {
   ProcessingRemoteDataSourceImpl({required this.dio, this.useMockData = false});
 
   @override
-  Future<List<ProcessingItemModel>> getProcessingItems(String userName) async {
+  Future<List<ProcessingItemModel>> getProcessingItems(String date) async {
     final token = await di.sl<SecureStorageService>().getAccessToken();
      
     if (useMockData) {
@@ -43,8 +43,8 @@ class ProcessingRemoteDataSourceImpl implements ProcessingRemoteDataSource {
           code: "9f60778799d34d70adaf8ba5adcb0dcd",
           qcQtyIn: 0,
           qcQtyOut: 0,
-          zcWarehouseQtyInt: 0,
-          zcWarehouseQtyOut: 0,
+          zcWarehouseQtyImport: 0,
+          zcWarehouseQtyExport: 0,
           qtyState: "未質檢",
         ),
       ];
@@ -52,9 +52,8 @@ class ProcessingRemoteDataSourceImpl implements ProcessingRemoteDataSource {
 
     try {
       // Make sure we're using POST with correct format
-      final response = await dio.post(
-        ApiConstants.homeListUrl,
-        data: {"name": userName}, // Ensure this exact format matches API docs
+      final response = await dio.get(
+        ApiConstants.getListUrl(date),
         options: Options(
           headers: {"Authorization": "Bearer $token"},
           contentType: 'application/json',

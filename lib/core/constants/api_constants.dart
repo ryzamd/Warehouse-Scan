@@ -15,6 +15,9 @@ class ApiConstants {
   
   // Warehouse out endpoints
   static const String warehouseOutEndpoint = 'warehouse_out/qc_int/warehouse_out_data';
+
+  static const String getListEndpoint = 'login/GetList';
+  static String getListUrl(String date) => '$baseUrl$getListEndpoint?date=$date';
   
   // Full URLs
   static String get loginUrl => baseUrl + loginEndpoint;

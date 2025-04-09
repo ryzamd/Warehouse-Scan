@@ -21,8 +21,8 @@ ProcessingItemModel _$ProcessingItemModelFromJson(Map<String, dynamic> json) =>
     code: json['code'] != null ? json['code'] as String : '',
     qcQtyIn: json['qc_qty_in'] != null ? (json['qc_qty_in'] as num).toInt() : 0,
     qcQtyOut: json['qc_qty_out'] != null ? (json['qc_qty_out'] as num).toInt() : 0,
-    zcWarehouseQtyInt: json['zc_warehouse_qty_int'] != null ? (json['zc_warehouse_qty_int'] as num).toInt() : 0,
-    zcWarehouseQtyOut: json['zc_warehouse_qty_out'] != null ? (json['zc_warehouse_qty_out'] as num).toInt() : 0,
+    zcWarehouseQtyImport: json['zc_warehouse_qty_int'] != null ? (json['zc_warehouse_qty_int'] as num).toInt() : 0,
+    zcWarehouseQtyExport: json['zc_warehouse_qty_out'] != null ? (json['zc_warehouse_qty_out'] as num).toInt() : 0,
     qtyState: json['qty_state'] != null ? json['qty_state'] as String : '',
     );
 
@@ -42,7 +42,7 @@ Map<String, dynamic> _$ProcessingItemModelToJson(
   'code': instance.code,
   'qcQtyIn': instance.qcQtyIn,
   'qcQtyOut': instance.qcQtyOut,
-  'zcWarehouseQtyInt': instance.zcWarehouseQtyInt,
-  'zcWarehouseQtyOut': instance.zcWarehouseQtyOut,
+  'zcWarehouseQtyImport': instance.zcWarehouseQtyImport,
+  'zcWarehouseQtyExport': instance.zcWarehouseQtyExport,
   'qtyState': instance.qtyState,
 };

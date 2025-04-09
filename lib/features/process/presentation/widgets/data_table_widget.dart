@@ -84,24 +84,11 @@ class ProcessingDataTable extends StatelessWidget {
       ),
       child: Row(
         children: [
-          _buildHeaderCell('Name', flex: 3,
-            onTap: () => _onSortColumn(context, 'name'),
-            isSort: sortColumn == 'name',
-            ascending: ascending
-          ),
-          _buildHeaderCell('Project\nCode', flex: 2,
-            onTap: () => _onSortColumn(context, 'project'),
-            isSort: sortColumn == 'project',
-            ascending: ascending
-          ),
-          _buildHeaderCell(
-            userRole == UserRole.warehouseIn ? 'Qty In' : 'Qty Out',
-            flex: 2,
-            onTap: () => _onSortColumn(context, 'qty'),
-            isSort: sortColumn == 'qty',
-            ascending: ascending
-          ),
-          _buildHeaderCell('Date', flex: 2,
+          _buildHeaderCell('名稱', flex: 3),
+          _buildHeaderCell('指令號', flex: 2),
+          _buildHeaderCell(userRole == UserRole.warehouseIn ? '入庫數量' : '出庫數量',flex: 2),
+          //date == 時間
+          _buildHeaderCell('時間', flex: 2,
             onTap: () => _onSortColumn(context, 'date'),
             isSort: sortColumn == 'date',
             ascending: ascending
@@ -113,10 +100,10 @@ class ProcessingDataTable extends StatelessWidget {
 
   Widget _buildHeaderCell(
     String text, {
-    int flex = 1,
+    int flex = 0,
     VoidCallback? onTap,
     bool isSort = false,
-    bool ascending = true
+    bool ascending = false
   }) {
     return Expanded(
       flex: flex,
@@ -131,19 +118,22 @@ class ProcessingDataTable extends StatelessWidget {
                 child: Text(
                   text,
                   textAlign: TextAlign.center,
-                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
-                    fontSize: 13,
+                    fontSize: 14,
                   ),
                 ),
               ),
               if (isSort)
-                Icon(
-                  ascending ? Icons.arrow_upward : Icons.arrow_downward,
-                  color: Colors.white,
-                  size: 16,
+                SizedBox(
+                  width: 25,
+                  height: 20,
+                  child: Icon(
+                    ascending ? Icons.arrow_upward : Icons.arrow_downward,
+                    color: Colors.white,
+                    size: 16,
+                  ),
                 ),
             ],
           ),
@@ -204,8 +194,8 @@ class ProcessingDataTable extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 4.0),
             child: Text(
               userRole == UserRole.warehouseIn
-                ? '${item.zcWarehouseQtyInt}'
-                : '${item.zcWarehouseQtyOut}',
+                ? '${item.zcWarehouseQtyImport}'
+                : '${item.zcWarehouseQtyExport}',
               style: const TextStyle(fontSize: 13),
               textAlign: TextAlign.center,
             ),

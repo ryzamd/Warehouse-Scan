@@ -14,8 +14,8 @@ class ProcessingItemEntity extends Equatable {
   final String code;
   final int qcQtyIn;
   final int qcQtyOut;
-  final int zcWarehouseQtyInt;
-  final int zcWarehouseQtyOut;
+  final int zcWarehouseQtyImport;
+  final int zcWarehouseQtyExport;
   final String qtyState;
 
   const ProcessingItemEntity({
@@ -32,8 +32,8 @@ class ProcessingItemEntity extends Equatable {
     required this.code,
     required this.qcQtyIn,
     required this.qcQtyOut,
-    required this.zcWarehouseQtyInt,
-    required this.zcWarehouseQtyOut,
+    required this.zcWarehouseQtyImport,
+    required this.zcWarehouseQtyExport,
     required this.qtyState,
   });
 
@@ -52,8 +52,8 @@ class ProcessingItemEntity extends Equatable {
         code,
         qcQtyIn,
         qcQtyOut,
-        zcWarehouseQtyInt,
-        zcWarehouseQtyOut,
+        zcWarehouseQtyImport,
+        zcWarehouseQtyExport,
         qtyState,
       ];
 }

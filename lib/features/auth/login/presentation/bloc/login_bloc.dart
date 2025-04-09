@@ -24,7 +24,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   ) async {
 
     // code tạm thời để logout trước khi login lại
-    await di.sl<AuthRepository>().logout();
+    //await di.sl<AuthRepository>().logout();
 
     // Show loading state
     emit(LoginLoading());
