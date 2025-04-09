@@ -37,13 +37,14 @@ class _WarehouseInPageState extends State<WarehouseInPage> with WidgetsBindingOb
     WidgetsBinding.instance.addObserver(this);
     _focusNode.requestFocus();
     
-    // Initialize hardware scanner
-    ScanService.initializeScannerListener((scannedData) {
-      debugPrint("QR DEBUG: Hardware scanner callback with data: $scannedData");
-      if (mounted) {
-        context.read<WarehouseInBloc>().add(HardwareScanEvent(scannedData));
-      }
-    });
+    if (!_cameraActive) {
+      ScanService.initializeScannerListener((scannedData) {
+        debugPrint("QR DEBUG: Hardware scanner callback with data: $scannedData");
+        if (mounted) {
+          context.read<WarehouseInBloc>().add(HardwareScanEvent(scannedData));
+        }
+      });
+    }
     
     _initializeCameraController();
   }
@@ -125,6 +126,9 @@ class _WarehouseInPageState extends State<WarehouseInPage> with WidgetsBindingOb
       _cameraActive = !_cameraActive;
 
       if (_cameraActive) {
+
+        ScanService.disposeScannerListener();
+        
         try {
           if (_controller == null) {
             _initializeCameraController();
@@ -138,6 +142,13 @@ class _WarehouseInPageState extends State<WarehouseInPage> with WidgetsBindingOb
         }
       } else if (_controller != null) {
         _controller?.stop();
+        
+        ScanService.initializeScannerListener((scannedData) {
+          debugPrint("QR DEBUG: Hardware scanner callback with data: $scannedData");
+          if (mounted) {
+            context.read<WarehouseInBloc>().add(HardwareScanEvent(scannedData));
+          }
+        });
       }
     });
   }
