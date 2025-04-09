@@ -84,7 +84,7 @@ class _WarehouseInPageState extends State<WarehouseInPage> with WidgetsBindingOb
           BarcodeFormat.upcE,
           BarcodeFormat.codabar,
         ],
-        detectionSpeed: DetectionSpeed.normal,
+        detectionSpeed: DetectionSpeed.noDuplicates,
         facing: CameraFacing.back,
         returnImage: false,
         torchEnabled: _torchEnabled,
@@ -200,28 +200,24 @@ class _WarehouseInPageState extends State<WarehouseInPage> with WidgetsBindingOb
         if (state is WarehouseInProcessing) {
           LoadingDialog.show(context);
         } else if (state is WarehouseInSuccess) {
-          // Hide loading dialog
-          if (Navigator.of(context).canPop()) {
-            Navigator.of(context).pop();
-          }
+
+          LoadingDialog.hide(context);
           
-          // Show success message
           SuccessImportDialog.show(context,
             onDismiss: () => _clearData(),
           );
         } else if (state is WarehouseInError) {
-          // Hide loading dialog
-          if (Navigator.of(context).canPop()) {
-            Navigator.of(context).pop();
+
+          LoadingDialog.hide(context);
+
+          if(context.mounted){
+              ErrorDialog.show(
+              context,
+              title: 'ERROR',
+              message: state.message,
+              onDismiss: () => _clearData(),
+            );
           }
-          
-          // Show error message using ErrorDialog
-          ErrorDialog.show(
-            context,
-            title: 'ERROR',
-            message: state.message,
-            onDismiss: () => _clearData(),
-          );
         }
       },
       builder: (context, state) {

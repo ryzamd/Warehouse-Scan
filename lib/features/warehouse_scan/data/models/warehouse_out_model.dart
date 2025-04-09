@@ -19,6 +19,8 @@ class WarehouseOutModel extends WarehouseOutEntity {
     required super.code,
     required super.staff,
     required super.qtyState,
+    required super.zcWarehouseQtyImport,
+    required super.zcWarehouseQtyExport
   });
 
   @JsonKey(name: 'mwh_id', defaultValue: 0)
@@ -50,6 +52,12 @@ class WarehouseOutModel extends WarehouseOutEntity {
 
   @JsonKey(name: 'c_date', defaultValue: '')
   String get getCDate => cDate;
+
+  @JsonKey(name: 'zc_warehouse_qty_int', defaultValue: 0.0, fromJson: _qtyFromJson)
+  double get getzcWarehouseQtyImport => zcWarehouseQtyImport;
+
+  @JsonKey(name: 'zc_warehouse_qty_int', defaultValue: 0.0, fromJson: _qtyFromJson)
+  double get getzcWarehouseQtyExport => zcWarehouseQtyExport;
 
   @JsonKey(defaultValue: '')
   String get getCode => code;

@@ -37,6 +37,8 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
   double _maxQuantity = 0;
   String _currentCode = '';
   String _currentMaterialName = '';
+  double _warehouseQtyImport = 0.0;
+  double _warehouseQtyExport = 0.0;
 
   @override
   void initState() {
@@ -93,7 +95,7 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
           BarcodeFormat.upcE,
           BarcodeFormat.codabar,
         ],
-        detectionSpeed: DetectionSpeed.normal,
+        detectionSpeed: DetectionSpeed.noDuplicates,
         facing: CameraFacing.back,
         returnImage: false,
         torchEnabled: _torchEnabled,
@@ -191,7 +193,6 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
       ConfirmationDialog.show(
         context,
         onConfirm: () {
-          // Submit form data
           context.read<WarehouseOutBloc>().add(
             ProcessWarehouseOutEvent(
               code: _currentCode,
@@ -213,6 +214,8 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
     _currentCode = '';
     _currentMaterialName = '';
     _maxQuantity = 0;
+    _warehouseQtyImport = 0.0;
+    _warehouseQtyExport = 0.0;
   }
 
   void _onDetect(BarcodeCapture capture) {
@@ -262,6 +265,8 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
             _currentCode = state.material.code;
             _currentMaterialName = state.material.mName;
             _maxQuantity = state.material.mQty;
+            _warehouseQtyImport = state.material.zcWarehouseQtyImport;
+            _warehouseQtyExport = state.material.zcWarehouseQtyExport;
           });
           
         } else if (state is WarehouseOutProcessingRequest) {
@@ -356,45 +361,43 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
 
                 // Material Info and Form
                 Expanded(
-                  child:  SingleChildScrollView(
+                  child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Form(
                       key: _formKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Table-like layout for info
-                          _buildInfoTable(),
-                        ],
-                      ),
+                      child: _buildInfoTable(),
                     ),
                   ),
                 ),
 
-                Center(
-                  child: ElevatedButton(
-                    onPressed: _submitForm,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green.shade600,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 32,
-                        vertical: 12,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Center(
+                      child: ElevatedButton(
+                        onPressed: _submitForm,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green.shade600,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 32,
+                            vertical: 12,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: const Text(
+                          'Save',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white
+                          ),
+                        ),
                       ),
                     ),
-                    child: const Text(
-                      'Save',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white
-                      ),
-                    ),
-                  ),
+                  )
                 ),
-                const SizedBox(height: 10),
               ],
             ),
           ),
@@ -404,196 +407,219 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
   }
   
   Widget _buildInfoTable() {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final availableHeight = screenHeight * 0.62;
+    
+    final normalRowHeight = availableHeight * 0.15;
+    
     return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        color: const Color(0xFFFAF1E6),
-        border: Border.all(color: Colors.grey.shade300),
+      constraints: BoxConstraints(
+        minHeight: availableHeight,
+        maxHeight: availableHeight,
       ),
-      child: Column(
-        spacing: 5,
+      child: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            color: const Color(0xFFFAF1E6),
+            border: Border.all(color: Colors.grey.shade300),
+          ),
+          child: IntrinsicHeight(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildTableRow('名稱', _currentMaterialName, height: normalRowHeight),
+                _buildDivider(),
+                _buildTableRow('入庫數量', _warehouseQtyImport.toString(), height: normalRowHeight),
+                _buildDivider(),
+                _buildTableRow('出庫數量', _warehouseQtyExport.toString(), height: normalRowHeight),
+                _buildDivider(),
+                _buildQuantityRow(height: normalRowHeight),
+                _buildDivider(),
+                _buildAddressRow(height: normalRowHeight),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+  
+  Widget _buildTableRow(String label, String value, {required double height}) {
+    return SizedBox(
+      height: height,
+      child: Row(
         children: [
-          _buildTableRow('ID', _currentCode),
-          _buildDivider(),
-          _buildTableRow('Material Name', _currentMaterialName),
-          _buildDivider(),
-          _buildQuantityRow(),
-          _buildDivider(),
-          _buildAddressRow(),
+          Container(
+            width: 74,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.blue.shade600,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(5),
+                bottomLeft: Radius.circular(5),
+              ),
+            ),
+            alignment: Alignment.centerLeft,
+            child: Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+              ),
+            ),
+          ),
+          // Value side (right)
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Text(
+                value.isEmpty ? 'No Scan data' : value,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: value.isEmpty ? Colors.black : Colors.black87,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+}
+  
+  Widget _buildQuantityRow({required double height}) {
+    return SizedBox(
+      height: height,
+      child: Row(
+        children: [
+          Container(
+            width: 74,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.blue.shade600,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(5),
+                bottomLeft: Radius.circular(5),
+              ),
+            ),
+            alignment: Alignment.centerLeft,
+            child: const Text(
+              '出庫數量',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+              ),
+            ),
+          ),
+          // Value side with text field
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: TextFormField(
+                controller: _quantityController,
+                keyboardType: TextInputType.number,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+                decoration: InputDecoration(
+                  hintText: 'Enter quantity',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a quantity';
+                  }
+                  final quantity = double.tryParse(value);
+                  if (quantity == null) {
+                    return 'Please enter a valid number';
+                  }
+                  if (quantity <= 0) {
+                    return 'Quantity must be greater than 0';
+                  }
+                  if (quantity > _maxQuantity) {
+                    return 'Quantity invalid';
+                  }
+                  return null;
+                },
+                onChanged: _validateQuantity,
+                enabled: _currentCode.isNotEmpty,
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
   
-  Widget _buildTableRow(String label, String value) {
-    return Row(
-      children: [
-        Container(
-          height: 70,
-          width: 72,
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-          decoration: BoxDecoration(
-            color: Colors.blue.shade600,
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(5),
-              bottomLeft: Radius.circular(5),
+  Widget _buildAddressRow({required double height}) {
+    return SizedBox(
+      height: height,
+      child: Row(
+        children: [
+          Container(
+            width: 74,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.blue.shade600,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(5),
+                bottomLeft: Radius.circular(5),
+              ),
             ),
-          ),
-          alignment: Alignment.centerLeft,
-          child: Text(
-            label,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 10,
-            ),
-          ),
-        ),
-        // Value side (right)
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Text(
-              value.isEmpty ? 'No Scan data' : value,
+            alignment: Alignment.centerLeft,
+            child: const Text(
+              '收貨方',
               style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
                 fontSize: 12,
-                fontWeight: FontWeight.w500,
-                color: value.isEmpty ? Colors.black : Colors.black87,
               ),
             ),
           ),
-        ),
-      ],
-    );
-  }
-  
-  Widget _buildQuantityRow() {
-    return Row(
-      children: [
-        Container(
-          height: 72,
-          width: 72,
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          decoration: BoxDecoration(
-            color: Colors.blue.shade600,
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(5),
-              bottomLeft: Radius.circular(5),
-            ),
-          ),
-          alignment: Alignment.centerLeft,
-          child: const Text(
-            'Quantity',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 10,
-            ),
-          ),
-        ),
-        // Value side with text field
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: TextFormField(
-              controller: _quantityController,
-              keyboardType: TextInputType.number,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-              ),
-              decoration: InputDecoration(
-                hintText: 'Enter quantity',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+          // Value side with text field
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: TextFormField(
+                controller: _addressController,
+                keyboardType: TextInputType.text,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
                 ),
-                helperText: _maxQuantity > 0 ? 'Max: $_maxQuantity' : null,
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter a quantity';
-                }
-                final quantity = double.tryParse(value);
-                if (quantity == null) {
-                  return 'Please enter a valid number';
-                }
-                if (quantity <= 0) {
-                  return 'Quantity must be greater than 0';
-                }
-                if (quantity > _maxQuantity) {
-                  return 'Quantity invalid';
-                }
-                return null;
-              },
-              onChanged: _validateQuantity,
-              enabled: _currentCode.isNotEmpty,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-  
-  Widget _buildAddressRow() {
-    return Row(
-      children: [
-        Container(
-          height: 70,
-          width: 72,
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          decoration: BoxDecoration(
-            color: Colors.blue.shade600,
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(5),
-              bottomLeft: Radius.circular(5),
-            ),
-          ),
-          alignment: Alignment.centerLeft,
-          child: const Text(
-            'Address',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 10,
-            ),
-          ),
-        ),
-        // Value side with text field
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: TextFormField(
-              controller: _addressController,
-              keyboardType: TextInputType.text,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-              ),
-              decoration: InputDecoration(
-                hintText: 'Enter address',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+                decoration: InputDecoration(
+                  hintText: 'Enter address',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                 ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
-                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter an address';
+                  }
+                  // Validate no special characters
+                  if (RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value)) {
+                    return 'No special characters allowed';
+                  }
+                  return null;
+                },
+                enabled: _currentCode.isNotEmpty,
               ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter an address';
-                }
-                // Validate no special characters
-                if (RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value)) {
-                  return 'No special characters allowed';
-                }
-                return null;
-              },
-              enabled: _currentCode.isNotEmpty,
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
   

@@ -1,8 +1,6 @@
-// lib/features/warehouse_scan/presentation/widgets/warehouse_in_widgets.dart
 import 'package:flutter/material.dart';
 
 class SuccessImportDialog extends StatelessWidget {
-  // Static flag to track if a dialog is currently showing
   static bool _isShowing = false;
   
   final VoidCallback onDismiss;
