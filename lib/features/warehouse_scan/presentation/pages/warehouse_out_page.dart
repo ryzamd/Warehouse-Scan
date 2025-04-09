@@ -507,7 +507,7 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
             ),
             alignment: Alignment.centerLeft,
             child: const Text(
-              '出庫數量',
+              '輸入數據',
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,

@@ -12,6 +12,7 @@ class WarehouseInBloc extends Bloc<WarehouseInEvent, WarehouseInState> {
   final ProcessWarehouseIn processWarehouseIn;
   final InternetConnectionChecker connectionChecker;
   final UserEntity currentUser;
+  bool _isProcessing = false;
   
   MobileScannerController? scannerController;
 
@@ -67,6 +68,12 @@ class WarehouseInBloc extends Bloc<WarehouseInEvent, WarehouseInState> {
     ProcessWarehouseInEvent event,
     Emitter<WarehouseInState> emit,
   ) async {
+
+    if(_isProcessing){
+      return;
+    }
+
+    _isProcessing = true;
     debugPrint('Processing warehouse in for code: ${event.code}');
     
     // Check for internet connection
@@ -82,7 +89,7 @@ class WarehouseInBloc extends Bloc<WarehouseInEvent, WarehouseInState> {
       final result = await processWarehouseIn(
         ProcessWarehouseInParams(
           code: event.code,
-          userName: currentUser.name, // Sử dụng userName từ currentUser
+          userName: currentUser.name,
         ),
       );
       
@@ -100,11 +107,15 @@ class WarehouseInBloc extends Bloc<WarehouseInEvent, WarehouseInState> {
         },
       );
     } catch (e) {
+      
       debugPrint('Error processing warehouse in: $e');
       emit(WarehouseInError(
         message: 'Data has already been stored.',
         previousState: state,
       ));
+
+    } finally {
+      _isProcessing = false;
     }
   }
   
