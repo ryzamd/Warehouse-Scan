@@ -27,7 +27,7 @@ class ProfilePage extends StatelessWidget {
               begin: Alignment.topRight,
               end: Alignment.bottomLeft,
               colors: [
-                Color(0xFF071952), // Bright blue matching login button
+                Color(0xFF071952),
                 Color(0xFF088395),
               ],
             ),
@@ -38,7 +38,7 @@ class ProfilePage extends StatelessWidget {
               child: Column(
                 children: [
                   const SizedBox(height: 40),
-                  // Profile avatar
+
                   Container(
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
@@ -67,7 +67,7 @@ class ProfilePage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  // User name
+
                   Text(
                     user.name,
                     style: const TextStyle(
@@ -84,7 +84,7 @@ class ProfilePage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  // User ID
+
                   Text(
                     user.userId,
                     style: const TextStyle(
@@ -94,7 +94,7 @@ class ProfilePage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  // Department
+
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                     decoration: BoxDecoration(
@@ -112,7 +112,7 @@ class ProfilePage extends StatelessWidget {
                     ),
                   ),
                   const Spacer(),
-                  // Logout button with same gradient as in login page
+
                   Container(
                     width: 220,
                     height: 55,
@@ -130,8 +130,8 @@ class ProfilePage extends StatelessWidget {
                         begin: Alignment.topRight,
                         end: Alignment.bottomLeft,
                         colors: [
-                          Color(0xFFFFB4C2), // Bright blue matching login button
-                          Color(0xFFDA7297), // Slightly darker shade for gradient
+                          Color(0xFFFFB4C2),
+                          Color(0xFFDA7297),
                         ],
                       ),
                     ),

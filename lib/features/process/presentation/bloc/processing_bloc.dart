@@ -277,9 +277,12 @@ class ProcessingBloc extends Bloc<ProcessingEvent, ProcessingState> {
     
     if (currentState is ProcessingLoaded) {
       emit(currentState.copyWith(selectedDate: event.selectedDate));
+
       add(RefreshProcessingItemsEvent(date: _formatDateForApi(event.selectedDate)));
+
     } else {
       add(GetProcessingItemsEvent(date: _formatDateForApi(event.selectedDate)));
+      
     }
   }
 

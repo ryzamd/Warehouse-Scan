@@ -9,11 +9,13 @@ import 'package:warehouse_scan/core/widgets/loading_dialog.dart';
 import 'package:warehouse_scan/core/widgets/scafford_custom.dart';
 import 'package:warehouse_scan/features/auth/login/domain/entities/user_entity.dart';
 import 'package:warehouse_scan/features/warehouse_scan/data/datasources/scan_service_impl.dart';
+import '../../../../core/widgets/confirmation_dialog.dart';
+import '../../../../core/widgets/notification_dialog.dart';
 import '../bloc/warehouse_out/warehouse_out_bloc.dart';
 import '../bloc/warehouse_out/warehouse_out_event.dart';
 import '../bloc/warehouse_out/warehouse_out_state.dart';
 import '../widgets/qr_scanner_widget.dart';
-import '../widgets/warehouse_out_widgets.dart';
+
 
 class WarehouseOutPage extends StatefulWidget {
   final UserEntity user;
@@ -192,6 +194,9 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
     if (_formKey.currentState!.validate()) {
       ConfirmationDialog.show(
         context,
+        title: 'Confirmation',
+        message: 'Are you sure you want to process this warehouse-out request?',
+        confirmColor: Colors.redAccent,
         onConfirm: () {
           context.read<WarehouseOutBloc>().add(
             ProcessWarehouseOutEvent(
@@ -201,9 +206,7 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
             ),
           );
         },
-        onCancel: () {
-          Navigator.of(context).pop(); // Close the dialog
-        },
+        onCancel: () {},
       );
     }
   }
@@ -272,23 +275,26 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
         } else if (state is WarehouseOutProcessingRequest) {
           LoadingDialog.show(context);
         } else if (state is WarehouseOutSuccess) {
-          // Hide loading dialog
+
           if (Navigator.of(context).canPop()) {
             Navigator.of(context).pop();
           }
           
-          // Show success message
-          SuccessOutDialog.show(
+           NotificationDialog.show(
             context,
+            title: 'Success',
+            message: 'The material has been successfully sent for warehouse-out processing.',
+            icon: Icons.check_circle_outline,
+            iconColor: Colors.green,
             onDismiss: () {
-              // Reset form
+
               _resetForm();
-              // Clear scanned data
+
               context.read<WarehouseOutBloc>().add(ClearScannedData());
             }
           );
         } else if (state is WarehouseOutError) {
-          // Hide loading dialog
+
           if (Navigator.of(context).canPop()) {
             Navigator.of(context).pop();
           }
@@ -328,7 +334,16 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
             ),
             IconButton(
               icon: const Icon(Icons.delete, color: Colors.white),
-              onPressed: _clearData,
+              onPressed: () {
+                  ConfirmationDialog.show(
+                  context,
+                  title: 'Clear Data',
+                  message: 'Are you sure you want to clear all data?',
+                  confirmColor: Colors.redAccent,
+                  onConfirm: _clearData,
+                  onCancel: () {},
+                );
+              }
             ),
           ],
           body: KeyboardListener(

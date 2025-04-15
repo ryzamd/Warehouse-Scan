@@ -9,11 +9,11 @@ import 'package:warehouse_scan/core/widgets/loading_dialog.dart';
 import 'package:warehouse_scan/core/widgets/scafford_custom.dart';
 import 'package:warehouse_scan/features/auth/login/domain/entities/user_entity.dart';
 import 'package:warehouse_scan/features/warehouse_scan/data/datasources/scan_service_impl.dart';
+import '../../../../core/widgets/notification_dialog.dart';
 import '../bloc/warehouse_in/warehouse_in_bloc.dart';
 import '../bloc/warehouse_in/warehouse_in_event.dart';
 import '../bloc/warehouse_in/warehouse_in_state.dart';
 import '../widgets/qr_scanner_widget.dart';
-import '../widgets/warehouse_in_widgets.dart';
 
 class WarehouseInPage extends StatefulWidget {
   final UserEntity user;
@@ -214,9 +214,14 @@ class _WarehouseInPageState extends State<WarehouseInPage> with WidgetsBindingOb
 
           LoadingDialog.hide(context);
           
-          SuccessImportDialog.show(context,
-            onDismiss: () => _clearData(),
-          );
+            NotificationDialog.show(
+              context,
+              title: 'Import successfully',
+              message: 'The material has been successfully imported to the warehouse.',
+              icon: Icons.favorite,
+              iconColor: Colors.green,
+              onDismiss: () => _clearData(),
+            );
         } else if (state is WarehouseInError) {
 
           LoadingDialog.hide(context);

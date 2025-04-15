@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:warehouse_scan/core/constants/app_routes.dart';
+import '../../../../../core/widgets/confirmation_dialog.dart';
+import '../../../../../core/widgets/error_dialog.dart';
 import '../bloc/logout_bloc.dart';
 import '../bloc/logout_event.dart';
 import '../bloc/logout_state.dart';
@@ -20,18 +22,15 @@ class LogoutButton extends StatelessWidget {
     return BlocListener<LogoutBloc, LogoutState>(
       listener: (context, state) {
         if (state is LogoutSuccess) {
-          // Navigate to login screen and clear the navigation stack
           Navigator.of(context).pushNamedAndRemoveUntil(
             AppRoutes.login,
             (route) => false,
           );
         } else if (state is LogoutFailure) {
-          // Show error message
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Logout failed: ${state.message}'),
-              backgroundColor: Colors.red,
-            ),
+          ErrorDialog.show(
+            context,
+            title: 'Logout Failed',
+            message: state.message,
           );
         }
       },
@@ -39,32 +38,17 @@ class LogoutButton extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: () {
-            // Show confirmation dialog
-            showDialog(
-              context: context,
-              builder: (dialogContext) => AlertDialog(
-                title: const Text('Confirm Logout'),
-                content: const Text('Are you sure you want to log out?'),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(dialogContext),
-                    child: const Text('Cancel'),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(dialogContext);
-                      context.read<LogoutBloc>().add(LogoutButtonPressed());
-                    },
-                    child: const Text(
-                      'Logout',
-                      style: TextStyle(color: Colors.red),
-                    ),
-                  ),
-                ],
-              ),
+            ConfirmationDialog.show(
+              context,
+              title: 'Confirm Logout',
+              message: 'Are you sure you want to log out?',
+              confirmText: 'Logout',
+              cancelText: 'Cancel',
+              confirmColor: Colors.red,
+              onConfirm: () {
+                context.read<LogoutBloc>().add(LogoutButtonPressed());
+              },
+              onCancel: () {},
             );
           },
           borderRadius: BorderRadius.circular(10),

@@ -1,4 +1,3 @@
-// lib/core/widgets/error_dialog.dart
 import 'package:flutter/material.dart';
 
 class ErrorDialog extends StatelessWidget {
@@ -14,8 +13,7 @@ class ErrorDialog extends StatelessWidget {
     required this.message,
     this.onDismiss,
   });
-  
-  // Show error dialog
+
   static void show(
     BuildContext context, {
     String title = 'Error',
@@ -35,7 +33,7 @@ class ErrorDialog extends StatelessWidget {
           onDismiss: onDismiss,
         ),
       ).then((_) {
-        // Make sure flag is reset when dialog is closed
+
         _isShowing = false;
       });
     }
@@ -70,7 +68,7 @@ class ErrorDialog extends StatelessWidget {
                 });
               }
             },
-            child: const Text('OK'),
+            child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.redAccent)),
           ),
         ],
       ),

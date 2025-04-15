@@ -15,6 +15,7 @@ import 'package:warehouse_scan/features/warehouse_scan/presentation/bloc/warehou
 import 'package:warehouse_scan/features/warehouse_scan/presentation/pages/warehouse_in_page.dart';
 import 'package:warehouse_scan/features/warehouse_scan/presentation/pages/warehouse_out_page.dart';
 import 'core/di/dependencies.dart' as di;
+import 'core/widgets/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -76,7 +77,7 @@ class _MyAppState extends State<MyApp> {
           systemOverlayStyle: SystemUiOverlayStyle.light,
         ),
       ),
-      initialRoute: AppRoutes.login,
+      initialRoute: AppRoutes.splash,
       onGenerateRoute: (settings) {
         switch (settings.name) {
           
@@ -117,7 +118,7 @@ class _MyAppState extends State<MyApp> {
           );
           
           default:
-            return MaterialPageRoute(builder: (_) => const LoginPage());
+            return MaterialPageRoute(builder: (_) => const SplashScreen());
         }
       },
     );
