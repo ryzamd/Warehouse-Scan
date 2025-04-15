@@ -1,15 +1,15 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../widgets/exit_confirmation_dialog.dart';
 
 class BackButtonService {
-  // Singleton instance
+
   static final BackButtonService _instance = BackButtonService._internal();
   factory BackButtonService() => _instance;
   BackButtonService._internal();
 
-  // Event channel để nhận sự kiện từ native
+
   static const EventChannel _eventChannel = EventChannel(
     'com.example.warehouse_scan/back_button',
   );
@@ -23,7 +23,7 @@ class BackButtonService {
     _subscription = _eventChannel.receiveBroadcastStream().listen(
       (_) {
         if (context.mounted) {
-          _showExitConfirmationDialog(context);
+          ExitConfirmationDialog.show(context);
         }
       },
     );
@@ -33,30 +33,5 @@ class BackButtonService {
   void dispose() {
     _subscription?.cancel();
     _subscription = null;
-  }
-
-  // Hiển thị dialog xác nhận thoát
-  void _showExitConfirmationDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            title: const Text('EXIT', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),),
-            content: const Text('Are you sure to exit the application?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Cancel'),
-              ),
-              TextButton(
-                onPressed: () => SystemNavigator.pop(),
-                child: const Text('OK'),
-              ),
-            ],
-          ),
-    );
   }
 }

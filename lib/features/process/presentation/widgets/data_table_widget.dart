@@ -86,8 +86,9 @@ class ProcessingDataTable extends StatelessWidget {
         children: [
           _buildHeaderCell('名稱', flex: 3),
           _buildHeaderCell('指令號', flex: 2),
-          _buildHeaderCell(userRole == UserRole.warehouseIn ? '入庫數量' : '出庫數量',flex: 2),
-          //date == 時間
+          _buildHeaderCell('入庫數量', flex: 2),
+          _buildHeaderCell('出庫數量', flex: 2),
+          _buildHeaderCell(userRole == UserRole.warehouseIn ? '資材入庫' : '資材出庫',flex: 2),
           _buildHeaderCell('時間', flex: 2,
             onTap: () => _onSortColumn(context, 'date'),
             isSort: sortColumn == 'date',
@@ -127,7 +128,7 @@ class ProcessingDataTable extends StatelessWidget {
               ),
               if (isSort)
                 SizedBox(
-                  width: 25,
+                  width: 10,
                   height: 20,
                   child: Icon(
                     ascending ? Icons.arrow_upward : Icons.arrow_downward,
@@ -169,8 +170,8 @@ class ProcessingDataTable extends StatelessWidget {
             child: Text(
               item.mName,
               style: const TextStyle(fontSize: 13),
-              textAlign: TextAlign.left,
-              maxLines: 3,
+              textAlign: TextAlign.center,
+              maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -182,9 +183,31 @@ class ProcessingDataTable extends StatelessWidget {
             child: Text(
               item.mPrjcode,
               style: const TextStyle(fontSize: 13),
-              textAlign: TextAlign.left,
-              maxLines: 3,
+              textAlign: TextAlign.center,
+              maxLines: 2,
               overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ),
+        Expanded(
+          flex: 2,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+            child: Text(
+              item.qcQtyIn.toString(),
+              style: const TextStyle(fontSize: 13),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+        Expanded(
+          flex: 2,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+            child: Text(
+              item.qcQtyOut.toString(),
+              style: const TextStyle(fontSize: 13),
+              textAlign: TextAlign.center,
             ),
           ),
         ),
