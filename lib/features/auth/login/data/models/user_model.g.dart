@@ -7,11 +7,11 @@ part of 'user_model.dart';
 // **************************************************************************
 
 UserModel _$UserModelFromJson(Map<String, dynamic> json) => UserModel(
-  userId: json['userId'] as String,
-  password: json['password'] as String,
-  department: json['department'] as String,
-  name: json['name'] as String,
-  token: json['token'] as String,
+  userId: json['userId'] != null ? json['userId'] as String : '',
+  password: json['password'] != null ? json['password'] as String : '',
+  department: json['department'] != null ? json['department'] as String : '',
+  name: json['name'] != null ? json['name'] as String : '',
+  token: json['token'] != null ? json['token'] as String : '',
   role: $enumDecode(_$UserRoleEnumMap, json['role']),
 );
 

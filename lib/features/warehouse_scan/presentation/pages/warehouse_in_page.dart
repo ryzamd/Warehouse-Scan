@@ -102,7 +102,7 @@ class _WarehouseInPageState extends State<WarehouseInPage> with WidgetsBindingOb
       debugPrint("QR DEBUG: ⚠️ Camera initialization error: $e");
       ErrorDialog.show(
         context,
-        title: 'Camera Error',
+        title: 'CAMERA ERROR',
         message: "Camera initialization error: $e",
       );
     }
@@ -216,7 +216,7 @@ class _WarehouseInPageState extends State<WarehouseInPage> with WidgetsBindingOb
           
             NotificationDialog.show(
               context,
-              title: 'Import successfully',
+              title: 'IMPORT SUCCESS',
               message: 'The material has been successfully imported to the warehouse.',
               icon: Icons.favorite,
               iconColor: Colors.green,

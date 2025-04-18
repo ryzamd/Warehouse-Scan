@@ -114,7 +114,7 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
       debugPrint("QR DEBUG: ⚠️ Camera initialization error: $e");
       ErrorDialog.show(
         context,
-        title: 'Camera Error',
+        title: 'CAMERA ERROR',
         message: "Camera initialization error: $e",
       );
     }
@@ -194,7 +194,7 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
     if (_formKey.currentState!.validate()) {
       ConfirmationDialog.show(
         context,
-        title: 'Confirmation',
+        title: 'CONFIRMATION',
         message: 'Are you sure you want to process this warehouse-out request?',
         confirmColor: Colors.redAccent,
         onConfirm: () {
@@ -282,7 +282,7 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
           
            NotificationDialog.show(
             context,
-            title: 'Success',
+            title: 'SUCCESS',
             message: 'The material has been successfully sent for warehouse-out processing.',
             icon: Icons.check_circle_outline,
             iconColor: Colors.green,
@@ -299,10 +299,9 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
             Navigator.of(context).pop();
           }
           
-          // Show error message using ErrorDialog
           ErrorDialog.show(
             context,
-            title: 'Error',
+            title: 'ERROR',
             message: state.message,
           );
         }
@@ -337,7 +336,7 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
               onPressed: () {
                   ConfirmationDialog.show(
                   context,
-                  title: 'Clear Data',
+                  title: 'CLEAR DATA',
                   message: 'Are you sure you want to clear all data?',
                   confirmColor: Colors.redAccent,
                   onConfirm: _clearData,
@@ -363,7 +362,6 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
             },
             child: Column(
               children: [
-                // QR Camera Section
                 Container(
                   margin: const EdgeInsets.all(5),
                   child: QRScannerWidget(
@@ -374,7 +372,6 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
                   ),
                 ),
 
-                // Material Info and Form
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),

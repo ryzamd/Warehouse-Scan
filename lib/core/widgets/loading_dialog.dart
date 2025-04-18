@@ -1,4 +1,3 @@
-// lib/core/widgets/loading_dialog.dart
 import 'package:flutter/material.dart';
 
 class LoadingDialog extends StatelessWidget {
@@ -8,9 +7,7 @@ class LoadingDialog extends StatelessWidget {
     super.key,
   });
   
-  // Show loading dialog
   static void show(BuildContext context) {
-    // Only show if no loading dialog is already visible
     if (!_isShowing && context.mounted) {
       _isShowing = true;
       
@@ -19,13 +16,11 @@ class LoadingDialog extends StatelessWidget {
         barrierDismissible: false,
         builder: (context) => const LoadingDialog(),
       ).then((_) {
-        // Ensure flag is reset when dialog is dismissed
         _isShowing = false;
       });
     }
   }
   
-  // Hide loading dialog
   static void hide(BuildContext context) {
     if (_isShowing && context.mounted) {
       Navigator.of(context).pop();
@@ -36,6 +31,9 @@ class LoadingDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
       content: const SizedBox(
         height: 150,
         width: 100,

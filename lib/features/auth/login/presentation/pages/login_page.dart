@@ -73,14 +73,12 @@ class _LoginPageState extends State<LoginPage> {
             arguments: state.user,
           );
         } else if (state is LoginFailure) {
-          // Đảm bảo rằng context vẫn hợp lệ trước khi hiển thị dialog
           if (context.mounted) {
             ErrorDialog.show(
               context,
-              title: 'Login Failed',
+              title: 'LOGIN FAILED',
               message: state.message,
               onDismiss: () {
-                // Reset state của LoginBloc sau khi đóng dialog
                 if (context.mounted) {
                   context.read<LoginBloc>().add(ResetLoginStateEvent());
                 }

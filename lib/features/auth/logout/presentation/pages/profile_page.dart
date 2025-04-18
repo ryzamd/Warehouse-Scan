@@ -42,26 +42,19 @@ class ProfilePage extends StatelessWidget {
                   Container(
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.2),
-                          spreadRadius: 3,
-                          blurRadius: 10,
-                          offset: const Offset(0, 5),
-                        ),
-                      ],
                     ),
                     child: CircleAvatar(
-                      radius: 60,
-                      backgroundColor: Colors.white,
-                      child: Text(
-                        user.name.isNotEmpty
-                            ? user.name.substring(0, 1).toUpperCase()
-                            : '?',
-                        style: const TextStyle(
-                          fontSize: 50,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF3a7bd5),
+                      radius: 65,
+                      backgroundColor: user.role == UserRole.warehouseIn ? Color(0xFFDA7297) : Color(0xFF1A1A19),
+                      child: Container(
+                        padding: const EdgeInsets.all(8.0),
+                        decoration: BoxDecoration(shape: BoxShape.circle, color: Color(0xFFECE9E6)),
+                        child: ClipOval(
+                          child: SizedBox.fromSize(
+                            size: const Size.fromRadius(48),
+                            child: user.role == UserRole.warehouseIn ? Image.asset('assets/avatar/Pig.png', cacheHeight: 84)
+                                                                        : Image.asset('assets/avatar/Panda.png', cacheHeight: 84),
+                          )
                         ),
                       ),
                     ),

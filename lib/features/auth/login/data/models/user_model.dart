@@ -16,8 +16,7 @@ class UserModel extends UserEntity {
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
-    // Determine role based on name
-    UserRole userRole = UserRole.warehouseIn; // Default
+    UserRole userRole = UserRole.warehouseIn;
     
     if (json['user'] != null && json['user']['users'] != null) {
       final users = json['user']['users'];

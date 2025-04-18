@@ -32,7 +32,6 @@ class ConfirmationDialog extends StatelessWidget {
     required VoidCallback onCancel,
     Color confirmColor = Colors.green,
   }) {
-    // Only show if no dialog is currently visible
     if (!_isShowing && context.mounted) {
       _isShowing = true;
       
@@ -72,7 +71,8 @@ class ConfirmationDialog extends StatelessWidget {
         title,
         style: const TextStyle(
           fontWeight: FontWeight.bold,
-          color: Colors.redAccent
+          color: Colors.redAccent,
+          fontSize: 18,
         ),
       ),
       content: Text(message),
@@ -85,7 +85,7 @@ class ConfirmationDialog extends StatelessWidget {
             cancelText,
             style: const TextStyle(
               color: Colors.grey,
-              fontSize: 16,
+              fontSize: 14,
             ),
           ),
         ),
@@ -105,7 +105,7 @@ class ConfirmationDialog extends StatelessWidget {
           child: Text(
             confirmText,
             style: const TextStyle(
-              fontSize: 16,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
             ),
           ),

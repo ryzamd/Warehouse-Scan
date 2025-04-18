@@ -31,21 +31,21 @@ class ExitConfirmationDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(16),
       ),
       title: const Text(
         'EXIT',
-        style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+        style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 18),
       ),
       content: const Text('Are you sure to exit the application?'),
       actions: [
         TextButton(
           onPressed: onCancel ?? () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: const Text('Cancel', style: TextStyle(fontSize: 14)),
         ),
         TextButton(
           onPressed: () => SystemNavigator.pop(),
-          child: const Text('OK'),
+          child: const Text('OK', style: TextStyle(fontSize: 14)),
         ),
       ],
     );

@@ -7,9 +7,6 @@ import 'package:warehouse_scan/core/di/dependencies.dart' as di;
 import '../models/processing_item_model.dart';
 
 abstract class ProcessingRemoteDataSource {
-  /// Get all processing items from the server with userName
-  ///
-  /// Throws [ServerException] for all server-related errors
   Future<List<ProcessingItemModel>> getProcessingItems(String date);
 }
 
@@ -21,13 +18,11 @@ class ProcessingRemoteDataSourceImpl implements ProcessingRemoteDataSource {
 
   @override
   Future<List<ProcessingItemModel>> getProcessingItems(String date) async {
-    final token = await di.sl<SecureStorageService>().getAccessToken();
+    final token = await di.sl<SecureStorageService>().getAccessTokenAsync();
      
     if (useMockData) {
-      // Simulate network delay
       await Future.delayed(const Duration(milliseconds: 800));
       
-      // Create mock data
       return [
         ProcessingItemModel(
           mwhId: 1693,
@@ -51,7 +46,6 @@ class ProcessingRemoteDataSourceImpl implements ProcessingRemoteDataSource {
     }
 
     try {
-      // Make sure we're using POST with correct format
       final response = await dio.get(
         ApiConstants.getListUrl(date),
         options: Options(
@@ -61,7 +55,6 @@ class ProcessingRemoteDataSourceImpl implements ProcessingRemoteDataSource {
         ),
       );
     
-      // Add detailed logging
       debugPrint('Processing API response code: ${response.statusCode}');
       debugPrint('Processing API response data type: ${response.data.runtimeType}');
     
