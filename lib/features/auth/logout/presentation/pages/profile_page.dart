@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:warehouse_scan/core/constants/enum.dart';
 import 'package:warehouse_scan/core/widgets/scafford_custom.dart';
 import 'package:warehouse_scan/features/auth/login/domain/entities/user_entity.dart';
 import 'package:warehouse_scan/features/auth/logout/presentation/widgets/logout_button.dart';
@@ -19,6 +18,7 @@ class ProfilePage extends StatelessWidget {
       child: CustomScaffold(
         title: 'PROFILE',
         showNavBar: true,
+        showHomeIcon: false,
         currentIndex: 2,
         user: user,
         body: Container(
@@ -45,15 +45,14 @@ class ProfilePage extends StatelessWidget {
                     ),
                     child: CircleAvatar(
                       radius: 65,
-                      backgroundColor: user.role == UserRole.warehouseIn ? Color(0xFFDA7297) : Color(0xFF1A1A19),
+                      backgroundColor: Color(0xFFDA7297),
                       child: Container(
                         padding: const EdgeInsets.all(8.0),
                         decoration: BoxDecoration(shape: BoxShape.circle, color: Color(0xFFECE9E6)),
                         child: ClipOval(
                           child: SizedBox.fromSize(
                             size: const Size.fromRadius(48),
-                            child: user.role == UserRole.warehouseIn ? Image.asset('assets/avatar/Pig.png', cacheHeight: 84)
-                                                                        : Image.asset('assets/avatar/Panda.png', cacheHeight: 84),
+                            child: Image.asset('assets/avatar/Pig.png', cacheHeight: 84)
                           )
                         ),
                       ),
@@ -95,7 +94,7 @@ class ProfilePage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
-                      user.role == UserRole.warehouseIn ? '进口商' : '出口商',
+                      'Warehouse Manager',
                       style: const TextStyle(
                         fontSize: 16,
                         color: Colors.white,

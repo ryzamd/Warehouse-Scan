@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:warehouse_scan/core/constants/enum.dart';
 import 'package:warehouse_scan/features/process/domain/entities/processing_item_entity.dart';
 import 'package:warehouse_scan/features/process/presentation/bloc/processing_bloc.dart';
 import 'package:warehouse_scan/features/process/presentation/bloc/processing_event.dart';
 import 'package:warehouse_scan/features/process/presentation/bloc/processing_state.dart';
 
+import '../../../auth/login/domain/entities/user_entity.dart';
+
 class ProcessingDataTable extends StatelessWidget {
-  final UserRole userRole;
+  final UserEntity user;
   
   const ProcessingDataTable({
     super.key,
-    required this.userRole,
+    required this.user,
   });
 
   void _onSortColumn(BuildContext context, String column) {
@@ -88,7 +89,8 @@ class ProcessingDataTable extends StatelessWidget {
           _buildHeaderCell('指令號', flex: 2),
           _buildHeaderCell('入庫數量', flex: 2),
           _buildHeaderCell('出庫數量', flex: 2),
-          _buildHeaderCell(userRole == UserRole.warehouseIn ? '資材入庫' : '資材出庫',flex: 2),
+          // _buildHeaderCell(userRole == UserRole.warehouseIn ? '資材入庫' : '資材出庫',flex: 2),
+          _buildHeaderCell('資材入庫', flex: 2),
           _buildHeaderCell('時間', flex: 2,
             onTap: () => _onSortColumn(context, 'date'),
             isSort: sortColumn == 'date',
@@ -216,9 +218,10 @@ class ProcessingDataTable extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4.0),
             child: Text(
-              userRole == UserRole.warehouseIn
-                ? '${item.zcWarehouseQtyImport}'
-                : '${item.zcWarehouseQtyExport}',
+              // userRole == UserRole.warehouseIn
+              //   ? '${item.zcWarehouseQtyImport}'
+              //   : '${item.zcWarehouseQtyExport}',
+              '${item.zcWarehouseQtyImport}',
               style: const TextStyle(fontSize: 13),
               textAlign: TextAlign.center,
             ),

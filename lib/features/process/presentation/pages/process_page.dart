@@ -28,7 +28,6 @@ class _ProcessingPageState extends State<ProcessingPage> {
     super.initState();
     _searchController = TextEditingController();
     
-    // Debug token state before loading data
     WidgetsBinding.instance.addPostFrameCallback((_) {
       di.sl<AuthRepository>().debugTokenState().then((_) {
         if (mounted) {
@@ -68,8 +67,9 @@ class _ProcessingPageState extends State<ProcessingPage> {
     return CustomScaffold(
       title: 'PROCESSING',
       user: widget.user,
+      showHomeIcon: true,
       currentIndex: 0,
-      showBackButton: false,
+      showBackButton: true,
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -87,7 +87,7 @@ class _ProcessingPageState extends State<ProcessingPage> {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(12),
                   child: ProcessingDataTable(
-                    userRole: widget.user!.role,
+                    user: widget.user!
                   ),
                 ),
               ),
@@ -134,7 +134,6 @@ class _ProcessingPageState extends State<ProcessingPage> {
           suffixIcon: IconButton(
             icon: const Icon(Icons.clear),
             onPressed: () {
-              // Clear search and reset data
               _searchController.clear();
               context.read<ProcessingBloc>().add(
                 const SearchProcessingItemsEvent(query: ''),
@@ -149,7 +148,6 @@ class _ProcessingPageState extends State<ProcessingPage> {
           ),
         ),
         onChanged: (value) {
-          // Send search event when text changes
           context.read<ProcessingBloc>().add(
             SearchProcessingItemsEvent(query: value),
           );

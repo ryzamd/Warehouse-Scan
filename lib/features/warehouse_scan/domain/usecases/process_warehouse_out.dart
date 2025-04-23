@@ -15,6 +15,7 @@ class ProcessWarehouseOut {
       userName: params.userName,
       address: params.address,
       quantity: params.quantity,
+      optionFunction: params.optionFunction,
     );
   }
 }
@@ -24,14 +25,16 @@ class ProcessWarehouseOutParams extends Equatable {
   final String userName;
   final String address;
   final double quantity;
+  final int optionFunction;
 
   const ProcessWarehouseOutParams({
     required this.code,
     required this.userName,
     required this.address,
     required this.quantity,
+    required this.optionFunction,
   });
 
   @override
-  List<Object> get props => [code, userName, address, quantity];
+  List<Object> get props => [code, userName, address, quantity, optionFunction];
 }

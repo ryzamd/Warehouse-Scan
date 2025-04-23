@@ -86,7 +86,7 @@ class NotificationDialog extends StatelessWidget {
           onPressed: () {
             _isShowing = false;
             Navigator.pop(context);
-            if (onDismiss != null) {
+            if (onDismiss != null && context.mounted) {
               onDismiss!();
             }
           },

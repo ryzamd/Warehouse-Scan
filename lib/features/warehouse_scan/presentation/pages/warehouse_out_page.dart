@@ -34,13 +34,14 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
   final TextEditingController _quantityController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
   
-  bool _cameraActive = false; // Camera mặc định tắt
+  bool _cameraActive = false;
   bool _torchEnabled = false;
   double _maxQuantity = 0;
   String _currentCode = '';
   String _currentMaterialName = '';
   double _warehouseQtyImport = 0.0;
   double _warehouseQtyExport = 0.0;
+  int _optionFunction = 2;
 
   @override
   void initState() {
@@ -48,7 +49,6 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
     WidgetsBinding.instance.addObserver(this);
     _focusNode.requestFocus();
     
-    // Initialize hardware scanner
     ScanService.initializeScannerListener((scannedData) {
       debugPrint("QR DEBUG: Hardware scanner callback with data: $scannedData");
       if (mounted) {
@@ -87,26 +87,16 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
 
     try {
       _controller = MobileScannerController(
-        formats: const [
-          BarcodeFormat.qrCode,
-          BarcodeFormat.code128,
-          BarcodeFormat.code39,
-          BarcodeFormat.ean8,
-          BarcodeFormat.ean13,
-          BarcodeFormat.upcA,
-          BarcodeFormat.upcE,
-          BarcodeFormat.codabar,
-        ],
-        detectionSpeed: DetectionSpeed.noDuplicates,
+        formats: const [BarcodeFormat.qrCode, BarcodeFormat.code128],
+        detectionSpeed: DetectionSpeed.normal,
+        detectionTimeoutMs: 1000,
         facing: CameraFacing.back,
         returnImage: false,
         torchEnabled: _torchEnabled,
       );
 
-      // Initialize scanner in BLoC
       context.read<WarehouseOutBloc>().add(InitializeScanner(_controller!));
       
-      // Make sure camera is stopped if _cameraActive is false
       if (!_cameraActive && _controller != null) {
         _controller!.stop();
       }
@@ -203,6 +193,7 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
               code: _currentCode,
               address: _addressController.text,
               quantity: double.tryParse(_quantityController.text) ?? 0,
+              optionFunction: _optionFunction,
             ),
           );
         },
@@ -255,15 +246,16 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
   Widget build(BuildContext context) {
     return BlocConsumer<WarehouseOutBloc, WarehouseOutState>(
       listener: (context, state) {
+        var navigatorContext = Navigator.of(context);
+
         if (state is WarehouseOutProcessing) {
           LoadingDialog.show(context);
         } else if (state is MaterialInfoLoaded) {
-          // Hide loading dialog
-          if (Navigator.of(context).canPop()) {
-            Navigator.of(context).pop();
+
+          if (navigatorContext.canPop()) {
+            navigatorContext.pop();
           }
           
-          // Update local state for form
           setState(() {
             _currentCode = state.material.code;
             _currentMaterialName = state.material.mName;
@@ -276,8 +268,8 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
           LoadingDialog.show(context);
         } else if (state is WarehouseOutSuccess) {
 
-          if (Navigator.of(context).canPop()) {
-            Navigator.of(context).pop();
+          if (navigatorContext.canPop()) {
+            navigatorContext.pop();
           }
           
            NotificationDialog.show(
@@ -295,8 +287,8 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
           );
         } else if (state is WarehouseOutError) {
 
-          if (Navigator.of(context).canPop()) {
-            Navigator.of(context).pop();
+          if (navigatorContext.canPop()) {
+            navigatorContext.pop();
           }
           
           ErrorDialog.show(
@@ -309,9 +301,9 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
       builder: (context, state) {
         return CustomScaffold(
           title: 'EXPORT PAGE',
+          showHomeIcon: true,
           user: widget.user,
           currentIndex: 1,
-          // Add camera control buttons to the AppBar
           actions: [
             IconButton(
               icon: Icon(
@@ -374,7 +366,7 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
 
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.symmetric(horizontal: 6),
                     child: Form(
                       key: _formKey,
                       child: _buildInfoTable(),
@@ -388,27 +380,53 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
                     child: Center(
                       child: MediaQuery.of(context).viewInsets.bottom > 0
                         ? const SizedBox.shrink()
-                        : ElevatedButton(
-                            onPressed: _submitForm,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green.shade600,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 32,
-                                vertical: 12,
+                        : Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            ElevatedButton(
+                              onPressed: _submitForm,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green.shade600,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 32,
+                                  vertical: 12,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
                               ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
+                              child: const Text(
+                                '保存',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white
+                                ),
                               ),
                             ),
-                            child: const Text(
-                              'Save',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white
+
+                            ElevatedButton(
+                              onPressed: () {
+                                setState(() {
+                                  _optionFunction = _optionFunction == 2 ? 1 : 2;
+                                });
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: _optionFunction == 2 ? Colors.red : Colors.green.shade600,
+                                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                               ),
-                            ),
-                          ),
+                              child: Text(
+                                      _optionFunction == 2 ? '减少' : '增加',
+                                      style: const TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                      ),
+                                    ),
+                            )
+                          ],
+                        ),
                     ),
                   ),
                 )

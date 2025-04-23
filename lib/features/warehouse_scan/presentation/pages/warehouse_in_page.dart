@@ -1,4 +1,3 @@
-// lib/features/warehouse_scan/presentation/pages/warehouse_in_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -75,16 +74,7 @@ class _WarehouseInPageState extends State<WarehouseInPage> with WidgetsBindingOb
 
     try {
       _controller = MobileScannerController(
-        formats: const [
-          BarcodeFormat.qrCode,
-          BarcodeFormat.code128,
-          BarcodeFormat.code39,
-          BarcodeFormat.ean8,
-          BarcodeFormat.ean13,
-          BarcodeFormat.upcA,
-          BarcodeFormat.upcE,
-          BarcodeFormat.codabar,
-        ],
+        formats: const [BarcodeFormat.qrCode, BarcodeFormat.code128],
         detectionSpeed: DetectionSpeed.normal,
         detectionTimeoutMs: 1000,
         facing: CameraFacing.back,
@@ -92,10 +82,8 @@ class _WarehouseInPageState extends State<WarehouseInPage> with WidgetsBindingOb
         torchEnabled: _torchEnabled,
       );
 
-      // Initialize scanner in BLoC
       context.read<WarehouseInBloc>().add(InitializeScanner(_controller!));
       
-      // Make sure camera is stopped if _cameraActive is false
       if (!_cameraActive && _controller != null) {
         _controller!.stop();
       }
@@ -241,6 +229,7 @@ class _WarehouseInPageState extends State<WarehouseInPage> with WidgetsBindingOb
         return CustomScaffold(
           title: 'IMPORT PAGE',
           user: widget.user,
+          showHomeIcon: true,
           currentIndex: 1,
           body: KeyboardListener(
             focusNode: _focusNode,

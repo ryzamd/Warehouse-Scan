@@ -21,10 +21,6 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   
-  // Using warehouse role options
-  String _selectedDepartment = '資材入庫';
-  final List<String> _departments = ['資材入庫', '資材出庫'];
-  
   final FocusNode _userIdFocusNode = FocusNode();
   final FocusNode _passwordFocusNode = FocusNode();
 
@@ -41,20 +37,6 @@ class _LoginPageState extends State<LoginPage> {
     FocusManager.instance.primaryFocus?.unfocus();
   }
 
-  void _handleDepartmentChange(String? department) {
-    if (department != null && department != _selectedDepartment) {
-      setState(() {
-        _selectedDepartment = department;
-      });
-      
-      Future.delayed(const Duration(milliseconds: 100), () {
-        if (mounted) {
-          FocusScope.of(context).canRequestFocus = true;
-        }
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
@@ -68,7 +50,7 @@ class _LoginPageState extends State<LoginPage> {
         if (state is LoginSuccess) {
           Navigator.pushNamedAndRemoveUntil(
             context,
-            AppRoutes.processing,
+            AppRoutes.warehouseMenu,
             (route) => false,
             arguments: state.user,
           );
@@ -168,12 +150,6 @@ class _LoginPageState extends State<LoginPage> {
                                               FocusScope.of(context).canRequestFocus = true;
                                             },
                                           ),
-                                          const SizedBox(height: 16),
-                                          DepartmentDropdown(
-                                            selectedDepartment: _selectedDepartment,
-                                            departments: _departments,
-                                            onChanged: _handleDepartmentChange,
-                                          ),
                                           const SizedBox(height: 24),
                                           BlocBuilder<LoginBloc, LoginState>(
                                             builder: (context, state) {
@@ -187,7 +163,7 @@ class _LoginPageState extends State<LoginPage> {
                                                       LoginButtonPressed(
                                                         userId: _userIdController.text,
                                                         password: _passwordController.text,
-                                                        name: _selectedDepartment,
+                                                        name: '資材出入',
                                                       ),
                                                     );
                                                   }

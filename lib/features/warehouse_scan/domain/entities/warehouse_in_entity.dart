@@ -1,4 +1,3 @@
-// lib/features/warehouse_scan/domain/entities/warehouse_in_entity.dart
 import 'package:equatable/equatable.dart';
 
 class WarehouseInEntity extends Equatable {

@@ -139,9 +139,10 @@ class WarehouseOutBloc extends Bloc<WarehouseOutEvent, WarehouseOutState> {
       final result = await processWarehouseOut(
         ProcessWarehouseOutParams(
           code: event.code,
-          userName: currentUser.name, // Sử dụng userName từ currentUser
+          userName: currentUser.name,
           address: event.address,
           quantity: event.quantity,
+          optionFunction: event.optionFunction,
         ),
       );
       
@@ -173,10 +174,8 @@ class WarehouseOutBloc extends Bloc<WarehouseOutEvent, WarehouseOutState> {
   ) {
     debugPrint('Hardware scan detected: ${event.scannedData}');
     
-    // Show processing state
     emit(WarehouseOutProcessing(event.scannedData));
     
-    // Get material info
     add(GetMaterialInfoEvent(event.scannedData));
   }
   

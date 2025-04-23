@@ -1,40 +1,54 @@
-// lib/common/widgets/custom_navbar.dart
 import 'package:flutter/material.dart';
-import '../../features/auth/login/domain/entities/user_entity.dart';
 import '../constants/app_routes.dart';
+import '../services/navigation_service.dart';
+import '../../features/auth/login/domain/entities/user_entity.dart';
 
 class CustomNavBar extends StatelessWidget {
   final int currentIndex;
   final UserEntity? user;
   final bool disableNavigation;
+  final bool showHomeIcon;
+  final Function(int)? customCallback;
 
-  const CustomNavBar({super.key, required this.currentIndex, this.user, this.disableNavigation = false});
+  const CustomNavBar({
+    super.key,
+    required this.currentIndex,
+    this.user,
+    this.disableNavigation = false,
+    required this.showHomeIcon,
+    this.customCallback,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final navigationService = NavigationService();
+    
     return Container(
-      decoration: BoxDecoration(color: Color(0xFF4158A6)),
+      decoration: const BoxDecoration(color: Color(0xFF4158A6)),
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
+              if (showHomeIcon)
               _buildNavItem(
                 context,
                 icon: Icons.home_outlined,
                 selectedIcon: Icons.home,
                 index: 0,
-                route: AppRoutes.processing,
+                route: navigationService.isInSpecialFeature ? AppRoutes.processingwarehouseOut : AppRoutes.processingwarehouseIn,
               ),
+              
               _buildNavItem(
                 context,
                 icon: Icons.work_rounded,
                 selectedIcon: Icons.work_rounded,
                 index: 1,
-                route: AppRoutes.scan,
-                badge: true,
+                route: AppRoutes.warehouseMenu,
               ),
+              
+              if (!showHomeIcon)
               _buildNavItem(
                 context,
                 icon: Icons.person_outline,
@@ -59,13 +73,23 @@ class CustomNavBar extends StatelessWidget {
     bool badge = false,
   }) {
     final isSelected = currentIndex == index;
+    final navigationService = NavigationService();
 
     return InkWell(
       onTap: disableNavigation ? null : () {
         if (!isSelected) {
-          Navigator.of(context).pushNamedAndRemoveUntil(
-            route,
-            (r) => false,
+          String destination = route;
+          
+          if (index == 1 && route == AppRoutes.warehouseMenu) {
+            destination = navigationService.getWorkDestination(context);
+          }
+          
+          if (index == 2 && route == AppRoutes.profile) {
+            navigationService.enterProfilePage();
+          }
+          
+          Navigator.of(context).pushReplacementNamed(
+            destination,
             arguments: user,
           );
         }
@@ -75,18 +99,10 @@ class CustomNavBar extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Icon(
-                  isSelected ? selectedIcon : icon,
-                  color:
-                      isSelected
-                          ? Colors.white
-                          : Colors.white.withValues(alpha: 0.7),
-                  size: 24,
-                ),
-              ],
+            Icon(
+              isSelected ? selectedIcon : icon,
+              color: isSelected ? Colors.white : Colors.white.withValues(alpha: 0.7),
+              size: 24,
             ),
           ],
         ),

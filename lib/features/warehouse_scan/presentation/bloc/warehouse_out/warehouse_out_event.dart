@@ -39,15 +39,17 @@ class ProcessWarehouseOutEvent extends WarehouseOutEvent {
   final String code;
   final String address;
   final double quantity;
+  final int optionFunction;
 
   const ProcessWarehouseOutEvent({
     required this.code,
     required this.address,
     required this.quantity,
+    required this.optionFunction,
   });
 
   @override
-  List<Object> get props => [code, address, quantity];
+  List<Object> get props => [code, address, quantity, optionFunction];
 }
 
 class HardwareScanEvent extends WarehouseOutEvent {
@@ -73,3 +75,5 @@ class ValidateQuantityEvent extends WarehouseOutEvent {
   @override
   List<Object> get props => [quantity, maxQuantity];
 }
+
+class GetAddressListEvent extends WarehouseOutEvent{}

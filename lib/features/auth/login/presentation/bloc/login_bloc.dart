@@ -17,46 +17,34 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     on<CheckToken>(_onCheckToken);
   }
 
-  /// Handle login button press event
   Future<void> _onLoginButtonPressed(
     LoginButtonPressed event,
     Emitter<LoginState> emit,
   ) async {
 
-    // code tạm thời để logout trước khi login lại
-    //await di.sl<AuthRepository>().logout();
-
-    // Show loading state
     emit(LoginLoading());
 
-    // Call the authRepository directly
     final result = await di.sl<AuthRepository>().loginUser(
       userId: event.userId,
       password: event.password,
       name: event.name,
     );
 
-    // Emit success or failure based on the result
     result.fold(
       (failure) => emit(LoginFailure(message: failure.message)),
       (user) async {
         emit(LoginSuccess(user: user));
         
-        // Debug token state after login success
         await di.sl<AuthRepository>().debugTokenState();
       }
     );
   }
 
-  /// Handle token check event
   Future<void> _onCheckToken(CheckToken event, Emitter<LoginState> emit) async {
-    // Show loading state
     emit(TokenChecking());
 
-    // Call the validate token use case
     final result = await validateToken(TokenParams(token: event.token));
 
-    // Emit success or failure based on the result
     result.fold(
       (failure) => emit(LoginInitial()),
       (user) => emit(LoginSuccess(user: user)),

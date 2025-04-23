@@ -105,7 +105,7 @@ Future<void> init() async {
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton(() => sharedPreferences);
   sl.registerLazySingleton(() => InternetConnectionChecker.createInstance(
-    checkTimeout: const Duration(milliseconds: 500),
+    checkTimeout: const Duration(milliseconds: 800),
     checkInterval: const Duration(seconds: 10),
   ));
 
