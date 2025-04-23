@@ -1,11 +1,10 @@
-// lib/core/errors/exceptions.dart
 class WarehouseException implements Exception {
   final String message;
 
   WarehouseException(this.message);
 
   @override
-  String toString() => 'WarehouseException: $message';
+  String toString() => message;
 }
 
 class MaterialNotFoundException implements Exception {
@@ -14,7 +13,7 @@ class MaterialNotFoundException implements Exception {
   MaterialNotFoundException(this.barcode);
 
   @override
-  String toString() => 'MaterialNotFoundException: No material found for barcode: $barcode';
+  String toString() => 'No material found for barcode: $barcode';
 }
 
 class WarehouseInException implements Exception {
@@ -23,7 +22,7 @@ class WarehouseInException implements Exception {
   WarehouseInException(this.message);
 
   @override
-  String toString() => 'WarehouseInException: $message';
+  String toString() => message;
 }
 
 class WarehouseOutException implements Exception {
@@ -32,5 +31,5 @@ class WarehouseOutException implements Exception {
   WarehouseOutException(this.message);
 
   @override
-  String toString() => 'WarehouseOutException: $message';
+  String toString() => message;
 }
