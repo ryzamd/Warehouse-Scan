@@ -20,7 +20,8 @@ class WarehouseOutModel extends WarehouseOutEntity {
     required super.staff,
     required super.qtyState,
     required super.zcWarehouseQtyImport,
-    required super.zcWarehouseQtyExport
+    required super.zcWarehouseQtyExport,
+    required super.address
   });
 
   @JsonKey(name: 'mwh_id', defaultValue: 0)
@@ -67,6 +68,9 @@ class WarehouseOutModel extends WarehouseOutEntity {
 
   @JsonKey(defaultValue: '')
   String get getQtyState => qtyState;
+
+  @JsonKey(name: 'zc_out_Warehouse_unit', defaultValue: '')
+  String get getAddress => address;
 
   factory WarehouseOutModel.fromJson(Map<String, dynamic> json) =>
       _$WarehouseOutModelFromJson(json);

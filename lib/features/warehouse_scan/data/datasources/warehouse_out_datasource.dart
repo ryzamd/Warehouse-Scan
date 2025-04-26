@@ -106,13 +106,10 @@ class WarehouseOutDataSourceImpl implements WarehouseOutDataSource {
   @override
   Future<GetAddressListModel> getAddressList() async {
     try {
-      
       final response = await dio.post(ApiConstants.getAddressListUrl);
       
-      debugPrint('Process warehouse out response: ${response.statusCode}');
-      
       if (response.statusCode == 200) {
-        if (response.data['message'] == 'Success') {
+        if (response.data['message'].toString().toLowerCase() == 'success') {
           return GetAddressListModel.fromJson(response.data);
         } else {
           throw WarehouseOutException(response.data['message'] ?? 'Get Address failed');
@@ -121,10 +118,10 @@ class WarehouseOutDataSourceImpl implements WarehouseOutDataSource {
         throw WarehouseOutException('Server returned error code: ${response.statusCode}');
       }
     } on DioException catch (e) {
-      debugPrint('DioException in processWarehouseOut: ${e.message}');
+      debugPrint('DioException in getAddressList: ${e.message}');
       throw WarehouseOutException('Network error');
     } catch (e) {
-      debugPrint('Unexpected error in processWarehouseOut: $e');
+      debugPrint('Unexpected error in getAddressList: $e');
       throw WarehouseOutException(e.toString());
     }
   }

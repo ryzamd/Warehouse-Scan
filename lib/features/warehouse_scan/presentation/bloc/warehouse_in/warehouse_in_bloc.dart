@@ -77,13 +77,13 @@ class WarehouseInBloc extends Bloc<WarehouseInEvent, WarehouseInState> {
     debugPrint('Processing warehouse in for code: ${event.code}');
     
     // Check for internet connection
-    if (!(await connectionChecker.hasConnection)) {
-      emit(WarehouseInError(
-        message: 'No internet connection. Please check your network.',
-        previousState: state,
-      ));
-      return;
-    }
+    // if (!(await connectionChecker.hasConnection)) {
+    //   emit(WarehouseInError(
+    //     message: 'No internet connection. Please check your network.',
+    //     previousState: state,
+    //   ));
+    //   return;
+    // }
     
     try {
       final result = await processWarehouseIn(

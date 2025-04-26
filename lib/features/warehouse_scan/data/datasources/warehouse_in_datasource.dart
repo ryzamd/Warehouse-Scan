@@ -25,8 +25,8 @@ class WarehouseInDataSourceImpl implements WarehouseInDataSource {
       final response = await dio.post(
         ApiConstants.warehouseInUrl,
         data: {
-          'In_code': code,
-          'In_UserName': userName,
+          'code': code,
+          'UserName': userName,
         },
       );
       

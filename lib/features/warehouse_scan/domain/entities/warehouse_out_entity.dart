@@ -17,6 +17,7 @@ class WarehouseOutEntity extends Equatable {
   final String qtyState;
   final double zcWarehouseQtyImport;
   final double zcWarehouseQtyExport;
+  final String address;
 
   const WarehouseOutEntity({
     required this.mwhId,
@@ -34,6 +35,7 @@ class WarehouseOutEntity extends Equatable {
     required this.qtyState,
     required this.zcWarehouseQtyImport,
     required this.zcWarehouseQtyExport,
+    required this.address,
   });
 
   @override
@@ -53,5 +55,6 @@ class WarehouseOutEntity extends Equatable {
         qtyState,
         zcWarehouseQtyImport,
         zcWarehouseQtyExport,
+        address,
       ];
 }

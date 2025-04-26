@@ -23,6 +23,7 @@ WarehouseOutModel _$WarehouseOutModelFromJson(Map<String, dynamic> json) =>
       code: json['code'] as String? ?? '',
       staff: json['staff'] as String? ?? '',
       qtyState: json['qty_state'] as String? ?? '',
+      address: json['zc_out_Warehouse_unit'] as String? ?? '',
     );
 
 Map<String, dynamic> _$WarehouseOutModelToJson(WarehouseOutModel instance) =>
@@ -42,4 +43,5 @@ Map<String, dynamic> _$WarehouseOutModelToJson(WarehouseOutModel instance) =>
       'code': instance.code,
       'staff': instance.staff,
       'qtyState': instance.qtyState,
+      'address': instance.address,
     };

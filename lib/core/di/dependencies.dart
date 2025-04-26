@@ -39,6 +39,8 @@ import 'package:warehouse_scan/features/warehouse_scan/domain/usecases/process_w
 import 'package:warehouse_scan/features/warehouse_scan/presentation/bloc/warehouse_in/warehouse_in_bloc.dart';
 import 'package:warehouse_scan/features/warehouse_scan/presentation/bloc/warehouse_out/warehouse_out_bloc.dart';
 
+import '../../features/warehouse_scan/domain/usecases/get_address_list.dart';
+
 final sl = GetIt.instance;
 
 Future<void> init() async {
@@ -183,6 +185,7 @@ Future<void> init() async {
   // Use cases
   sl.registerLazySingleton(() => GetMaterialInfo(sl()));
   sl.registerLazySingleton(() => ProcessWarehouseOut(sl()));
+  sl.registerLazySingleton(() => GetAddressList(sl()));
   
   // BLoC
   sl.registerFactoryParam<WarehouseOutBloc, UserEntity, void>(
@@ -191,6 +194,7 @@ Future<void> init() async {
       processWarehouseOut: sl(),
       connectionChecker: sl(),
       currentUser: user,
+      getAddressList: sl(),
     ),
   );
 

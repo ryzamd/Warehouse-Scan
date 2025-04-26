@@ -1,30 +1,30 @@
 import 'package:flutter/material.dart';
 
 class LoadingDialog extends StatelessWidget {
-  static bool _isShowing = false;
+  static bool isShowing = false;
   
   const LoadingDialog({
     super.key,
   });
   
   static void show(BuildContext context) {
-    if (!_isShowing && context.mounted) {
-      _isShowing = true;
+    if (!isShowing && context.mounted) {
+      isShowing = true;
       
       showDialog(
         context: context,
         barrierDismissible: false,
         builder: (context) => const LoadingDialog(),
       ).then((_) {
-        _isShowing = false;
+        isShowing = false;
       });
     }
   }
   
   static void hide(BuildContext context) {
-    if (_isShowing && context.mounted) {
+    if (isShowing && context.mounted) {
       Navigator.of(context).pop();
-      _isShowing = false;
+      isShowing = false;
     }
   }
   

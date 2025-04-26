@@ -1,9 +1,12 @@
 // lib/features/warehouse_scan/presentation/bloc/warehouse_out/warehouse_out_bloc.dart
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:warehouse_scan/features/auth/login/domain/entities/user_entity.dart';
+import '../../../domain/usecases/get_address_list.dart';
 import '../../../domain/usecases/get_material_info.dart';
 import '../../../domain/usecases/process_warehouse_out.dart';
 import 'warehouse_out_event.dart';
@@ -14,6 +17,7 @@ class WarehouseOutBloc extends Bloc<WarehouseOutEvent, WarehouseOutState> {
   final ProcessWarehouseOut processWarehouseOut;
   final InternetConnectionChecker connectionChecker;
   final UserEntity currentUser;
+  final GetAddressList getAddressList;
   
   MobileScannerController? scannerController;
 
@@ -22,6 +26,7 @@ class WarehouseOutBloc extends Bloc<WarehouseOutEvent, WarehouseOutState> {
     required this.processWarehouseOut,
     required this.connectionChecker,
     required this.currentUser,
+    required this.getAddressList,
   }) : super(WarehouseOutInitial()) {
     on<InitializeScanner>(_onInitializeScanner);
     on<ScanBarcode>(_onScanBarcode);
@@ -30,11 +35,10 @@ class WarehouseOutBloc extends Bloc<WarehouseOutEvent, WarehouseOutState> {
     on<HardwareScanEvent>(_onHardwareScan);
     on<ClearScannedData>(_onClearScannedData);
     on<ValidateQuantityEvent>(_onValidateQuantity);
+    on<GetAddressListEvent>(_onGetAddressListAsync);
     
-    // Listen for connection changes
     connectionChecker.onStatusChange.listen((status) {
       if (status == InternetConnectionStatus.disconnected) {
-        // Handle disconnection
         debugPrint('Internet connection lost!');
       }
     });
@@ -75,13 +79,13 @@ class WarehouseOutBloc extends Bloc<WarehouseOutEvent, WarehouseOutState> {
     debugPrint('Getting material info for code: ${event.code}');
     
     // Check for internet connection
-    if (!(await connectionChecker.hasConnection)) {
-      emit(WarehouseOutError(
-        message: 'No internet connection. Please check your network.',
-        previousState: state,
-      ));
-      return;
-    }
+    // if (!(await connectionChecker.hasConnection)) {
+    //   emit(WarehouseOutError(
+    //     message: 'No internet connection. Please check your network.',
+    //     previousState: state,
+    //   ));
+    //   return;
+    // }
     
     try {
       final result = await getMaterialInfo(
@@ -118,15 +122,6 @@ class WarehouseOutBloc extends Bloc<WarehouseOutEvent, WarehouseOutState> {
     Emitter<WarehouseOutState> emit,
   ) async {
     debugPrint('Processing warehouse out: ${event.code}, ${event.address}, ${event.quantity}');
-    
-    // Check for internet connection
-    if (!(await connectionChecker.hasConnection)) {
-      emit(WarehouseOutError(
-        message: 'No internet connection. Please check your network.',
-        previousState: state,
-      ));
-      return;
-    }
     
     // Show processing state
     emit(WarehouseOutProcessingRequest(
@@ -201,34 +196,25 @@ class WarehouseOutBloc extends Bloc<WarehouseOutEvent, WarehouseOutState> {
     if (state is MaterialInfoLoaded) {
       final currentState = state as MaterialInfoLoaded;
       final double? quantity = double.tryParse(event.quantity);
+      String? error;
+      bool exceeded = false;
       
-      if (quantity == null) {
-        emit(currentState.copyWith(
-          quantityError: 'Please enter a valid number',
-          quantityExceeded: false,
-        ));
-        return;
+      if (event.quantity.isEmpty) {
+        // Don't show error for empty field
+        error = null;
+      } else if (quantity == null) {
+        error = 'Please enter a valid number';
+      } else if (quantity <= 0) {
+        error = 'Quantity must be greater than 0';
+      } else if (quantity > event.maxQuantity) {
+        error = 'Quantity exceeds available amount';
+        exceeded = true;
       }
       
-      if (quantity < 0) {
-        emit(currentState.copyWith(
-          quantityError: 'Quantity cannot be negative',
-          quantityExceeded: false,
-        ));
-        return;
-      }
-      
-      if (quantity > event.maxQuantity) {
-        emit(currentState.copyWith(
-          quantityError: 'Quantity invalid',
-          quantityExceeded: true,
-        ));
-        return;
-      }
-      
+      // Only update validation properties, not create a new state type
       emit(currentState.copyWith(
-        quantityError: null,
-        quantityExceeded: false,
+        quantityError: error,
+        quantityExceeded: exceeded,
       ));
     }
   }
@@ -237,5 +223,32 @@ class WarehouseOutBloc extends Bloc<WarehouseOutEvent, WarehouseOutState> {
   Future<void> close() {
     scannerController?.dispose();
     return super.close();
+  }
+
+  Future<void> _onGetAddressListAsync(
+    GetAddressListEvent event,
+    Emitter<WarehouseOutState> emit,
+  ) async {
+    debugPrint('Getting address list');
+    
+    emit(AddressListLoading());
+    
+    try {
+      final result = await getAddressList();
+      
+      result.fold(
+        (failure) {
+          debugPrint('Failed to get address list: ${failure.message}');
+          emit(AddressListError(message: failure.message));
+        },
+        (addressListEntity) {
+          debugPrint('Address list loaded successfully: ${addressListEntity.listAddress.length} addresses');
+          emit(AddressListLoaded(addressList: addressListEntity.listAddress));
+        },
+      );
+    } catch (e) {
+      debugPrint('Error getting address list: $e');
+      emit(AddressListError(message: 'Failed to load address list'));
+    }
   }
 }
