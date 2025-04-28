@@ -32,6 +32,10 @@ class NavigationService {
   void enterProcessingPageWarehouseOut() {
     previousMainRoute = AppRoutes.processingwarehouseOut;
   }
+
+  void enterProcessingPageInventory() {
+    previousMainRoute = AppRoutes.processingwarehouseOut;
+  }
   
   void enterProfilePage() {
     previousMainRoute = AppRoutes.warehouseMenu;
@@ -41,8 +45,11 @@ class NavigationService {
   String getWorkDestination(BuildContext context) {
     final currentRoute = ModalRoute.of(context)?.settings.name;
     
-    if (currentRoute == AppRoutes.warehouseIn || currentRoute == AppRoutes.warehouseOut) {
-      return lastWarehouseRoute ?? AppRoutes.warehouseMenu;
+    switch(currentRoute){
+      case AppRoutes.warehouseIn:
+      case AppRoutes.warehouseOut:
+      case AppRoutes.inventoryCheck:
+        return lastWarehouseRoute ?? AppRoutes.warehouseMenu;
     }
     
     if (currentRoute == AppRoutes.profile) {
@@ -59,8 +66,7 @@ class NavigationService {
       return true;
     }
     
-    if (currentRoute == AppRoutes.warehouseMenu ||
-        currentRoute == AppRoutes.profile) {
+    if (currentRoute == AppRoutes.warehouseMenu || currentRoute == AppRoutes.profile) {
       return false;
     }
     
@@ -70,10 +76,16 @@ class NavigationService {
   void handleBackButton(BuildContext context) {
     String? currentRoute = ModalRoute.of(context)?.settings.name;
     
-    if (currentRoute == AppRoutes.warehouseIn || currentRoute == AppRoutes.warehouseOut
-                        || currentRoute == AppRoutes.processingwarehouseIn || currentRoute == AppRoutes.processingwarehouseOut) {
-      Navigator.pop(context);
+    switch(currentRoute){
+      case AppRoutes.warehouseIn:
+      case AppRoutes.warehouseOut:
+      case AppRoutes.processingwarehouseIn:
+      case AppRoutes.processingwarehouseOut:
+      case AppRoutes.inventoryCheck:
+        Navigator.pop(context);
+      break;
     }
+
     if (currentRoute != null && currentRoute.startsWith('/warehouse_menu/')) {
       Navigator.pushReplacementNamed(
         context,

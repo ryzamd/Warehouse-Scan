@@ -48,6 +48,12 @@ class WarehouseMenuPage extends StatelessWidget {
                 icon: Icons.output,
                 route: AppRoutes.warehouseOut,
               ),
+              _buildFunctionTile(
+                context,
+                title: 'Inventory',
+                icon: Icons.inventory_2,
+                route: AppRoutes.inventoryCheck,
+              ),
             ],
           ),
         ),

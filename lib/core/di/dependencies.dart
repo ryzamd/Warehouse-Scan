@@ -21,6 +21,12 @@ import '../../features/auth/logout/data/repositories/logout_repository_impl.dart
 import '../../features/auth/logout/domain/repositories/logout_repository.dart';
 import '../../features/auth/logout/domain/usecases/logout_usecase.dart';
 import '../../features/auth/logout/presentation/bloc/logout_bloc.dart';
+import '../../features/inventory_check/data/datasources/inventory_check_datasource.dart';
+import '../../features/inventory_check/data/repositories/inventory_check_repository_impl.dart';
+import '../../features/inventory_check/domain/repositories/inventory_check_repository.dart';
+import '../../features/inventory_check/domain/usecases/check_item_code.dart';
+import '../../features/inventory_check/domain/usecases/save_inventory_items.dart';
+import '../../features/inventory_check/presentation/bloc/inventory_check_bloc.dart';
 import '../../features/process/data/datasources/processing_remote_datasource.dart';
 import '../../features/process/data/repositories/processing_repository_impl.dart';
 import '../../features/process/domain/repositories/processing_repository.dart';
@@ -44,36 +50,40 @@ import '../../features/warehouse_scan/domain/usecases/get_address_list.dart';
 final sl = GetIt.instance;
 
 Future<void> init() async {
-  // Core services
+  await _initSystemCore();
+  await _initLoginFeature();
+  await _initProcessFeature();
+  await _initWarehousImportFeature();
+  await _initWarehouseExportFeature();
+  await _initCheckMaterialToImportInventory();
+  await _initLogoutFeature();
+}
+
+Future<void> _initSystemCore() async {
+  
   sl.registerLazySingleton(() => SecureStorageService());
   
-  // Create DioClient instance
   final dioClient = DioClient();
   sl.registerLazySingleton<DioClient>(() => dioClient);
   
-  // Register AuthRepository
-  sl.registerLazySingleton<AuthRepository>(
-    () => AuthRepository(sl<SecureStorageService>(), sl<DioClient>()),
-  );
+  sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl()));
   
-  // Register navigator key
+  sl.registerLazySingleton<AuthRepository>(() => AuthRepository(sl<SecureStorageService>(), sl<DioClient>()));
+  
   final navigatorKey = GlobalKey<NavigatorState>();
   sl.registerLazySingleton<GlobalKey<NavigatorState>>(() => navigatorKey);
   
-  // Create TokenInterceptor and add it to DioClient immediately
   final tokenInterceptor = TokenInterceptor(
     authRepository: sl<AuthRepository>(),
     navigatorKey: sl<GlobalKey<NavigatorState>>(),
   );
   
-  // Add interceptor to dio client
   dioClient.dio.interceptors.insert(0, tokenInterceptor);
   
-  // Register the individual Dio instance
   sl.registerLazySingleton<Dio>(() => dioClient.dio);
-  
-  // ======= Login Page ======== //
-  // BLoC
+}
+
+Future<void> _initLoginFeature() async {
   sl.registerFactory(
     () => LoginBloc(
       userLogin: sl(),
@@ -81,11 +91,9 @@ Future<void> init() async {
     ),
   );
 
-  // Use cases
   sl.registerLazySingleton(() => UserLogin(sl()));
   sl.registerLazySingleton(() => ValidateToken(sl()));
 
-  // Repository
   sl.registerLazySingleton<UserRepository>(
     () => UserRepositoryImpl(
       remoteDataSource: sl(),
@@ -93,38 +101,24 @@ Future<void> init() async {
     ),
   );
 
-  // Data sources
   sl.registerLazySingleton<LoginRemoteDataSource>(
     () => LoginRemoteDataSourceImpl(dio: sl<Dio>()),
   );
 
-  // Core
-  sl.registerLazySingleton<NetworkInfo>(
-    () => NetworkInfoImpl(sl()),
-  );
-
-  // External
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton(() => sharedPreferences);
   sl.registerLazySingleton(() => InternetConnectionChecker.createInstance(
     checkTimeout: const Duration(milliseconds: 800),
     checkInterval: const Duration(seconds: 10),
   ));
+}
 
-  // ======= End Login Page ======== //
+Future<void> _initProcessFeature() async {
 
-  // ======= Process Page ======== //
-  // BLoC
-  sl.registerFactory(
-    () => ProcessingBloc(
-      getProcessingItems: sl(),
-    ),
-  );
+  sl.registerFactory(() => ProcessingBloc(getProcessingItems: sl()));
 
-  // Use cases
   sl.registerLazySingleton(() => GetProcessingItems(sl()));
 
-  // Repository
   sl.registerLazySingleton<ProcessingRepository>(
     () => ProcessingRepositoryImpl(
       remoteDataSource: sl(),
@@ -132,22 +126,20 @@ Future<void> init() async {
     ),
   );
 
-  // Data sources
   sl.registerLazySingleton<ProcessingRemoteDataSource>(
-    () => ProcessingRemoteDataSourceImpl(dio: sl(), useMockData: false),
+    () => ProcessingRemoteDataSourceImpl(
+      dio: sl(),
+      useMockData: false
+    ),
   );
+}
 
-  // ======= End Process Page ======== //
-
-
-  // ======= Warehouse-In ======== //
+Future<void> _initWarehousImportFeature() async {
   
-  // Data sources
   sl.registerLazySingleton<WarehouseInDataSource>(
     () => WarehouseInDataSourceImpl(dio: sl()),
   );
   
-  // Repository
   sl.registerLazySingleton<WarehouseInRepository>(
     () => WarehouseInRepositoryImpl(
       dataSource: sl(),
@@ -155,10 +147,8 @@ Future<void> init() async {
     ),
   );
   
-  // Use cases
   sl.registerLazySingleton(() => ProcessWarehouseIn(sl()));
-  
-  // BLoC
+
   sl.registerFactoryParam<WarehouseInBloc, UserEntity, void>(
     (user, _) => WarehouseInBloc(
       processWarehouseIn: sl(),
@@ -166,15 +156,14 @@ Future<void> init() async {
       currentUser: user,
     ),
   );
+}
+
+Future<void> _initWarehouseExportFeature() async {
   
-  // ======= Warehouse-Out ======== //
-  
-  // Data sources
   sl.registerLazySingleton<WarehouseOutDataSource>(
     () => WarehouseOutDataSourceImpl(dio: sl()),
   );
   
-  // Repository
   sl.registerLazySingleton<WarehouseOutRepository>(
     () => WarehouseOutRepositoryImpl(
       dataSource: sl(),
@@ -182,12 +171,10 @@ Future<void> init() async {
     ),
   );
   
-  // Use cases
   sl.registerLazySingleton(() => GetMaterialInfo(sl()));
   sl.registerLazySingleton(() => ProcessWarehouseOut(sl()));
   sl.registerLazySingleton(() => GetAddressList(sl()));
   
-  // BLoC
   sl.registerFactoryParam<WarehouseOutBloc, UserEntity, void>(
     (user, _) => WarehouseOutBloc(
       getMaterialInfo: sl(),
@@ -197,8 +184,10 @@ Future<void> init() async {
       getAddressList: sl(),
     ),
   );
+}
 
-  // ======= Logout ======== //
+Future<void> _initLogoutFeature() async {
+
   sl.registerLazySingleton<LogoutDataSource>(
     () => LogoutDataSourceImpl(
       sharedPreferences: sl(),
@@ -206,17 +195,36 @@ Future<void> init() async {
     ),
   );
 
-  sl.registerLazySingleton<LogoutRepository>(
-    () => LogoutRepositoryImpl(
-      dataSource: sl(),
-    ),
-  );
-
+  sl.registerLazySingleton<LogoutRepository>(() => LogoutRepositoryImpl(dataSource: sl()));
   sl.registerLazySingleton(() => LogoutUseCase(sl()));
 
   sl.registerFactory(
     () => LogoutBloc(
       logoutUseCase: sl(),
+    ),
+  );
+}
+
+Future<void> _initCheckMaterialToImportInventory() async {
+
+  sl.registerLazySingleton<InventoryCheckDataSource>(() => InventoryCheckDataSourceImpl(dio: sl()));
+  
+  sl.registerLazySingleton<InventoryCheckRepository>(
+    () => InventoryCheckRepositoryImpl(
+      dataSource: sl(),
+      networkInfo: sl(),
+    ),
+  );
+  
+  sl.registerLazySingleton(() => CheckItemCode(sl()));
+  sl.registerLazySingleton(() => SaveInventoryItems(sl()));
+  
+  sl.registerFactoryParam<InventoryCheckBloc, UserEntity, void>(
+    (user, _) => InventoryCheckBloc(
+      checkItemCode: sl(),
+      saveInventoryItems: sl(),
+      connectionChecker: sl(),
+      currentUser: user,
     ),
   );
 }
