@@ -21,6 +21,12 @@ import '../../features/auth/logout/data/repositories/logout_repository_impl.dart
 import '../../features/auth/logout/domain/repositories/logout_repository.dart';
 import '../../features/auth/logout/domain/usecases/logout_usecase.dart';
 import '../../features/auth/logout/presentation/bloc/logout_bloc.dart';
+import '../../features/batch_scan/data/datasources/batch_scan_datasource.dart';
+import '../../features/batch_scan/data/repositories/batch_scan_repository_impl.dart';
+import '../../features/batch_scan/domain/repositories/batch_scan_repository.dart';
+import '../../features/batch_scan/domain/usecases/check_batch_code.dart';
+import '../../features/batch_scan/domain/usecases/process_batch.dart';
+import '../../features/batch_scan/presentation/bloc/batch_scan_bloc.dart';
 import '../../features/inventory_check/data/datasources/inventory_check_datasource.dart';
 import '../../features/inventory_check/data/repositories/inventory_check_repository_impl.dart';
 import '../../features/inventory_check/domain/repositories/inventory_check_repository.dart';
@@ -57,6 +63,7 @@ Future<void> init() async {
   await _initWarehouseExportFeature();
   await _initCheckMaterialToImportInventory();
   await _initLogoutFeature();
+  await _initBatchScanFeature();
 }
 
 Future<void> _initSystemCore() async {
@@ -223,6 +230,31 @@ Future<void> _initCheckMaterialToImportInventory() async {
     (user, _) => InventoryCheckBloc(
       checkItemCode: sl(),
       saveInventoryItems: sl(),
+      connectionChecker: sl(),
+      currentUser: user,
+    ),
+  );
+}
+
+Future<void> _initBatchScanFeature() async {
+  sl.registerLazySingleton<BatchScanDataSource>(
+    () => BatchScanDataSourceImpl(dio: sl()),
+  );
+  
+  sl.registerLazySingleton<BatchScanRepository>(
+    () => BatchScanRepositoryImpl(
+      dataSource: sl(),
+      networkInfo: sl(),
+    ),
+  );
+  
+  sl.registerLazySingleton(() => CheckBatchCode(sl()));
+  sl.registerLazySingleton(() => ProcessBatch(sl()));
+  
+  sl.registerFactoryParam<BatchScanBloc, UserEntity, void>(
+    (user, _) => BatchScanBloc(
+      checkBatchCode: sl(),
+      processBatch: sl(),
       connectionChecker: sl(),
       currentUser: user,
     ),

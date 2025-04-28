@@ -50,6 +50,12 @@ class WarehouseMenuPage extends StatelessWidget {
               ),
               _buildFunctionTile(
                 context,
+                title: 'Batch Scan',
+                icon: Icons.qr_code_scanner,
+                route: AppRoutes.batchScan,
+              ),
+              _buildFunctionTile(
+                context,
                 title: 'Inventory',
                 icon: Icons.inventory_2,
                 route: AppRoutes.inventoryCheck,

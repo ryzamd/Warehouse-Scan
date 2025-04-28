@@ -49,6 +49,7 @@ class NavigationService {
       case AppRoutes.warehouseIn:
       case AppRoutes.warehouseOut:
       case AppRoutes.inventoryCheck:
+      case AppRoutes.batchScan:
         return lastWarehouseRoute ?? AppRoutes.warehouseMenu;
     }
     
@@ -82,6 +83,7 @@ class NavigationService {
       case AppRoutes.processingwarehouseIn:
       case AppRoutes.processingwarehouseOut:
       case AppRoutes.inventoryCheck:
+      case AppRoutes.batchScan:
         Navigator.pop(context);
       break;
     }
