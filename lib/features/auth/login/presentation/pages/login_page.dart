@@ -47,15 +47,18 @@ class _LoginPageState extends State<LoginPage> {
       create: (context) => di.sl<LoginBloc>(),
       child: BlocListener<LoginBloc, LoginState>(
       listener: (context, state) {
-        if (state is LoginSuccess) {
-          Navigator.pushNamedAndRemoveUntil(
-            context,
-            AppRoutes.warehouseMenu,
-            (route) => false,
-            arguments: state.user,
-          );
-        } else if (state is LoginFailure) {
-          if (context.mounted) {
+        switch(state){
+          case LoginSuccess():
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              AppRoutes.warehouseMenu,
+              (route) => false,
+              arguments: state.user,
+            );
+          break;
+
+          case LoginFailure():
+            if(!context.mounted) break;
             ErrorDialog.show(
               context,
               title: 'LOGIN FAILED',
@@ -66,7 +69,7 @@ class _LoginPageState extends State<LoginPage> {
                 }
               },
             );
-          }
+          break;
         }
       },
         child: Scaffold(

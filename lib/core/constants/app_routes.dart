@@ -8,6 +8,7 @@ class AppRoutes {
   static const String warehouseOut = '/warehouse_menu/export';
   static const String processingwarehouseIn = '/warehouse_menu/import/processing';
   static const String processingwarehouseOut = '/warehouse_menu/export/processing';
+  static const String inventoryCheck = '/warehouse_menu/inventory_check';
   
   // Profile
   static const String profile = '/profile';
