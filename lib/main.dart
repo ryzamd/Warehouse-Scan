@@ -9,6 +9,8 @@ import 'core/services/navigation_service.dart';
 import 'features/auth/login/domain/entities/user_entity.dart';
 import 'features/auth/login/presentation/pages/login_page.dart';
 import 'features/auth/logout/presentation/pages/profile_page.dart';
+import 'features/batch_scan/presentation/bloc/batch_scan_bloc.dart';
+import 'features/batch_scan/presentation/pages/batch_scan_page.dart';
 import 'features/inventory_check/presentation/bloc/inventory_check_bloc.dart';
 import 'features/inventory_check/presentation/pages/inventory_check_page.dart';
 import 'features/process/presentation/bloc/processing_bloc.dart';
@@ -134,6 +136,16 @@ class _MyAppState extends State<MyApp> {
               builder: (context) => BlocProvider(
                 create: (context) => di.sl<InventoryCheckBloc>(param1: args),
                 child: InventoryCheckPage(user: args!),
+              ),
+            );
+            
+          case AppRoutes.batchScan:
+            NavigationService().setLastWarehouseRoute(AppRoutes.batchScan);
+            return MaterialPageRoute(
+              settings: settings,
+              builder: (context) => BlocProvider(
+                create: (context) => di.sl<BatchScanBloc>(param1: args),
+                child: BatchScanPage(user: args!),
               ),
             );
                       
