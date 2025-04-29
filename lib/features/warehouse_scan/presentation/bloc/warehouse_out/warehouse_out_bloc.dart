@@ -1,4 +1,3 @@
-// lib/features/warehouse_scan/presentation/bloc/warehouse_out/warehouse_out_bloc.dart
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
@@ -6,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:warehouse_scan/features/auth/login/domain/entities/user_entity.dart';
-import '../../../domain/usecases/get_address_list.dart';
 import '../../../domain/usecases/get_material_info.dart';
 import '../../../domain/usecases/process_warehouse_out.dart';
 import 'warehouse_out_event.dart';
@@ -17,7 +15,6 @@ class WarehouseOutBloc extends Bloc<WarehouseOutEvent, WarehouseOutState> {
   final ProcessWarehouseOut processWarehouseOut;
   final InternetConnectionChecker connectionChecker;
   final UserEntity currentUser;
-  final GetAddressList getAddressList;
   
   MobileScannerController? scannerController;
 
@@ -26,7 +23,6 @@ class WarehouseOutBloc extends Bloc<WarehouseOutEvent, WarehouseOutState> {
     required this.processWarehouseOut,
     required this.connectionChecker,
     required this.currentUser,
-    required this.getAddressList,
   }) : super(WarehouseOutInitial()) {
     on<InitializeScanner>(_onInitializeScanner);
     on<ScanBarcode>(_onScanBarcode);
@@ -35,7 +31,6 @@ class WarehouseOutBloc extends Bloc<WarehouseOutEvent, WarehouseOutState> {
     on<HardwareScanEvent>(_onHardwareScan);
     on<ClearScannedData>(_onClearScannedData);
     on<ValidateQuantityEvent>(_onValidateQuantity);
-    on<GetAddressListEvent>(_onGetAddressListAsync);
     
     connectionChecker.onStatusChange.listen((status) {
       if (status == InternetConnectionStatus.disconnected) {
@@ -223,32 +218,5 @@ class WarehouseOutBloc extends Bloc<WarehouseOutEvent, WarehouseOutState> {
   Future<void> close() {
     scannerController?.dispose();
     return super.close();
-  }
-
-  Future<void> _onGetAddressListAsync(
-    GetAddressListEvent event,
-    Emitter<WarehouseOutState> emit,
-  ) async {
-    debugPrint('Getting address list');
-    
-    emit(AddressListLoading());
-    
-    try {
-      final result = await getAddressList();
-      
-      result.fold(
-        (failure) {
-          debugPrint('Failed to get address list: ${failure.message}');
-          emit(AddressListError(message: failure.message));
-        },
-        (addressListEntity) {
-          debugPrint('Address list loaded successfully: ${addressListEntity.listAddress.length} addresses');
-          emit(AddressListLoaded(addressList: addressListEntity.listAddress));
-        },
-      );
-    } catch (e) {
-      debugPrint('Error getting address list: $e');
-      emit(AddressListError(message: 'Failed to load address list'));
-    }
   }
 }

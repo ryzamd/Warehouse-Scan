@@ -14,7 +14,7 @@ class WarehouseOutInitial extends WarehouseOutState {}
 class WarehouseOutScanning extends WarehouseOutState {
   final bool isCameraActive;
   final bool isTorchEnabled;
-  final dynamic controller;  // Using dynamic to avoid import conflicts
+  final dynamic controller;
 
   const WarehouseOutScanning({
     required this.isCameraActive,
@@ -102,24 +102,4 @@ class WarehouseOutError extends WarehouseOutState {
 
   @override
   List<Object> get props => [message, previousState];
-}
-
-class AddressListLoading extends WarehouseOutState {}
-
-class AddressListLoaded extends WarehouseOutState {
-  final List<String> addressList;
-
-  const AddressListLoaded({required this.addressList});
-
-  @override
-  List<Object> get props => [addressList];
-}
-
-class AddressListError extends WarehouseOutState {
-  final String message;
-
-  const AddressListError({required this.message});
-
-  @override
-  List<Object> get props => [message];
 }

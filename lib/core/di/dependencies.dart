@@ -16,6 +16,11 @@ import 'package:warehouse_scan/features/auth/login/domain/usecases/user_login.da
 import 'package:warehouse_scan/features/auth/login/domain/usecases/validate_token.dart';
 import 'package:warehouse_scan/features/auth/login/presentation/bloc/login_bloc.dart';
 
+import '../../features/address/data/datasource/address_datasource.dart';
+import '../../features/address/data/repositories/address_repository_impl.dart';
+import '../../features/address/domain/repositories/address_repository.dart';
+import '../../features/address/domain/usecases/get_address_list_usecase.dart';
+import '../../features/address/presentation/bloc/address_bloc.dart';
 import '../../features/auth/logout/data/datasources/logout_datasource.dart';
 import '../../features/auth/logout/data/repositories/logout_repository_impl.dart';
 import '../../features/auth/logout/domain/repositories/logout_repository.dart';
@@ -51,8 +56,6 @@ import 'package:warehouse_scan/features/warehouse_scan/domain/usecases/process_w
 import 'package:warehouse_scan/features/warehouse_scan/presentation/bloc/warehouse_in/warehouse_in_bloc.dart';
 import 'package:warehouse_scan/features/warehouse_scan/presentation/bloc/warehouse_out/warehouse_out_bloc.dart';
 
-import '../../features/warehouse_scan/domain/usecases/get_address_list.dart';
-
 final sl = GetIt.instance;
 
 Future<void> init() async {
@@ -64,6 +67,7 @@ Future<void> init() async {
   await _initCheckMaterialToImportInventory();
   await _initLogoutFeature();
   await _initBatchScanFeature();
+  await _initAddressFeature();
 }
 
 Future<void> _initSystemCore() async {
@@ -180,7 +184,6 @@ Future<void> _initWarehouseExportFeature() async {
   
   sl.registerLazySingleton(() => GetMaterialInfo(sl()));
   sl.registerLazySingleton(() => ProcessWarehouseOut(sl()));
-  sl.registerLazySingleton(() => GetAddressList(sl()));
   
   sl.registerFactoryParam<WarehouseOutBloc, UserEntity, void>(
     (user, _) => WarehouseOutBloc(
@@ -188,7 +191,6 @@ Future<void> _initWarehouseExportFeature() async {
       processWarehouseOut: sl(),
       connectionChecker: sl(),
       currentUser: user,
-      getAddressList: sl(),
     ),
   );
 }
@@ -259,4 +261,19 @@ Future<void> _initBatchScanFeature() async {
       currentUser: user,
     ),
   );
+}
+
+Future<void> _initAddressFeature() async {
+  sl.registerLazySingleton<AddressDataSource>(() => AddressDataSourceImpl(dio: sl()));
+  
+  sl.registerLazySingleton<AddressRepository>(
+    () => AddressRepositoryImpl(
+      dataSource: sl(),
+      networkInfo: sl(),
+    ),
+  );
+  
+  sl.registerLazySingleton(() => GetAddressListUseCase(sl()));
+  
+  sl.registerFactory(() => AddressBloc(getAddressListUseCase: sl()));
 }

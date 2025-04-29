@@ -75,5 +75,3 @@ class ValidateQuantityEvent extends WarehouseOutEvent {
   @override
   List<Object> get props => [quantity, maxQuantity];
 }
-
-class GetAddressListEvent extends WarehouseOutEvent{}
