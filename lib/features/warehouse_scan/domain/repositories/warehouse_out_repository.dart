@@ -1,13 +1,10 @@
 import 'package:dartz/dartz.dart';
 import 'package:warehouse_scan/core/errors/failures.dart';
-import '../entities/get_address_list_entity.dart';
 import '../entities/warehouse_out_entity.dart';
 
 abstract class WarehouseOutRepository {
 
   Future<Either<Failure, WarehouseOutEntity>> getMaterialInfo(String code, String userName);
-
-  Future<Either<Failure, GetAddressListEntity>> getAddressList();
 
   Future<Either<Failure, bool>> processWarehouseOut({
     required String code,

@@ -1,4 +1,3 @@
-// lib/features/warehouse_scan/presentation/pages/warehouse_out_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,9 +8,11 @@ import 'package:warehouse_scan/core/widgets/loading_dialog.dart';
 import 'package:warehouse_scan/core/widgets/scafford_custom.dart';
 import 'package:warehouse_scan/features/auth/login/domain/entities/user_entity.dart';
 import 'package:warehouse_scan/features/warehouse_scan/data/datasources/scan_service_impl.dart';
-import '../../../../core/constants/app_colors.dart';
+import '../../../../core/di/dependencies.dart' as di;
 import '../../../../core/widgets/confirmation_dialog.dart';
 import '../../../../core/widgets/notification_dialog.dart';
+import '../../../address/presentation/bloc/address_bloc.dart';
+import '../../../address/presentation/widgets/address_selector.dart';
 import '../bloc/warehouse_out/warehouse_out_bloc.dart';
 import '../bloc/warehouse_out/warehouse_out_event.dart';
 import '../bloc/warehouse_out/warehouse_out_state.dart';
@@ -37,16 +38,13 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
   
   bool _cameraActive = false;
   bool _torchEnabled = false;
-  bool _isLoadingAddresses = false;
   double _maxQuantity = 0;
   String _currentCode = '';
   String _currentMaterialName = '';
-  String _currentAddress = '';
   double _warehouseQtyImport = 0.0;
   double _warehouseQtyExport = 0.0;
   int _optionFunction = 2;
   
-  List<String> _addressList = [];
 
   @override
   void initState() {
@@ -58,7 +56,6 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
       debugPrint("QR DEBUG: Hardware scanner callback with data: $scannedData");
       if (mounted) {
         context.read<WarehouseOutBloc>().add(HardwareScanEvent(scannedData));
-        context.read<WarehouseOutBloc>().add(GetAddressListEvent());
       }
     });
     
@@ -216,7 +213,6 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
     _maxQuantity = 0;
     _warehouseQtyImport = 0.0;
     _warehouseQtyExport = 0.0;
-    _currentAddress = '';
   }
 
   void _onDetect(BarcodeCapture capture) {
@@ -258,7 +254,6 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
         switch (state) {
           case WarehouseOutProcessing():
           case WarehouseOutProcessingRequest():
-          case AddressListLoading():
             LoadingDialog.show(context);
             break;
             
@@ -274,7 +269,6 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
                 _maxQuantity = state.material.mQty;
                 _warehouseQtyImport = state.material.zcWarehouseQtyImport;
                 _warehouseQtyExport = state.material.zcWarehouseQtyExport;
-                _currentAddress = _optionFunction == 2 ? state.material.address : '';
               });
             }
             break;
@@ -307,35 +301,6 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
               title: 'ERROR',
               message: state.message,
             );
-            break;
-            
-          case AddressListLoaded():
-          if (LoadingDialog.isShowing && navigatorContext.canPop()) {
-                navigatorContext.pop();
-            }
-            
-            setState(() {
-              _isLoadingAddresses = false;
-              _addressList = state.addressList;
-            });
-            break;
-            
-          case AddressListError():
-            if (navigatorContext.canPop()) {
-              navigatorContext.pop();
-            }
-            
-            setState(() {
-              _isLoadingAddresses = false;
-            });
-            
-            if (context.mounted) {
-              ErrorDialog.show(
-                context,
-                title: 'ERROR',
-                message: 'Failed to load address list: ${state.message}',
-              );
-            }
             break;
         }
       },
@@ -662,6 +627,7 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
     return SizedBox(
       height: height,
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           Container(
             width: 74,
@@ -683,80 +649,21 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
               ),
             ),
           ),
-          // Value side with text field and dropdown
           Expanded(
-            child: Row(
-              children: [
-                Expanded(
-                  flex: 5,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: ValueListenableBuilder<TextEditingValue>(
-                      valueListenable: _addressController,
-                      builder: (context, value, child) {
-
-                        if (_optionFunction == 2 && _addressController.text != _currentAddress) {
-                          WidgetsBinding.instance.addPostFrameCallback((_) {
-                            _addressController.text = _currentAddress;
-                          });
-                        }
-
-                        return TextFormField(
-                          controller: _addressController,
-                          keyboardType: TextInputType.text,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          decoration: InputDecoration(
-                            hintText: 'Enter address',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide(
-                                color: value.text.isNotEmpty ? Colors.grey.shade600 : Colors.grey.shade400,
-                                width: value.text.isNotEmpty ? 2.0 : 1.0,
-                              ),
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 8,
-                            ),
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter an address';
-                            }
-                            if (RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value)) {
-                              return 'No special characters allowed';
-                            }
-                            return null;
-                          },
-                          enabled: _currentCode.isNotEmpty && _optionFunction == 1,
-                        );
-                      },
-                    )
-                  ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: BlocProvider(
+                create: (context) => di.sl<AddressBloc>(),
+                child: AddressSelector(
+                  currentAddress: _addressController.text,
+                  onAddressSelected: (address) {
+                    setState(() {
+                      _addressController.text = address;
+                    });
+                  },
+                  enabled: _currentCode.isNotEmpty && _optionFunction == 1,
                 ),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.orangeAccent,
-                    borderRadius: BorderRadius.all(Radius.circular(8))
-                  ),
-                  margin: EdgeInsets.only(right: 8),
-                  width: 40,
-                  child: _isLoadingAddresses
-                    ? const Center(child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)))
-                    : IconButton(
-                        icon: const Icon(Icons.arrow_drop_down, size: 24),
-                        onPressed: _addressList.isEmpty || !_currentCode.isNotEmpty || _optionFunction == 2 ? null : () {
-                          _showAddressSelector(context);
-                        },
-                      ),
-                ),
-              ],
+              ),
             ),
           ),
         ],
@@ -764,62 +671,6 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
     );
   }
 
-  void _showAddressSelector(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (context) {
-        return Container(
-          height: 300,
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          decoration: BoxDecoration(
-            color: Colors.blueGrey.shade100,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: Text(
-                  'SELECT ADDRESS',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.inputText
-                  ),
-                ),
-              ),
-              const Divider(color: Colors.grey,),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: _addressList.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text(_addressList[index],
-                             textAlign: TextAlign.center,
-                             style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                      textColor: Colors.orangeAccent.shade700,
-                      onTap: () {
-                        setState(() {
-                          _addressController.text = _addressList[index];
-                        });
-                        Navigator.pop(context);
-                      },
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-}
-  
   Widget _buildDivider() {
     return const SizedBox(height: 2);
   }
