@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:warehouse_scan/core/services/get_translate_key.dart';
 import '../../domain/entities/user_entity.dart';
 
 abstract class LoginState extends Equatable {
@@ -8,16 +9,12 @@ abstract class LoginState extends Equatable {
   List<Object> get props => [];
 }
 
-/// Initial state when the app starts
 class LoginInitial extends LoginState {}
 
-/// State while checking for saved token
 class TokenChecking extends LoginState {}
 
-/// State while performing login
 class LoginLoading extends LoginState {}
 
-/// State when login is successful
 class LoginSuccess extends LoginState {
   final UserEntity user;
 
@@ -27,12 +24,11 @@ class LoginSuccess extends LoginState {
   List<Object> get props => [user];
 }
 
-/// State when login fails
 class LoginFailure extends LoginState {
   final String message;
 
   const LoginFailure({required this.message});
 
   @override
-  List<Object> get props => [message];
+  String toString() => StringKey.networkErrorMessage;
 }

@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 import 'package:warehouse_scan/core/errors/failures.dart';
-import '../entities/inventory_item_entity.dart';
+import '../../data/models/batch_inventory_response_model.dart';
 import '../repositories/inventory_check_repository.dart';
 
 class SaveInventoryItems {
@@ -9,7 +9,7 @@ class SaveInventoryItems {
 
   SaveInventoryItems(this.repository);
 
-  Future<Either<Failure, List<InventoryItemEntity>>> call(SaveInventoryItemsParams params) async {
+  Future<Either<Failure, BatchInventoryResponseModel>> call(SaveInventoryItemsParams params) async {
     return await repository.saveInventoryItems(params.codes);
   }
 }

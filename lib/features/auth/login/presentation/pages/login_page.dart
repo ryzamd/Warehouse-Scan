@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:warehouse_scan/core/constants/app_routes.dart';
+import 'package:warehouse_scan/core/localization/context_extension.dart';
+import 'package:warehouse_scan/core/services/get_translate_key.dart';
 import 'package:warehouse_scan/core/widgets/logo_custom.dart';
 import '../../../../../core/di/dependencies.dart' as di;
 import '../../../../../core/widgets/error_dialog.dart';
+import '../../../../../core/widgets/language_selector.dart';
 import '../bloc/login_bloc.dart';
 import '../bloc/login_event.dart';
 import '../bloc/login_state.dart';
@@ -61,8 +64,8 @@ class _LoginPageState extends State<LoginPage> {
             if(!context.mounted) break;
             ErrorDialog.show(
               context,
-              title: 'LOGIN FAILED',
-              message: state.message,
+              title: context.multiLanguage.loginFailedUPCASE,
+              message: TranslateKey.getStringKey(context.multiLanguage, state.message),
               onDismiss: () {
                 if (context.mounted) {
                   context.read<LoginBloc>().add(ResetLoginStateEvent());
@@ -90,12 +93,23 @@ class _LoginPageState extends State<LoginPage> {
               bottom: false,
               child: Stack(
                 children: [
+                  Stack(
+                    children: [
+                      Positioned(
+                        top: 0,
+                        right: 0,
+                        child: SafeArea(
+                          child: const LanguageSelector(),
+                        ),
+                      ),
+                    ]
+                  ),
                   Positioned.fill(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24.0),
                       child: Column(
                         children: [
-                          const SizedBox(height: 30),
+                          const SizedBox(height: 45),
                           buildLogoWidget(),
                           const SizedBox(height: 24),
                           
@@ -119,11 +133,11 @@ class _LoginPageState extends State<LoginPage> {
                                         children: [
                                           LoginTextField(
                                             controller: _userIdController,
-                                            hintText: '请选择用户名',
+                                            hintText: context.multiLanguage.usernameHint,
                                             focusNode: _userIdFocusNode,
                                             validator: (value) {
                                               if (value == null || value.isEmpty) {
-                                                return 'Please enter your username';
+                                                return context.multiLanguage.pleaseEnterUsername;
                                               }
                                               return null;
                                             },
@@ -137,12 +151,12 @@ class _LoginPageState extends State<LoginPage> {
                                           const SizedBox(height: 16),
                                           LoginTextField(
                                             controller: _passwordController,
-                                            hintText: '输入密码',
+                                            hintText: context.multiLanguage.passwordHint,
                                             obscureText: true,
                                             focusNode: _passwordFocusNode,
                                             validator: (value) {
                                               if (value == null || value.isEmpty) {
-                                                return 'Please enter your password';
+                                                return context.multiLanguage.pleaseEnterPassword;
                                               }
                                               return null;
                                             },

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:warehouse_scan/core/localization/context_extension.dart';
 import '../../domain/entities/batch_item_entity.dart';
 import '../bloc/batch_scan_bloc.dart';
 import '../bloc/batch_scan_event.dart';
@@ -15,11 +16,11 @@ class BatchItemList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (items.isEmpty) {
-      return const Center(
+      return  Center(
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: 20.0),
           child: Text(
-            'No items in batch. Scan QR codes to add.',
+            context.multiLanguage.batchListNoItemsMessage,
             style: TextStyle(
               fontSize: 16,
               fontStyle: FontStyle.italic,
@@ -63,7 +64,7 @@ class BatchItemList extends StatelessWidget {
           children: [
             Expanded(
               child: Text(
-                'Code: ${_truncateCode(item.code)}',
+                context.multiLanguage.batchListCodeWithValue(_truncateCode(item.code)),
                 style: titleStyle,
               ),
             ),
@@ -76,20 +77,20 @@ class BatchItemList extends StatelessWidget {
           children: [
             const SizedBox(height: 4),
             Text(
-              'Name: ${item.name}',
+              context.multiLanguage.batchListNameWithValue(item.name),
               style: const TextStyle(fontSize: 13),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 2),
             Text(
-              'Quantity: ${item.quantity} ${item.unit}',
+              context.multiLanguage.batchListQuantityWithValue(item.quantity, item.unit),
               style: const TextStyle(fontSize: 13),
             ),
             if (item.isError && item.errorMessage.isNotEmpty) ...[
               const SizedBox(height: 2),
               Text(
-                'Error: ${item.errorMessage}',
+                context.multiLanguage.batchListErrorWithValue(item.errorMessage),
                 style: const TextStyle(fontSize: 12, color: Colors.red),
               ),
             ],

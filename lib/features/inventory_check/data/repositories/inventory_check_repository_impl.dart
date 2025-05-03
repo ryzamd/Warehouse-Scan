@@ -2,9 +2,11 @@ import 'package:dartz/dartz.dart';
 import 'package:warehouse_scan/core/errors/failures.dart';
 import 'package:warehouse_scan/core/errors/warehouse_exceptions.dart';
 import 'package:warehouse_scan/core/network/network_infor.dart';
+import '../../../../core/services/get_translate_key.dart';
 import '../../domain/entities/inventory_item_entity.dart';
 import '../../domain/repositories/inventory_check_repository.dart';
 import '../datasources/inventory_check_datasource.dart';
+import '../models/batch_inventory_response_model.dart';
 
 class InventoryCheckRepositoryImpl implements InventoryCheckRepository {
   final InventoryCheckDataSource dataSource;
@@ -19,38 +21,34 @@ class InventoryCheckRepositoryImpl implements InventoryCheckRepository {
   Future<Either<Failure, InventoryItemEntity>> checkItemCode(String code, String userName) async {
     if (await networkInfo.isConnected) {
       try {
+
         final item = await dataSource.checkItemCode(code, userName);
+
         return Right(item);
 
       } on MaterialNotFoundException {
-        return Left(ServerFailure('Material is not exist in system.'));
-
-      } on WarehouseException catch (e) {
-        return Left(ServerFailure(e.message));
-
-      } catch (e) {
-        return Left(ServerFailure(e.toString()));
+        return Left(ServerFailure(StringKey.materialNotFound));
       }
     } else {
-      return Left(ConnectionFailure('No internet access, please check internet connection.'));
+      return Left(ConnectionFailure(StringKey.networkErrorMessage));
     }
   }
   
   @override
-  Future<Either<Failure, List<InventoryItemEntity>>> saveInventoryItems(List<String> codes) async {
+  Future<Either<Failure, BatchInventoryResponseModel>> saveInventoryItems(List<String> codes) async {
     if (await networkInfo.isConnected) {
       try {
-        final items = await dataSource.saveInventoryItems(codes);
-        return Right(items);
 
-      } on WarehouseException catch (e) {
-        return Left(ServerFailure(e.message));
+        final response = await dataSource.saveInventoryItems(codes);
 
-      } catch (e) {
-        return Left(ServerFailure(e.toString()));
+        return Right(response);
+
+      } on WarehouseException catch (_) {
+        return Left(ServerFailure(StringKey.cannotSavingInventoryListMessage));
+
       }
     } else {
-      return Left(ConnectionFailure('No internet access, please check internet connection.'));
+      return Left(ConnectionFailure(StringKey.networkErrorMessage));
     }
   }
 }

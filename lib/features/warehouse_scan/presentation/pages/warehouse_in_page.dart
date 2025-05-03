@@ -3,11 +3,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:warehouse_scan/core/constants/key_code_constants.dart';
+import 'package:warehouse_scan/core/localization/context_extension.dart';
 import 'package:warehouse_scan/core/widgets/error_dialog.dart';
 import 'package:warehouse_scan/core/widgets/loading_dialog.dart';
 import 'package:warehouse_scan/core/widgets/scafford_custom.dart';
 import 'package:warehouse_scan/features/auth/login/domain/entities/user_entity.dart';
 import 'package:warehouse_scan/features/warehouse_scan/data/datasources/scan_service_impl.dart';
+import '../../../../core/services/get_translate_key.dart';
 import '../../../../core/widgets/notification_dialog.dart';
 import '../bloc/warehouse_in/warehouse_in_bloc.dart';
 import '../bloc/warehouse_in/warehouse_in_event.dart';
@@ -38,7 +40,6 @@ class _WarehouseInPageState extends State<WarehouseInPage> with WidgetsBindingOb
     
     if (!_cameraActive) {
       ScanService.initializeScannerListener((scannedData) {
-        debugPrint("QR DEBUG: Hardware scanner callback with data: $scannedData");
         if (mounted) {
           context.read<WarehouseInBloc>().add(HardwareScanEvent(scannedData));
         }
@@ -88,11 +89,10 @@ class _WarehouseInPageState extends State<WarehouseInPage> with WidgetsBindingOb
         _controller!.stop();
       }
     } catch (e) {
-      debugPrint("QR DEBUG: ⚠️ Camera initialization error: $e");
       ErrorDialog.show(
         context,
-        title: 'CAMERA ERROR',
-        message: "Camera initialization error: $e",
+        title: context.multiLanguage.errorUPCASE,
+        message: context.multiLanguage.cameraInitializationErrorMessage(e.toString()),
       );
     }
   }
@@ -205,8 +205,8 @@ class _WarehouseInPageState extends State<WarehouseInPage> with WidgetsBindingOb
           
             NotificationDialog.show(
               context,
-              title: 'IMPORT SUCCESS',
-              message: 'The material has been successfully imported to the warehouse.',
+              title: context.multiLanguage.importSuccessTitle,
+              message: context.multiLanguage.importSuccessMessage,
               icon: Icons.favorite,
               iconColor: Colors.green,
               onDismiss: () => _clearData(),
@@ -218,8 +218,11 @@ class _WarehouseInPageState extends State<WarehouseInPage> with WidgetsBindingOb
           if(context.mounted){
               ErrorDialog.show(
               context,
-              title: 'ERROR',
-              message: state.message,
+              title: context.multiLanguage.errorUPCASE,
+              message: TranslateKey.getStringKey(
+                context.multiLanguage,
+                state.message,
+              ),
               onDismiss: () => _clearData(),
             );
           }
@@ -227,7 +230,7 @@ class _WarehouseInPageState extends State<WarehouseInPage> with WidgetsBindingOb
       },
       builder: (context, state) {
         return CustomScaffold(
-          title: 'IMPORT PAGE',
+          title: context.multiLanguage.importPageTitle,
           user: widget.user,
           showHomeIcon: true,
           currentIndex: 1,
@@ -248,7 +251,6 @@ class _WarehouseInPageState extends State<WarehouseInPage> with WidgetsBindingOb
             },
             child: Column(
               children: [
-                // QR Camera Section
                 Container(
                   margin: const EdgeInsets.all(5),
                   child: QRScannerWidget(
@@ -259,10 +261,9 @@ class _WarehouseInPageState extends State<WarehouseInPage> with WidgetsBindingOb
                   ),
                 ),
 
-                // App Instructions
                 Center(
-                  child: const Text(
-                    'Scan QR code to process warehouse-in materials',
+                  child: Text(
+                    context.multiLanguage.scanInstructionMessage,
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
@@ -272,10 +273,8 @@ class _WarehouseInPageState extends State<WarehouseInPage> with WidgetsBindingOb
                   ),
                 ),
                 
-                // Empty space
                 const Spacer(),
                 
-                // Camera controls with enhanced visibility
                 Container(
                   margin: const EdgeInsets.only(bottom: 20),
                   child: Row(
@@ -288,7 +287,7 @@ class _WarehouseInPageState extends State<WarehouseInPage> with WidgetsBindingOb
                           size: 28,
                         ),
                         onPressed: _cameraActive ? _toggleTorch : null,
-                        label: 'Flash',
+                        label: context.multiLanguage.flashIconButton,
                         color: _torchEnabled ? Colors.amber.shade700 : Colors.blueGrey.shade700,
                       ),
                       const SizedBox(width: 16),
@@ -299,7 +298,7 @@ class _WarehouseInPageState extends State<WarehouseInPage> with WidgetsBindingOb
                           size: 28,
                         ),
                         onPressed: _cameraActive ? _switchCamera : null,
-                        label: 'Flip',
+                        label: context.multiLanguage.flipIconButton,
                         color: Colors.blue.shade700,
                       ),
                       const SizedBox(width: 16),
@@ -310,7 +309,7 @@ class _WarehouseInPageState extends State<WarehouseInPage> with WidgetsBindingOb
                           size: 28,
                         ),
                         onPressed: _toggleCamera,
-                        label: _cameraActive ? 'Stop' : 'Start',
+                        label: _cameraActive ? context.multiLanguage.stopIconButton : context.multiLanguage.starIconButton,
                         color: _cameraActive ? Colors.red.shade700 : Colors.green.shade700,
                       ),
                     ],
@@ -324,7 +323,6 @@ class _WarehouseInPageState extends State<WarehouseInPage> with WidgetsBindingOb
     );
   }
   
-  // Helper method to build enhanced camera control buttons
   Widget _buildEnhancedButton({
     required Widget icon,
     required VoidCallback? onPressed,

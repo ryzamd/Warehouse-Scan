@@ -110,12 +110,14 @@ class BatchProcessSuccess extends BatchScanState {
 class BatchScanError extends BatchScanState {
   final String message;
   final BatchScanState previousState;
+  final Map<String, dynamic>? args;
 
   const BatchScanError({
     required this.message,
     required this.previousState,
+    this.args
   });
 
   @override
-  List<Object> get props => [message, previousState];
+  List<Object> get props => [message, previousState, args!];
 }

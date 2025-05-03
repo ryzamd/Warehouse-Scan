@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:warehouse_scan/core/constants/app_routes.dart';
+import 'package:warehouse_scan/core/localization/context_extension.dart';
 import '../../../../../core/widgets/confirmation_dialog.dart';
 import '../../../../../core/widgets/error_dialog.dart';
 import '../bloc/logout_bloc.dart';
@@ -29,7 +30,7 @@ class LogoutButton extends StatelessWidget {
         } else if (state is LogoutFailure) {
           ErrorDialog.show(
             context,
-            title: 'LOGOUT FAILED',
+            title: context.multiLanguage.loginFailedUPCASE,
             message: state.message,
           );
         }
@@ -40,10 +41,10 @@ class LogoutButton extends StatelessWidget {
           onTap: () {
             ConfirmationDialog.show(
               context,
-              title: 'LOGOUT',
-              message: 'Are you sure you want to log out?',
-              confirmText: 'Logout',
-              cancelText: 'Cancel',
+              title: context.multiLanguage.logoutDialogLabel,
+              message: context.multiLanguage.logoutConfirmMessage,
+              confirmText: context.multiLanguage.logoutButtonUPCASE,
+              cancelText: context.multiLanguage.cancelButton,
               confirmColor: Colors.red,
               onConfirm: () {
                 context.read<LogoutBloc>().add(LogoutButtonPressed());
@@ -65,8 +66,8 @@ class LogoutButton extends StatelessWidget {
                     ),
                   );
                 }
-                return const Text(
-                  'LOGOUT',
+                return Text(
+                  context.multiLanguage.logoutButtonUPCASE,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 18,

@@ -1,9 +1,11 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:warehouse_scan/core/constants/api_constants.dart';
+import 'package:warehouse_scan/core/errors/failures.dart';
 import 'package:warehouse_scan/core/errors/server_exception.dart';
 import 'package:warehouse_scan/core/services/secure_storage_service.dart';
 import 'package:warehouse_scan/core/di/dependencies.dart' as di;
+import '../../../../core/services/get_translate_key.dart';
 import '../models/processing_item_model.dart';
 
 abstract class ProcessingRemoteDataSource {
@@ -66,16 +68,13 @@ class ProcessingRemoteDataSourceImpl implements ProcessingRemoteDataSource {
       
         return result;
       } else {
-        throw ServerException('Failed to load processing items: ${response.statusCode}');
+        throw ServerException(StringKey.failedToLoadProcessItemsMessage);
       }
     } on DioException catch (e) {
       debugPrint('DioException in getProcessingItems: ${e.message}');
       debugPrint('Request path: ${e.requestOptions.path}');
       debugPrint('Request data: ${e.requestOptions.data}');
-      throw ServerException(e.message ?? 'Error fetching processing items');
-    } catch (e) {
-      debugPrint('Unexpected error in getProcessingItems: $e');
-      throw ServerException(e.toString());
+      throw ConnectionFailure(StringKey.networkErrorMessage);
     }
   }
 }

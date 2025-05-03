@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:warehouse_scan/features/auth/login/domain/entities/user_entity.dart';
+import '../../../../core/services/get_translate_key.dart';
 import '../../data/models/batch_process_response_model.dart';
 import '../../domain/entities/batch_item_entity.dart';
 import '../../domain/usecases/check_batch_code.dart';
@@ -53,7 +54,7 @@ class BatchScanBloc extends Bloc<BatchScanEvent, BatchScanState> {
 
     if (codeExists) {
       emit(BatchScanError(
-        message: 'This item is already in the list.',
+        message: StringKey.batchItemAlreadyExistsMessage,
         previousState: state,
       ));
       
@@ -101,7 +102,8 @@ class BatchScanBloc extends Bloc<BatchScanEvent, BatchScanState> {
       );
     } catch (e) {
       emit(BatchScanError(
-        message: 'Error checking item: ${e.toString()}',
+        message: StringKey.errorCheckingItemMessage,
+        args: {'error': e.toString()},
         previousState: state,
       ));
       
@@ -137,7 +139,7 @@ class BatchScanBloc extends Bloc<BatchScanEvent, BatchScanState> {
   Future<void> _onProcessBatch(ProcessBatchEvent event, Emitter<BatchScanState> emit) async {
     if (_batchItems.isEmpty) {
       emit(BatchScanError(
-        message: 'Batch is empty. Please scan items first.',
+        message: StringKey.batchIsEmptyMessage,
         previousState: state,
       ));
       return;
@@ -171,11 +173,6 @@ class BatchScanBloc extends Bloc<BatchScanEvent, BatchScanState> {
           emit(BatchListUpdated(batchItems: _batchItems));
         },
         (response) {
-          final successCodes = response.results
-              .where((result) => result.isSuccess)
-              .map((result) => result.code)
-              .toSet();
-          
           final updatedItems = _batchItems.map((item) {
             final result = response.results.firstWhere(
               (r) => r.code == item.code,

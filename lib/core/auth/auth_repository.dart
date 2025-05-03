@@ -1,4 +1,3 @@
-// lib/core/repositories/auth_repository.dart
 import 'dart:convert';
 import 'dart:math';
 import 'package:dartz/dartz.dart';
@@ -9,6 +8,7 @@ import '../../features/auth/login/domain/entities/user_entity.dart';
 import '../constants/api_constants.dart';
 import '../errors/failures.dart';
 import '../network/dio_client.dart';
+import '../services/get_translate_key.dart';
 import '../services/secure_storage_service.dart';
 
 
@@ -18,7 +18,6 @@ class AuthRepository {
 
   AuthRepository(this._secureStorage, this._dioClient);
 
-  // Login user and save token
   Future<Either<Failure, UserEntity>> loginUser({
     required String userId,
     required String password,
@@ -45,56 +44,43 @@ class AuthRepository {
           final user = UserModel.fromJson(response.data);
           final token = response.data['token'];
           
-          // Ensure token isn't null or empty
           if (token == null || token.isEmpty) {
             return Left(AuthFailure('No token received from server'));
           }
           
-          // Save token to secure storage
           await _secureStorage.saveAccessTokenAsync(token);
           await _secureStorage.saveUserIdAsync(user.userId);
           
-          // Save user data
           await _secureStorage.saveUserDataAsync(jsonEncode(response.data['user']['users']));
           
-          // Explicitly set token in DioClient for immediate use
           _dioClient.setAuthToken(token);
           
-          debugPrint('Login successful, token saved and set in DioClient');
           return Right(user);
         } else {
-          return Left(AuthFailure(response.data['message'] ?? 'Invalid credentials'));
+          return Left(AuthFailure(StringKey.invalidCredentialsMessage));
         }
       } else {
-        return Left(AuthFailure('Server returned ${response.statusCode}'));
+        return Left(AuthFailure(StringKey.serverErrorMessage));
       }
-    } on DioException catch (e) {
-      debugPrint('DioException in loginUser: ${e.message}');
-      return Left(ServerFailure(e.message ?? 'Server error occurred'));
-    } catch (e) {
-      debugPrint('Unexpected error in loginUser: $e');
-      return Left(ServerFailure(e.toString()));
+    } on DioException catch (_) {
+      return Left(ConnectionFailure(StringKey.networkErrorMessage));
     }
   }
 
-  // Check if token is valid (not expired)
   Future<bool> isTokenValid() async {
     final token = await _secureStorage.getAccessTokenAsync();
     if (token == null || token.isEmpty) {
       return false;
     }
 
-    // Check expiry if available
     final expiry = await _secureStorage.getTokenExpiryAsync();
     if (expiry != null) {
       return expiry.isAfter(DateTime.now());
     }
     
-    // If no expiry info, assume token is valid
     return true;
   }
 
-  // Logout user and clear all data
   Future<bool> logout() async {
     try {
       await _secureStorage.clearAllDataAsync();
@@ -106,17 +92,14 @@ class AuthRepository {
     }
   }
 
-  // Get current access token
   Future<String?> getAccessToken() async {
     return await _secureStorage.getAccessTokenAsync();
   }
 
-  // Check if user is logged in with valid token
   Future<bool> isLoggedIn() async {
     return await _secureStorage.hasTokenAsync() && await isTokenValid();
   }
 
-  // Get current user data
   Future<UserEntity?> getCurrentUser() async {
     final userData = await _secureStorage.getUserDataAsync();
     if (userData != null) {
@@ -130,7 +113,6 @@ class AuthRepository {
     return null;
   }
 
-  // Debug method to check token state
   Future<void> debugTokenState() async {
     final token = await _secureStorage.getAccessTokenAsync();
     final userId = await _secureStorage.getUserIdAsync();

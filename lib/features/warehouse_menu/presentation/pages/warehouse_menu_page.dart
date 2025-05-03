@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:warehouse_scan/core/localization/context_extension.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/services/navigation_service.dart';
@@ -17,7 +18,7 @@ class WarehouseMenuPage extends StatelessWidget {
     });
     
     return CustomScaffold(
-      title: 'Warehouse Menu',
+      title: context.multiLanguage.warehouseMenuTitle,
       user: user,
       showHomeIcon: false,
       currentIndex: 1,
@@ -38,25 +39,25 @@ class WarehouseMenuPage extends StatelessWidget {
             children: [
               _buildFunctionTile(
                 context,
-                title: 'Import Material',
+                title: context.multiLanguage.importMaterialMenuTitle,
                 icon: Icons.input,
                 route: AppRoutes.warehouseIn,
               ),
               _buildFunctionTile(
                 context,
-                title: 'Export Material',
+                title: context.multiLanguage.exportMaterialMenuTitle,
                 icon: Icons.output,
                 route: AppRoutes.warehouseOut,
               ),
               _buildFunctionTile(
                 context,
-                title: 'Batch Scan',
+                title: context.multiLanguage.batchScanMenuTitle,
                 icon: Icons.qr_code_scanner,
                 route: AppRoutes.batchScan,
               ),
               _buildFunctionTile(
                 context,
-                title: 'Inventory',
+                title: context.multiLanguage.inventoryMenuTitle,
                 icon: Icons.inventory_2,
                 route: AppRoutes.inventoryCheck,
               ),

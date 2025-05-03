@@ -87,12 +87,28 @@ class InventorySaving extends InventoryCheckState {
 }
 
 class InventorySaveSuccess extends InventoryCheckState {
-  final List<InventoryItemEntity> savedItems;
+  final List<String> savedItems;
+  final List<String> inventoriedItems;
+  final List<String> failedItems;
+  final int inventoriedCount;
+  final int failedCount;
 
-  const InventorySaveSuccess({required this.savedItems});
+  const InventorySaveSuccess({
+    required this.savedItems,
+    required this.inventoriedItems,
+    required this.failedItems,
+    required this.inventoriedCount,
+    required this.failedCount,
+  });
 
   @override
-  List<Object> get props => [savedItems];
+  List<Object> get props => [
+    savedItems,
+    inventoriedItems,
+    failedItems,
+    inventoriedCount,
+    failedCount
+  ];
 }
 
 class InventoryCheckError extends InventoryCheckState {

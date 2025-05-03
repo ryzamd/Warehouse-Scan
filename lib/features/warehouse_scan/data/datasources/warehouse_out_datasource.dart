@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:warehouse_scan/core/constants/api_constants.dart';
 import 'package:warehouse_scan/core/errors/warehouse_exceptions.dart';
+import '../../../../core/services/get_translate_key.dart';
 import '../models/warehouse_out_model.dart';
 
 abstract class WarehouseOutDataSource {
@@ -44,16 +45,11 @@ class WarehouseOutDataSourceImpl implements WarehouseOutDataSource {
           throw MaterialNotFoundException(code);
         }
       } else {
-        throw WarehouseOutException('Server returned error code: ${response.statusCode}');
+        throw WarehouseInException(StringKey.processingFetchDataFailedMessage);
       }
     } on DioException catch (e) {
       debugPrint('DioException in getMaterialInfo: ${e.message}');
-      throw WarehouseOutException(e.message ?? 'Network error');
-    } on MaterialNotFoundException {
-      rethrow;
-    } catch (e) {
-      debugPrint('Unexpected error in getMaterialInfo: $e');
-      throw WarehouseOutException(e.toString());
+     throw WarehouseInException(StringKey.networkErrorMessage);
     }
   }
   
@@ -85,17 +81,14 @@ class WarehouseOutDataSourceImpl implements WarehouseOutDataSource {
         if (response.data['message'] == 'Success') {
           return true;
         } else {
-          throw WarehouseOutException(response.data['message'] ?? 'Processing failed');
+          throw WarehouseInException(StringKey.processingFetchDataFailedMessage);
         }
       } else {
-        throw WarehouseOutException('Server returned error code: ${response.statusCode}');
+        throw WarehouseOutException(StringKey.serverErrorMessage);
       }
     } on DioException catch (e) {
       debugPrint('DioException in processWarehouseOut: ${e.message}');
-      throw WarehouseOutException(e.message ?? 'Network error');
-    } catch (e) {
-      debugPrint('Unexpected error in processWarehouseOut: $e');
-      throw WarehouseOutException(e.toString());
+      throw WarehouseOutException(StringKey.networkErrorMessage);
     }
   }
 }

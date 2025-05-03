@@ -20,6 +20,7 @@ class WarehouseInModel extends WarehouseInEntity {
     required super.staff,
     required super.qtyState,
     required super.inWarehouse,
+    required super.message
   });
 
   @JsonKey(name: 'mwh_id', defaultValue: 0)
@@ -63,6 +64,9 @@ class WarehouseInModel extends WarehouseInEntity {
 
   @JsonKey(name: 'in_warehouse', defaultValue: '')
   String get getInWarehouse => inWarehouse;
+
+  @JsonKey(name: 'message', defaultValue: '')
+  String get getMessage => message;
 
   factory WarehouseInModel.fromJson(Map<String, dynamic> json) =>
       _$WarehouseInModelFromJson(json);

@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:warehouse_scan/features/auth/login/domain/entities/user_entity.dart';
+import '../../../../../core/services/get_translate_key.dart';
 import '../../../domain/usecases/get_material_info.dart';
 import '../../../domain/usecases/process_warehouse_out.dart';
 import 'warehouse_out_event.dart';
@@ -60,10 +61,8 @@ class WarehouseOutBloc extends Bloc<WarehouseOutEvent, WarehouseOutState> {
   ) async {
     debugPrint('Barcode scanned: ${event.barcode}');
     
-    // Show processing state
     emit(WarehouseOutProcessing(event.barcode));
     
-    // Get material info
     add(GetMaterialInfoEvent(event.barcode));
   }
   
@@ -73,20 +72,19 @@ class WarehouseOutBloc extends Bloc<WarehouseOutEvent, WarehouseOutState> {
   ) async {
     debugPrint('Getting material info for code: ${event.code}');
     
-    // Check for internet connection
-    // if (!(await connectionChecker.hasConnection)) {
-    //   emit(WarehouseOutError(
-    //     message: 'No internet connection. Please check your network.',
-    //     previousState: state,
-    //   ));
-    //   return;
-    // }
+    if (!(await connectionChecker.hasConnection)) {
+      emit(WarehouseOutError(
+        message: StringKey.networkErrorMessage,
+        previousState: state,
+      ));
+      return;
+    }
     
     try {
       final result = await getMaterialInfo(
         GetMaterialInfoParams(
           code: event.code,
-          userName: currentUser.name, // Sử dụng userName từ currentUser
+          userName: currentUser.name,
         ),
       );
       
@@ -94,7 +92,8 @@ class WarehouseOutBloc extends Bloc<WarehouseOutEvent, WarehouseOutState> {
         (failure) {
           debugPrint('Failed to get material info: ${failure.message}');
           emit(WarehouseOutError(
-            message: failure.message,
+            message: StringKey.materialWithCodeNotFoundMessage,
+            args: {"code": event.code.toString()},
             previousState: state,
           ));
         },
@@ -106,7 +105,7 @@ class WarehouseOutBloc extends Bloc<WarehouseOutEvent, WarehouseOutState> {
     } catch (e) {
       debugPrint('Error getting material info: $e');
       emit(WarehouseOutError(
-        message: 'Failed to get material information',
+        message: StringKey.failedToGetMaterialInformation,
         previousState: state,
       ));
     }
@@ -152,7 +151,7 @@ class WarehouseOutBloc extends Bloc<WarehouseOutEvent, WarehouseOutState> {
     } catch (e) {
       debugPrint('Error processing warehouse out: $e');
       emit(WarehouseOutError(
-        message: 'Failed to process warehouse out',
+        message: StringKey.failedToProcessExportingWarehouse,
         previousState: state is MaterialInfoLoaded ? state : WarehouseOutInitial(),
       ));
     }

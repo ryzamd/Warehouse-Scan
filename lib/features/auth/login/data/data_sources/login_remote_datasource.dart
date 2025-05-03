@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:warehouse_scan/core/constants/api_constants.dart';
 import 'package:warehouse_scan/core/errors/server_exception.dart';
+import 'package:warehouse_scan/core/services/get_translate_key.dart';
+import '../../../../../core/errors/failures.dart';
 import '../models/user_model.dart';
 
 abstract class LoginRemoteDataSource {
@@ -38,24 +40,21 @@ class LoginRemoteDataSourceImpl implements LoginRemoteDataSource {
         if (response.data['message'] == '登錄成功') {
           return UserModel.fromJson(response.data);
         } else {
-          throw AuthException(response.data['message'] ?? 'Invalid credentials');
+          throw AuthException(StringKey.invalidCredentialsMessage);
         }
       } else {
-        throw AuthException('Invalid credentials');
+        throw AuthException(StringKey.invalidCredentialsMessage);
       }
-    } on DioException catch (e) {
-      throw ServerException(e.message ?? 'Server error occurred');
-    } on AuthException {
-      rethrow;
-    } catch (e) {
-      throw ServerException(e.toString());
+    } on DioException catch (_) {
+      throw ServerException(StringKey.serverErrorMessage);
+
+    } catch(_){
+      throw ConnectionFailure(StringKey.networkErrorMessage);
     }
   }
   
   @override
   Future<UserModel> validateToken(String token) async {
-    // Token validation is not specified in the API documentation
-    // Could be implemented when available
-    throw UnimplementedError('Token validation not implemented');
+    throw UnimplementedError(StringKey.validateTokenMessage);
   }
 }

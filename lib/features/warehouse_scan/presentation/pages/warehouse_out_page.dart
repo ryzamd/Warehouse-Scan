@@ -3,12 +3,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:warehouse_scan/core/constants/key_code_constants.dart';
+import 'package:warehouse_scan/core/localization/context_extension.dart';
 import 'package:warehouse_scan/core/widgets/error_dialog.dart';
 import 'package:warehouse_scan/core/widgets/loading_dialog.dart';
 import 'package:warehouse_scan/core/widgets/scafford_custom.dart';
 import 'package:warehouse_scan/features/auth/login/domain/entities/user_entity.dart';
 import 'package:warehouse_scan/features/warehouse_scan/data/datasources/scan_service_impl.dart';
 import '../../../../core/di/dependencies.dart' as di;
+import '../../../../core/services/get_translate_key.dart';
 import '../../../../core/widgets/confirmation_dialog.dart';
 import '../../../../core/widgets/notification_dialog.dart';
 import '../../../address/presentation/bloc/address_bloc.dart';
@@ -107,8 +109,8 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
       debugPrint("QR DEBUG: ⚠️ Camera initialization error: $e");
       ErrorDialog.show(
         context,
-        title: 'CAMERA ERROR',
-        message: "Camera initialization error: $e",
+        title: context.multiLanguage.cameraErrorUPCASE,
+        message: context.multiLanguage.cameraInitializationErrorMessage(e.toString()),
       );
     }
   }
@@ -187,8 +189,8 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
     if (_formKey.currentState!.validate()) {
       ConfirmationDialog.show(
         context,
-        title: 'CONFIRMATION',
-        message: 'Are you sure you want to process this warehouse-out request?',
+        title: context.multiLanguage.confirmationUPCASE,
+        message: context.multiLanguage.processConfirmationMessage,
         confirmColor: Colors.redAccent,
         onConfirm: () {
           context.read<WarehouseOutBloc>().add(
@@ -280,8 +282,8 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
             
             NotificationDialog.show(
               context,
-              title: 'SUCCESS',
-              message: 'The material has been successfully sent for warehouse-out processing.',
+              title: context.multiLanguage.successUPCASE,
+              message: context.multiLanguage.importSuccessMessage,
               icon: Icons.check_circle_outline,
               iconColor: Colors.green,
               onDismiss: () {
@@ -298,15 +300,15 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
             
             ErrorDialog.show(
               context,
-              title: 'ERROR',
-              message: state.message,
+              title: context.multiLanguage.errorUPCASE,
+              message: TranslateKey.getStringKey(context.multiLanguage, state.message, args: state.args),
             );
             break;
         }
       },
       builder: (context, state) {
         return CustomScaffold(
-          title: 'EXPORT PAGE',
+          title: context.multiLanguage.exportPageTitle,
           showHomeIcon: true,
           user: widget.user,
           currentIndex: 1,
@@ -334,8 +336,8 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
               onPressed: () {
                   ConfirmationDialog.show(
                   context,
-                  title: 'CLEAR DATA',
-                  message: 'Are you sure you want to clear all data?',
+                  title: context.multiLanguage.clearDataTitleUPCASE,
+                  message: context.multiLanguage.clearDataMessageWarehouseOut,
                   confirmColor: Colors.redAccent,
                   onConfirm: _clearData,
                   onCancel: () {},
@@ -401,8 +403,8 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                               ),
-                              child: const Text(
-                                '保存',
+                              child: Text(
+                                context.multiLanguage.saveButton,
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -420,8 +422,8 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
                                   
                                   ErrorDialog.show(
                                     context,
-                                    title: 'ERROR',
-                                    message: 'You must clear data first to switch functionality !',
+                                    title: context.multiLanguage.errorUPCASE,
+                                    message: context.multiLanguage.switchFunctionErrorMessage,
                                   );
                                 }else{
                                   setState(() {
@@ -435,7 +437,7 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                               ),
                               child: Text(
-                                      _optionFunction == 2 ? '减少' : '增加',
+                                      _optionFunction == 2 ? context.multiLanguage.decreaseButton : context.multiLanguage.increaseButton,
                                       style: const TextStyle(
                                                 fontSize: 16,
                                                 fontWeight: FontWeight.bold,
@@ -479,11 +481,11 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                _buildTableRow('名稱', _currentMaterialName, height: normalRowHeight),
+                _buildTableRow(context.multiLanguage.materialNameLabel, _currentMaterialName, height: normalRowHeight),
                 _buildDivider(),
-                _buildTableRow('入庫數量', _warehouseQtyImport.toString(), height: normalRowHeight),
+                _buildTableRow(context.multiLanguage.warehouseQtyImportLabel, _warehouseQtyImport.toString(), height: normalRowHeight),
                 _buildDivider(),
-                _buildTableRow('出庫數量', _warehouseQtyExport.toString(), height: normalRowHeight),
+                _buildTableRow(context.multiLanguage.warehouseQtyExportLabel, _warehouseQtyExport.toString(), height: normalRowHeight),
                 _buildDivider(),
                 _buildQuantityRow(height: normalRowHeight),
                 _buildDivider(),
@@ -526,7 +528,7 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Text(
-                value.isEmpty ? 'No Scan data' : value,
+                value.isEmpty ? context.multiLanguage.noScanDataMessage : value,
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
@@ -556,8 +558,8 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
               ),
             ),
             alignment: Alignment.centerLeft,
-            child: const Text(
-              '輸入數據',
+            child: Text(
+              context.multiLanguage.inputQuantityLabel,
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
@@ -579,7 +581,7 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
                       fontWeight: FontWeight.w500,
                     ),
                     decoration: InputDecoration(
-                      hintText: 'Enter quantity',
+                      hintText: context.multiLanguage.inputQuantityHint,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -597,17 +599,17 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter a quantity';
+                        return context.multiLanguage.inputQuantityEmptyValidationMessage;
                       }
                       final quantity = double.tryParse(value);
                       if (quantity == null) {
-                        return 'Please enter a valid number';
+                        return context.multiLanguage.inputQuantityInvalidNumberValidationMessage;
                       }
                       if (quantity <= 0) {
-                        return 'Quantity must be greater than 0';
+                        return context.multiLanguage.inputQuantityGreaterThanZeroValidationMessage;
                       }
                       if (quantity > _maxQuantity) {
-                        return 'Quantity invalid';
+                        return context.multiLanguage.inputQuantityInvalidValidationMessage;
                       }
                       return null;
                     },
@@ -640,8 +642,8 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
               ),
             ),
             alignment: Alignment.centerLeft,
-            child: const Text(
-              '收貨方',
+            child: Text(
+              context.multiLanguage.addressLabel,
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,

@@ -1,4 +1,3 @@
-// lib/features/inventory_check/data/models/inventory_item_model.dart
 import 'package:json_annotation/json_annotation.dart';
 import '../../domain/entities/inventory_item_entity.dart';
 

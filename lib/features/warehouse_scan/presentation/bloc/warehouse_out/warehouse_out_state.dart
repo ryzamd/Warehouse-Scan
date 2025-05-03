@@ -94,12 +94,14 @@ class WarehouseOutSuccess extends WarehouseOutState {}
 class WarehouseOutError extends WarehouseOutState {
   final String message;
   final WarehouseOutState previousState;
+    final Map<String, dynamic>? args;
 
   const WarehouseOutError({
     required this.message,
     required this.previousState,
+    this.args
   });
 
   @override
-  List<Object> get props => [message, previousState];
+  List<Object> get props => [message, previousState, this.args!];
 }

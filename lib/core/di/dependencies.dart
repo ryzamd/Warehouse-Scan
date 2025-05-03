@@ -56,6 +56,8 @@ import 'package:warehouse_scan/features/warehouse_scan/domain/usecases/process_w
 import 'package:warehouse_scan/features/warehouse_scan/presentation/bloc/warehouse_in/warehouse_in_bloc.dart';
 import 'package:warehouse_scan/features/warehouse_scan/presentation/bloc/warehouse_out/warehouse_out_bloc.dart';
 
+import '../localization/language_bloc.dart';
+
 final sl = GetIt.instance;
 
 Future<void> init() async {
@@ -92,6 +94,11 @@ Future<void> _initSystemCore() async {
   dioClient.dio.interceptors.insert(0, tokenInterceptor);
   
   sl.registerLazySingleton<Dio>(() => dioClient.dio);
+
+  final sharedPreferences = await SharedPreferences.getInstance();
+  sl.registerLazySingleton(() => sharedPreferences);
+  
+  sl.registerLazySingleton(() => LanguageBloc(sharedPreferences: sl()));
 }
 
 Future<void> _initLoginFeature() async {
@@ -116,8 +123,6 @@ Future<void> _initLoginFeature() async {
     () => LoginRemoteDataSourceImpl(dio: sl<Dio>()),
   );
 
-  final sharedPreferences = await SharedPreferences.getInstance();
-  sl.registerLazySingleton(() => sharedPreferences);
   sl.registerLazySingleton(() => InternetConnectionChecker.createInstance(
     checkTimeout: const Duration(milliseconds: 800),
     checkInterval: const Duration(seconds: 10),

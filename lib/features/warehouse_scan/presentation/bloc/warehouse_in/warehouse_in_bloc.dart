@@ -1,4 +1,3 @@
-// lib/features/warehouse_scan/presentation/bloc/warehouse_in/warehouse_in_bloc.dart
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
@@ -27,10 +26,8 @@ class WarehouseInBloc extends Bloc<WarehouseInEvent, WarehouseInState> {
     on<HardwareScanEvent>(_onHardwareScan);
     on<ClearScannedData>(_onClearScannedData);
     
-    // Listen for connection changes
     connectionChecker.onStatusChange.listen((status) {
       if (status == InternetConnectionStatus.disconnected) {
-        // Handle disconnection
         debugPrint('Internet connection lost!');
       }
     });
@@ -57,10 +54,8 @@ class WarehouseInBloc extends Bloc<WarehouseInEvent, WarehouseInState> {
   ) async {
     debugPrint('Barcode scanned: ${event.barcode}');
     
-    // Show processing state
     emit(WarehouseInProcessing(event.barcode));
     
-    // Process the barcode
     add(ProcessWarehouseInEvent(event.barcode));
   }
   
@@ -76,15 +71,6 @@ class WarehouseInBloc extends Bloc<WarehouseInEvent, WarehouseInState> {
     _isProcessing = true;
     debugPrint('Processing warehouse in for code: ${event.code}');
     
-    // Check for internet connection
-    // if (!(await connectionChecker.hasConnection)) {
-    //   emit(WarehouseInError(
-    //     message: 'No internet connection. Please check your network.',
-    //     previousState: state,
-    //   ));
-    //   return;
-    // }
-    
     try {
       final result = await processWarehouseIn(
         ProcessWarehouseInParams(
@@ -97,7 +83,7 @@ class WarehouseInBloc extends Bloc<WarehouseInEvent, WarehouseInState> {
         (failure) {
           debugPrint('Warehouse in processing failed: ${failure.message}');
           emit(WarehouseInError(
-            message: 'Data has already been stored.',
+            message: failure.message,
             previousState: state,
           ));
         },
@@ -110,7 +96,7 @@ class WarehouseInBloc extends Bloc<WarehouseInEvent, WarehouseInState> {
       
       debugPrint('Error processing warehouse in: $e');
       emit(WarehouseInError(
-        message: 'Data has already been stored.',
+        message: e.toString(),
         previousState: state,
       ));
 
@@ -125,10 +111,8 @@ class WarehouseInBloc extends Bloc<WarehouseInEvent, WarehouseInState> {
   ) {
     debugPrint('Hardware scan detected: ${event.scannedData}');
     
-    // Show processing state
     emit(WarehouseInProcessing(event.scannedData));
     
-    // Process the barcode
     add(ProcessWarehouseInEvent(event.scannedData));
   }
   

@@ -1,4 +1,3 @@
-// lib/features/warehouse_scan/presentation/bloc/warehouse_in/warehouse_in_state.dart
 import 'package:equatable/equatable.dart';
 import '../../../domain/entities/warehouse_in_entity.dart';
 
@@ -14,7 +13,7 @@ class WarehouseInInitial extends WarehouseInState {}
 class WarehouseInScanning extends WarehouseInState {
   final bool isCameraActive;
   final bool isTorchEnabled;
-  final dynamic controller;  // Using dynamic to avoid import conflicts
+  final dynamic controller;
 
   const WarehouseInScanning({
     required this.isCameraActive,

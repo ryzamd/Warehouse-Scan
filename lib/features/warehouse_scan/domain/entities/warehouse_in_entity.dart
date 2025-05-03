@@ -15,6 +15,7 @@ class WarehouseInEntity extends Equatable {
   final String staff;
   final String qtyState;
   final String inWarehouse;
+  final String message;
 
   const WarehouseInEntity({
     required this.mwhId,
@@ -31,6 +32,7 @@ class WarehouseInEntity extends Equatable {
     required this.staff,
     required this.qtyState,
     required this.inWarehouse,
+    required this.message
   });
 
   @override
@@ -49,5 +51,6 @@ class WarehouseInEntity extends Equatable {
         staff,
         qtyState,
         inWarehouse,
+        message,
       ];
 }

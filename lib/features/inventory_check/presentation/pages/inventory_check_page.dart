@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:warehouse_scan/core/constants/key_code_constants.dart';
+import 'package:warehouse_scan/core/localization/context_extension.dart';
+import 'package:warehouse_scan/core/services/get_translate_key.dart';
 import 'package:warehouse_scan/core/widgets/error_dialog.dart';
 import 'package:warehouse_scan/core/widgets/loading_dialog.dart';
 import 'package:warehouse_scan/core/widgets/notification_dialog.dart';
@@ -89,8 +91,8 @@ class _InventoryCheckPageState extends State<InventoryCheckPage>
     } catch (e) {
       ErrorDialog.show(
         context,
-        title: 'ERROR',
-        message: "Cannot access to camera",
+        title: context.multiLanguage.errorUPCASE,
+        message: context.multiLanguage.cannotAccessCameraWithoutParam,
       );
     }
   }
@@ -185,14 +187,20 @@ class _InventoryCheckPageState extends State<InventoryCheckPage>
             LoadingDialog.show(context);
             break;
 
-          case InventorySaveSuccess():
+           case InventorySaveSuccess(:final inventoriedCount, :final failedCount):
             if (LoadingDialog.isShowing) {
               Navigator.of(context).pop();
             }
+            
+            final messages = [
+              if (inventoriedCount > 0) context.multiLanguage.successfullyProcessed(inventoriedCount),
+              if (failedCount > 0) context.multiLanguage.failedToProcess(failedCount),
+            ];
+            
             NotificationDialog.show(
               context,
-              title: 'SUCCESS',
-              message: 'Materials saved in warehouse',
+              title: context.multiLanguage.successUPCASE,
+              message: messages.join(''),
               icon: Icons.check_circle_outline,
               iconColor: Colors.green,
             );
@@ -202,13 +210,17 @@ class _InventoryCheckPageState extends State<InventoryCheckPage>
             if (LoadingDialog.isShowing) {
               Navigator.of(context).pop();
             }
-            ErrorDialog.show(context, title: 'ERROR', message: message);
+            ErrorDialog.show(
+              context,
+              title: context.multiLanguage.errorUPCASE,
+              message: TranslateKey.getStringKey(context.multiLanguage, message)
+            );
             break;
         }
       },
       builder: (context, state) {
         return CustomScaffold(
-          title: 'INVENTORY',
+          title: context.multiLanguage.inventoryPageTitle,
           user: widget.user,
           showHomeIcon: true,
           currentIndex: 1,
@@ -236,8 +248,8 @@ class _InventoryCheckPageState extends State<InventoryCheckPage>
               onPressed: () {
                   ConfirmationDialog.show(
                   context,
-                  title: 'CLEAR DATA',
-                  message: 'Are you sure you want to clear all data?',
+                  title: context.multiLanguage.clearDataUPCASE,
+                  message: context.multiLanguage.clearDataMessageInventoryCheck,
                   confirmColor: Colors.redAccent,
                   onConfirm: _clearInventory,
                   onCancel: () {},
@@ -279,7 +291,7 @@ class _InventoryCheckPageState extends State<InventoryCheckPage>
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Scanned Items (${_getScannedItemsCount(state)})',
+                        context.multiLanguage.scannedItemsInventoryCheckLabel(_getScannedItemsCount(state)),
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -313,8 +325,8 @@ class _InventoryCheckPageState extends State<InventoryCheckPage>
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    child: const Text(
-                      'Save',
+                    child: Text(
+                      context.multiLanguage.saveButton,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,

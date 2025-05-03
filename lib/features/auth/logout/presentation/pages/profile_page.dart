@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:warehouse_scan/core/localization/context_extension.dart';
 import 'package:warehouse_scan/core/widgets/scafford_custom.dart';
 import 'package:warehouse_scan/features/auth/login/domain/entities/user_entity.dart';
 import 'package:warehouse_scan/features/auth/logout/presentation/widgets/logout_button.dart';
@@ -16,7 +17,7 @@ class ProfilePage extends StatelessWidget {
     return BlocProvider(
       create: (context) => di.sl<LogoutBloc>(),
       child: CustomScaffold(
-        title: 'PROFILE',
+        title: context.multiLanguage.profilePageTitle,
         showNavBar: true,
         showHomeIcon: false,
         currentIndex: 2,
@@ -94,7 +95,7 @@ class ProfilePage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
-                      'Warehouse Manager',
+                      context.multiLanguage.warehouseManagerLabel,
                       style: const TextStyle(
                         fontSize: 16,
                         color: Colors.white,

@@ -1,6 +1,6 @@
-// lib/features/warehouse_scan/presentation/widgets/qr_scanner_widget.dart
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:warehouse_scan/core/localization/context_extension.dart';
 
 class QRScannerWidget extends StatelessWidget {
   final MobileScannerController? controller;
@@ -43,16 +43,15 @@ class QRScannerWidget extends StatelessWidget {
                   placeholderBuilder: (context, child) {
                     return Container(
                       color: Colors.black,
-                      child: const Center(
+                      child: Center(
                         child: Text(
-                          "Initializing camera...",
+                          context.multiLanguage.qrInitializingCameraMessage,
                           style: TextStyle(color: Colors.white),
                         ),
                       ),
                     );
                   },
                   errorBuilder: (context, error, child) {
-                    debugPrint("QR DEBUG: Camera error: ${error.errorCode}");
                     return Container(
                       color: Colors.black,
                       child: Center(
@@ -61,7 +60,7 @@ class QRScannerWidget extends StatelessWidget {
                           children: [
                             const Icon(Icons.error, color: Colors.red, size: 50),
                             Text(
-                              "Camera error: ${error.errorCode}",
+                              context.multiLanguage.qrCameraErrorMessage(error.errorCode.toString()),
                               textAlign: TextAlign.center,
                               style: const TextStyle(color: Colors.red),
                             ),
@@ -74,7 +73,7 @@ class QRScannerWidget extends StatelessWidget {
                                 controller!.stop();
                                 controller!.start();
                               },
-                              child: const Text("Try Again", style: TextStyle(color: Color(0xFFFEF9E1)),),
+                              child: Text(context.multiLanguage.qrTryAgainButton, style: TextStyle(color: Color(0xFFFEF9E1)),),
                             ),
                           ],
                         ),
@@ -84,9 +83,9 @@ class QRScannerWidget extends StatelessWidget {
                 )
               : Container(
                   color: Colors.black,
-                  child: const Center(
+                  child: Center(
                     child: Text(
-                      "Camera is off",
+                      context.multiLanguage.qrCameraIsOffStatus,
                       style: TextStyle(
                         fontSize: 18,
                         color: Colors.white,

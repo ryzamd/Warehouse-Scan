@@ -3,6 +3,7 @@ import 'package:warehouse_scan/core/errors/failures.dart';
 import 'package:warehouse_scan/core/errors/warehouse_exceptions.dart';
 import 'package:warehouse_scan/core/network/network_infor.dart';
 
+import '../../../../core/services/get_translate_key.dart';
 import '../../domain/entities/batch_item_entity.dart';
 import '../../domain/entities/batch_process_response_entity.dart';
 import '../../domain/repositories/batch_scan_repository.dart';
@@ -24,14 +25,10 @@ class BatchScanRepositoryImpl implements BatchScanRepository {
         final result = await dataSource.checkCode(code, userName);
         return Right(result);
       } on MaterialNotFoundException {
-        return Left(ServerFailure('Material with code $code not found in the system.'));
-      } on WarehouseException catch (e) {
-        return Left(ServerFailure(e.message));
-      } catch (e) {
-        return Left(ServerFailure(e.toString()));
+        return Left(ServerFailure(StringKey.materialWithCodeNotFoundMessage));
       }
     } else {
-      return Left(ConnectionFailure('No internet connection. Please check your network settings and try again.'));
+      return Left(ConnectionFailure(StringKey.networkErrorMessage));
     }
   }
 
@@ -44,6 +41,7 @@ class BatchScanRepositoryImpl implements BatchScanRepository {
     required int operationMode,
   }) async {
     if (await networkInfo.isConnected) {
+
       try {
         final result = await dataSource.processBatch(
           codes: codes,
@@ -53,13 +51,12 @@ class BatchScanRepositoryImpl implements BatchScanRepository {
           operationMode: operationMode,
         );
         return Right(result);
-      } on WarehouseException catch (e) {
-        return Left(ServerFailure(e.message));
-      } catch (e) {
-        return Left(ServerFailure(e.toString()));
+
+      } on WarehouseException catch (_) {
+        return Left(ServerFailure(StringKey.somethingWentWrongMessage));
       }
     } else {
-      return Left(ConnectionFailure('No internet connection. Please check your network settings and try again.'));
+      return Left(ConnectionFailure(StringKey.networkErrorMessage));
     }
   }
 }

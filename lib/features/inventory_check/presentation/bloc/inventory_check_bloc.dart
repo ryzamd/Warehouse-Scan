@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:warehouse_scan/features/auth/login/domain/entities/user_entity.dart';
+import '../../../../core/services/get_translate_key.dart';
 import '../../domain/entities/inventory_item_entity.dart';
 import '../../domain/usecases/check_item_code.dart';
 import '../../domain/usecases/save_inventory_items.dart';
@@ -53,7 +54,7 @@ class InventoryCheckBloc extends Bloc<InventoryCheckEvent, InventoryCheckState> 
 
     if (codeExists) {
       emit(InventoryCheckError(
-        message: 'This item has been scanned.',
+        message: StringKey.thisItemHasBeenScannedMessage,
         previousState: state,
       ));
       
@@ -86,7 +87,7 @@ class InventoryCheckBloc extends Bloc<InventoryCheckEvent, InventoryCheckState> 
       result.fold(
         (failure) {
           emit(InventoryCheckError(
-            message: failure.message,
+            message: StringKey.materialNotFound,
             previousState: state,
           ));
           
@@ -102,7 +103,7 @@ class InventoryCheckBloc extends Bloc<InventoryCheckEvent, InventoryCheckState> 
       );
     } catch (e) {
       emit(InventoryCheckError(
-        message: 'Error while checking materials',
+        message: StringKey.errorWhileCheckingMaterialMessage,
         previousState: state,
       ));
       
@@ -138,7 +139,7 @@ class InventoryCheckBloc extends Bloc<InventoryCheckEvent, InventoryCheckState> 
   Future<void> _onSaveInventoryList(SaveInventoryListEvent event, Emitter<InventoryCheckState> emit) async {
     if (_scannedItems.isEmpty) {
       emit(InventoryCheckError(
-        message: 'Material is empty',
+        message: StringKey.materialIsEmptyMessage,
         previousState: state,
       ));
       return;
@@ -160,22 +161,61 @@ class InventoryCheckBloc extends Bloc<InventoryCheckEvent, InventoryCheckState> 
           
           emit(InventoryListUpdated(scannedItems: _scannedItems));
         },
-        (savedItems) {
-          emit(InventorySaveSuccess(savedItems: savedItems));
+        (response) {
+          final inventoriedCount = response.results.where((result) => result.isInventoried).length;
+          final failedCount = response.results.where((result) => result.hasError).length;
           
-          _scannedItems = [];
+          final Map<String, String> inventoriedItems = {};
+          final Map<String, String> failedItems = {};
           
-          emit(InventoryCheckScanning(
-            isCameraActive: true,
-            isTorchEnabled: false,
-            controller: scannerController,
-            scannedItems: _scannedItems,
+          for (final result in response.results) {
+            if (result.isInventoried) {
+              inventoriedItems[result.code] = result.message;
+            } else if (result.hasError) {
+              failedItems[result.code] = result.message;
+            }
+          }
+          
+          final updatedItems = _scannedItems.map((item) {
+            if (inventoriedItems.containsKey(item.code)) {
+              return item.copyWith(
+                isInventoried: true,
+                statusMessage: inventoriedItems[item.code] ?? '',
+              );
+            } else if (failedItems.containsKey(item.code)) {
+              return item.copyWith(
+                isError: true,
+                statusMessage: failedItems[item.code] ?? '',
+              );
+            }
+            return item;
+          }).toList();
+          
+          _scannedItems = updatedItems.where((item) => !response.results.any((r) => r.isSuccess && r.code == item.code)).toList();
+          
+          emit(InventorySaveSuccess(
+            savedItems: response.results.where((r) => r.isSuccess).map((r) => r.code).toList(),
+            inventoriedItems: response.results.where((r) => r.isInventoried).map((r) => r.code).toList(),
+            failedItems: response.results.where((r) => r.hasError).map((r) => r.code).toList(),
+            inventoriedCount: inventoriedCount,
+            failedCount: failedCount,
           ));
+          
+          if (_scannedItems.isNotEmpty) {
+            emit(InventoryListUpdated(scannedItems: _scannedItems));
+          } else {
+            emit(InventoryCheckScanning(
+              isCameraActive: true,
+              isTorchEnabled: false,
+              controller: scannerController,
+              scannedItems: _scannedItems,
+            ));
+          }
         },
       );
     } catch (e) {
       emit(InventoryCheckError(
-        message: 'Cannot saving inventory list.',
+        message: StringKey.cannotSavingInventoryListMessage,
         previousState: state,
       ));
       

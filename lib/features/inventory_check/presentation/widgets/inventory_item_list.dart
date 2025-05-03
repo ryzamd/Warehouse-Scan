@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:warehouse_scan/core/localization/context_extension.dart';
 import '../../domain/entities/inventory_item_entity.dart';
 import '../bloc/inventory_check_bloc.dart';
 import '../bloc/inventory_check_event.dart';
@@ -15,11 +16,11 @@ class InventoryItemList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (items.isEmpty) {
-      return const Center(
+      return Center(
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: 20.0),
           child: Text(
-            'No data',
+            context.multiLanguage.noDataMessage,
             style: TextStyle(
               fontSize: 16,
               fontStyle: FontStyle.italic,
@@ -42,6 +43,8 @@ class InventoryItemList extends StatelessWidget {
   }
   
   Widget _buildItemCard(BuildContext context, InventoryItemEntity item) {
+    final Color titleColor = item.isError ? Colors.red : (item.isInventoried ? Colors.orange : Colors.black87);
+        
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
       elevation: 3,
@@ -54,10 +57,11 @@ class InventoryItemList extends StatelessWidget {
           vertical: 8,
         ),
         title: Text(
-          'Code: ${_truncateCode(item.code)}',
-          style: const TextStyle(
+          context.multiLanguage.batchListCodeWithValue(_truncateCode(item.code)),
+          style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 14,
+            color: titleColor,
           ),
         ),
         subtitle: Column(
@@ -65,16 +69,26 @@ class InventoryItemList extends StatelessWidget {
           children: [
             const SizedBox(height: 4),
             Text(
-              'Name: ${item.mName}',
+              context.multiLanguage.batchListNameWithValue(item.mName),
               style: const TextStyle(fontSize: 13),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 2),
             Text(
-              'Quantity: ${item.mQty} ${item.mUnit}',
+              context.multiLanguage.batchListQuantityWithValue(item.mQty, item.mUnit),
               style: const TextStyle(fontSize: 13),
             ),
+            if (item.statusMessage.isNotEmpty) ...[
+              const SizedBox(height: 4),
+              Text(
+                "Error: ${item.statusMessage}",
+                style: TextStyle(
+                  fontSize: 12,
+                  color: item.isError ? Colors.red : Colors.orange,
+                ),
+              ),
+            ],
           ],
         ),
         trailing: IconButton(

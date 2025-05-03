@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:warehouse_scan/core/constants/api_constants.dart';
 import 'package:warehouse_scan/core/errors/warehouse_exceptions.dart';
+import 'package:warehouse_scan/core/services/get_translate_key.dart';
 import '../models/address_model.dart';
 
 abstract class AddressDataSource {
@@ -22,17 +22,13 @@ class AddressDataSourceImpl implements AddressDataSource {
         if (response.data['message'].toString().toLowerCase() == 'success') {
           return AddressModel.fromJson(response.data);
         } else {
-          throw WarehouseException(response.data['message'] ?? 'Get Address failed');
+          throw WarehouseException(StringKey.getAddressListFailedMessage);
         }
       } else {
-        throw WarehouseException('Server returned error code: ${response.statusCode}');
+        throw WarehouseException(StringKey.serverErrorMessage);
       }
-    } on DioException catch (e) {
-      debugPrint('DioException in getAddressList: ${e.message}');
-      throw WarehouseException('Network error');
-    } catch (e) {
-      debugPrint('Unexpected error in getAddressList: $e');
-      throw WarehouseException(e.toString());
+    } on DioException catch (_) {
+      throw WarehouseException(StringKey.networkErrorMessage);
     }
   }
 }

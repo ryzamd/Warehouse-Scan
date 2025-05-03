@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:warehouse_scan/core/constants/api_constants.dart';
 import 'package:warehouse_scan/core/errors/warehouse_exceptions.dart';
+import '../../../../core/services/get_translate_key.dart';
 import '../models/batch_item_model.dart';
 import '../models/batch_process_request_model.dart';
 import '../models/batch_process_response_model.dart';
@@ -42,14 +43,10 @@ class BatchScanDataSourceImpl implements BatchScanDataSource {
           throw MaterialNotFoundException(code);
         }
       } else {
-        throw WarehouseException('Server returned error code: ${response.statusCode}');
+        throw WarehouseException(StringKey.serverErrorMessage);
       }
-    } on DioException catch (e) {
-      throw WarehouseException(e.message ?? 'Network error');
-    } on MaterialNotFoundException {
-      rethrow;
-    } catch (e) {
-      throw WarehouseException(e.toString());
+    } on DioException catch (_) {
+      throw WarehouseException(StringKey.networkErrorMessage);
     }
   }
   
@@ -82,12 +79,10 @@ class BatchScanDataSourceImpl implements BatchScanDataSource {
       if (response.statusCode == 200) {
         return BatchProcessResponseModel.fromJson(response.data);
       } else {
-        throw WarehouseException('Server returned error code: ${response.statusCode}');
+        throw WarehouseException(StringKey.serverErrorMessage);
       }
-    } on DioException catch (e) {
-      throw WarehouseException(e.message ?? 'Network error');
-    } catch (e) {
-      throw WarehouseException(e.toString());
+    } on DioException catch (_) {
+      throw WarehouseException(StringKey.networkErrorMessage);
     }
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:warehouse_scan/core/constants/key_code_constants.dart';
+import 'package:warehouse_scan/core/localization/context_extension.dart';
 import 'package:warehouse_scan/core/widgets/confirmation_dialog.dart';
 import 'package:warehouse_scan/core/widgets/error_dialog.dart';
 import 'package:warehouse_scan/core/widgets/loading_dialog.dart';
@@ -11,6 +12,7 @@ import 'package:warehouse_scan/core/widgets/scafford_custom.dart';
 import 'package:warehouse_scan/features/auth/login/domain/entities/user_entity.dart';
 import 'package:warehouse_scan/features/warehouse_scan/data/datasources/scan_service_impl.dart';
 import 'package:warehouse_scan/features/warehouse_scan/presentation/widgets/qr_scanner_widget.dart';
+import '../../../../core/services/get_translate_key.dart';
 import '../../../../core/widgets/batch_scan_dialog.dart';
 import '../../domain/entities/batch_item_entity.dart';
 import '../bloc/batch_scan_bloc.dart';
@@ -89,8 +91,8 @@ class _BatchScanPageState extends State<BatchScanPage> with WidgetsBindingObserv
     } catch (e) {
       ErrorDialog.show(
         context,
-        title: 'ERROR',
-        message: "Cannot access camera: $e",
+        title: context.multiLanguage.errorUPCASE,
+        message: context.multiLanguage.cannotAccessCamera(e.toString()),
       );
     }
   }
@@ -171,10 +173,10 @@ class _BatchScanPageState extends State<BatchScanPage> with WidgetsBindingObserv
   void _clearBatch() {
     ConfirmationDialog.show(
       context,
-      title: 'CLEAR DATA',
-      message: 'Are you sure you want to clear all items from the batch?',
-      confirmText: 'Clear',
-      cancelText: 'Cancel',
+      title: context.multiLanguage.clearDataTitleUPCASE,
+      message: context.multiLanguage.clearDataMessage,
+      confirmText: context.multiLanguage.clearButton,
+      cancelText: context.multiLanguage.cancelButton,
       confirmColor: Colors.red,
       onConfirm: () {
         context.read<BatchScanBloc>().add(ClearBatchListEvent());
@@ -220,9 +222,9 @@ class _BatchScanPageState extends State<BatchScanPage> with WidgetsBindingObserv
             
             NotificationDialog.show(
               context,
-              title: 'SUCCESS',
-              message: 'Successfully processed $successCount items.\n'
-                      '${failCount > 0 ? 'Failed to process $failCount items.' : ''}',
+              title: context.multiLanguage.successUPCASE,
+                message: '${context.multiLanguage.successfullyProcessed(successCount)}'
+                    '${failCount > 0 ? '\n${context.multiLanguage.failedToProcess(failCount)}' : ''}',
               icon: Icons.check_circle_outline,
               iconColor: Colors.green,
             );
@@ -235,8 +237,12 @@ class _BatchScanPageState extends State<BatchScanPage> with WidgetsBindingObserv
             
             ErrorDialog.show(
               context,
-              title: 'ERROR',
-              message: state.message,
+              title: context.multiLanguage.errorUPCASE,
+              message: TranslateKey.getStringKey(
+                context.multiLanguage,
+                state.message,
+                args: state.args,
+              ),
             );
           break;
         }
@@ -245,7 +251,7 @@ class _BatchScanPageState extends State<BatchScanPage> with WidgetsBindingObserv
         final items = _getBatchItems(state);
         
         return CustomScaffold(
-          title: 'BATCH SCAN',
+          title: context.multiLanguage.batchScanTitleUPCASE,
           user: widget.user,
           showHomeIcon: true,
           currentIndex: 1,
@@ -303,7 +309,7 @@ class _BatchScanPageState extends State<BatchScanPage> with WidgetsBindingObserv
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Batch Items (${items.length})',
+                        context.multiLanguage.batchItems(items.length),
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -341,8 +347,8 @@ class _BatchScanPageState extends State<BatchScanPage> with WidgetsBindingObserv
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    child: const Text(
-                      'Execute',
+                    child: Text(
+                      context.multiLanguage.executeButton,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,

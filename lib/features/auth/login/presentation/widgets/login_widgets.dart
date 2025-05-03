@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:warehouse_scan/core/constants/app_colors.dart';
+import 'package:warehouse_scan/core/localization/context_extension.dart';
 
-/// Custom text field widget for the login page
 class LoginTextField extends StatelessWidget {
   final TextEditingController controller;
   final String hintText;
@@ -81,7 +81,6 @@ class LoginTextField extends StatelessWidget {
   }
 }
 
-/// Department selection dropdown widget with improved keyboard handling
 class DepartmentDropdown extends StatefulWidget {
   final String selectedDepartment;
   final List<String> departments;
@@ -198,7 +197,6 @@ class _DepartmentDropdownState extends State<DepartmentDropdown> {
   }
 }
 
-/// Custom gradient login button
 class LoginButton extends StatelessWidget {
   final VoidCallback onPressed;
   final bool isLoading;
@@ -233,8 +231,8 @@ class LoginButton extends StatelessWidget {
           child: Center(
             child: isLoading
                 ? const CircularProgressIndicator(color: Colors.white)
-                : const Text(
-                    '登录',
+                :  Text(
+                    context.multiLanguage.loginButton,
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 16,

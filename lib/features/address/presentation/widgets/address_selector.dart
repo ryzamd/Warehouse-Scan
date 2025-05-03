@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:warehouse_scan/core/constants/app_colors.dart';
+import 'package:warehouse_scan/core/localization/context_extension.dart';
 import '../bloc/address_bloc.dart';
 import '../bloc/address_event.dart';
 import '../bloc/address_state.dart';
@@ -43,7 +44,7 @@ class _AddressSelectorState extends State<AddressSelector> {
                   fontWeight: FontWeight.w500,
                 ),
                 decoration: InputDecoration(
-                  hintText: 'Select address',
+                  hintText: context.multiLanguage.enterOrSelectAddressHint,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -61,7 +62,7 @@ class _AddressSelectorState extends State<AddressSelector> {
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please select an address';
+                    return context.multiLanguage.enterOrSelectAddressValidationMessage;
                   }
                   return null;
                 },
@@ -139,10 +140,10 @@ class _AddressSelectorState extends State<AddressSelector> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Padding(
+              Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Text(
-                  'SELECT ADDRESS',
+                  context.multiLanguage.selectAddressTitleUPCASE,
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,

@@ -2,12 +2,13 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:warehouse_scan/core/constants/api_constants.dart';
 import 'package:warehouse_scan/core/errors/warehouse_exceptions.dart';
+import 'package:warehouse_scan/core/services/get_translate_key.dart';
 import '../models/inventory_item_model.dart';
+import '../models/batch_inventory_response_model.dart';
 
 abstract class InventoryCheckDataSource {
   Future<InventoryItemModel> checkItemCode(String code, String userName);
-
-  Future<List<InventoryItemModel>> saveInventoryItems(List<String> codes);
+  Future<BatchInventoryResponseModel> saveInventoryItems(List<String> codes);
 }
 
 class InventoryCheckDataSourceImpl implements InventoryCheckDataSource {
@@ -35,19 +36,15 @@ class InventoryCheckDataSourceImpl implements InventoryCheckDataSource {
           throw MaterialNotFoundException(code);
         }
       } else {
-        throw WarehouseException('Server returned error code: ${response.statusCode}');
+        throw WarehouseException(StringKey.serverErrorMessage);
       }
-    } on DioException catch (e) {
-      throw WarehouseException(e.message ?? 'Network error');
-    } on MaterialNotFoundException {
-      rethrow;
-    } catch (e) {
-      throw WarehouseException(e.toString());
+    } on DioException catch (_) {
+      throw WarehouseException(StringKey.networkErrorMessage);
     }
   }
   
   @override
-  Future<List<InventoryItemModel>> saveInventoryItems(List<String> codes) async {
+  Future<BatchInventoryResponseModel> saveInventoryItems(List<String> codes) async {
     try {
       final response = await dio.post(
         ApiConstants.saveInventoryUrl,
@@ -55,22 +52,12 @@ class InventoryCheckDataSourceImpl implements InventoryCheckDataSource {
       );
       
       if (response.statusCode == 200) {
-        
-        if (response.data['message'] == 'Success') {
-          final List<dynamic> dataList = response.data['data'];
-
-          return dataList.map((json) => InventoryItemModel.fromJson(json)).toList();
-
-        } else {
-          throw WarehouseException(response.data['message'] ?? 'Saving inventory failed');
-        }
+        return BatchInventoryResponseModel.fromJson(response.data);
       } else {
-        throw WarehouseException('Server returned error code: ${response.statusCode}');
+        throw WarehouseException(StringKey.serverErrorMessage);
       }
-    } on DioException catch (e) {
-      throw WarehouseException(e.message ?? 'Network error');
-    } catch (e) {
-      throw WarehouseException(e.toString());
+    } on DioException catch (_) {
+      throw WarehouseException(StringKey.networkErrorMessage);
     }
   }
 }

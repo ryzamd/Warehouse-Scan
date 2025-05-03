@@ -22,6 +22,7 @@ WarehouseInModel _$WarehouseInModelFromJson(Map<String, dynamic> json) =>
       staff: json['staff'] as String? ?? '',
       qtyState: json['qty_state'] as String? ?? '',
       inWarehouse: json['in_warehouse'] as String? ?? '',
+      message: json['message'] as String? ?? '',
     );
 
 Map<String, dynamic> _$WarehouseInModelToJson(WarehouseInModel instance) =>
@@ -40,4 +41,5 @@ Map<String, dynamic> _$WarehouseInModelToJson(WarehouseInModel instance) =>
       'staff': instance.staff,
       'qtyState': instance.qtyState,
       'inWarehouse': instance.inWarehouse,
+      'message': instance.message
     };
