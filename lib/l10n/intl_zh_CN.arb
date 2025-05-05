@@ -111,5 +111,13 @@
   "processingFetchDataFailedMessage": "获取数据处理失败",
   "getAddressListFailedMessage": "获取地址列表失败",
   "somethingWentWrongMessage": "发生错误，请检查数据。",
-  "cannotGetProcessingItemsMessage": "获取家庭列表项目失败。"
+  "cannotGetProcessingItemsMessage": "获取家庭列表项目失败。",
+  "withdrawLabel": "提取",
+  "exitDialogLabel": "退出",
+  "exitDialogMessage": "您确定要退出应用程序吗？",
+  "exitDialogConfirmButton": "退出",
+  "processPageTitleUPCASE": "处理",
+  "searchHintLabel": "搜索",
+  "storageFailedMessage": "存储失败: 请检查质量检查是否已完成，或联系IT部门以获取说明。",
+  "noDataAvailableMessage": "沒有可撤回數據。"
 }

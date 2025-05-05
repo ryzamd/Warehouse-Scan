@@ -34,7 +34,7 @@ class WarehouseInDataSourceImpl implements WarehouseInDataSource {
         if (response.data['message'] == 'Success') {
           return WarehouseInModel.fromJson(response.data);
         } else {
-          throw WarehouseInException(StringKey.processingFetchDataFailedMessage);
+          throw WarehouseInException(response.data['message']);
         }
       } else {
         throw WarehouseInException(StringKey.serverErrorMessage);

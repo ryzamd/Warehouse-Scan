@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:warehouse_scan/core/constants/app_colors.dart';
 import 'package:warehouse_scan/core/localization/context_extension.dart';
+import '../../../../core/constants/key_code_constants.dart';
+import '../../../../core/widgets/error_dialog.dart';
 import '../bloc/address_bloc.dart';
 import '../bloc/address_event.dart';
 import '../bloc/address_state.dart';
@@ -10,23 +12,59 @@ class AddressSelector extends StatefulWidget {
   final String currentAddress;
   final ValueChanged<String> onAddressSelected;
   final bool enabled;
+  final String? mode;
   
   const AddressSelector({
     super.key,
     required this.currentAddress,
     required this.onAddressSelected,
     this.enabled = true,
+    this.mode,
   });
 
   @override
-  State<AddressSelector> createState() => _AddressSelectorState();
+  State<AddressSelector> createState() => AddressSelectorState();
 }
 
-class _AddressSelectorState extends State<AddressSelector> {
+class AddressSelectorState extends State<AddressSelector> {
+  
+  late TextEditingController _controller;
+  List<String> _addresses = [];
+
   @override
   void initState() {
     super.initState();
+    _controller = TextEditingController(text: widget.currentAddress);
     context.read<AddressBloc>().add(GetAddressListEvent());
+    _controller.addListener(_onTextChanged);
+  }
+
+  @override
+  void dispose() {
+    _controller.removeListener(_onTextChanged);
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(covariant AddressSelector oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.mode != widget.mode) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (widget.mode == KeyFunction.WITHDRAW_FUNCTION) {
+          _controller.text = widget.currentAddress.isNotEmpty ? widget.currentAddress : '';
+        } else if (widget.mode == KeyFunction.EXPORT_FUNCTION) {
+          _controller.text = '';
+        }
+        Form.of(context).validate();
+      });
+    }
+  }
+
+  void _onTextChanged() {
+    if (mounted) {
+      Form.of(context).validate();
+    }
   }
 
   @override
@@ -37,7 +75,7 @@ class _AddressSelectorState extends State<AddressSelector> {
           children: [
             Expanded(
               child: TextFormField(
-                controller: TextEditingController(text: widget.currentAddress),
+                controller: _controller,
                 enabled: widget.enabled,
                 style: const TextStyle(
                   fontSize: 12,
@@ -61,8 +99,10 @@ class _AddressSelectorState extends State<AddressSelector> {
                   ),
                 ),
                 validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return context.multiLanguage.enterOrSelectAddressValidationMessage;
+                  if(widget.mode == KeyFunction.EXPORT_FUNCTION) {
+                    if (value == null || value.isEmpty) {
+                      return context.multiLanguage.enterOrSelectAddressValidationMessage;
+                    }
                   }
                   return null;
                 },
@@ -165,6 +205,7 @@ class _AddressSelectorState extends State<AddressSelector> {
                       textColor: Colors.orangeAccent.shade700,
                       onTap: () {
                         widget.onAddressSelected(addresses[index]);
+                        _controller.text = addresses[index];
                         Navigator.pop(context);
                       },
                     );
@@ -176,5 +217,25 @@ class _AddressSelectorState extends State<AddressSelector> {
         );
       },
     );
+  }
+
+  bool handleSave() {
+    if (widget.mode == KeyFunction.WITHDRAW_FUNCTION) {
+      if (!_addresses.contains(_controller.text)) {
+        ErrorDialog.show(
+          context,
+          title: context.multiLanguage.errorUPCASE,
+          message: context.multiLanguage.noDataAvailableMessage,
+        );
+        return false;
+      }
+      return true;
+    }
+
+    if (widget.mode == KeyFunction.EXPORT_FUNCTION) {
+      return Form.of(context).validate();
+    }
+
+    return true;
   }
 }

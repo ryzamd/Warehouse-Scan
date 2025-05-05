@@ -20,12 +20,12 @@ class LanguageSelector extends StatelessWidget {
         final locale = state.locale;
         
         Widget flagIcon;
-        if (locale.languageCode == 'en') {
-          flagIcon = Image.asset('assets/flags/US.png', width: 28, height: 28);
+        if (locale.languageCode == 'zh' && locale.countryCode == 'TW') {
+           flagIcon = Image.asset('assets/flags/TW.png', width: 28, height: 28);
         } else if (locale.languageCode == 'zh' && locale.countryCode == 'CN') {
           flagIcon = Image.asset('assets/flags/CN.png', width: 28, height: 28);
         } else {
-          flagIcon = Image.asset('assets/flags/TW.png', width: 28, height: 28);
+          flagIcon = Image.asset('assets/flags/US.png', width: 28, height: 28);
         }
         
         return PopupMenuButton<LanguageEvent>(
@@ -45,14 +45,14 @@ class LanguageSelector extends StatelessWidget {
           ),
           itemBuilder: (context) => [
             PopupMenuItem(
-              value: LanguageEvent.toEnglish,
+              value: LanguageEvent.toChineseTraditional,
               child: Row(
                 children: [
-                  Image.asset('assets/flags/US.png', width: 24, height: 24),
+                  Image.asset('assets/flags/TW.png', width: 24, height: 24),
                   const SizedBox(width: 12),
-                  const Text('English'),
+                  const Text('繁體中文'),
                   const Spacer(),
-                  if (locale.languageCode == 'en')
+                  if (locale.languageCode == 'zh' && locale.countryCode == 'TW')
                     Icon(Icons.check, color: iconColor ?? AppColors.primary),
                 ],
               ),
@@ -71,14 +71,14 @@ class LanguageSelector extends StatelessWidget {
               ),
             ),
             PopupMenuItem(
-              value: LanguageEvent.toChineseTraditional,
+              value: LanguageEvent.toEnglish,
               child: Row(
                 children: [
-                  Image.asset('assets/flags/TW.png', width: 24, height: 24),
+                  Image.asset('assets/flags/US.png', width: 24, height: 24),
                   const SizedBox(width: 12),
-                  const Text('繁體中文'),
+                  const Text('English'),
                   const Spacer(),
-                  if (locale.languageCode == 'zh' && locale.countryCode == 'TW')
+                  if (locale.languageCode == 'en')
                     Icon(Icons.check, color: iconColor ?? AppColors.primary),
                 ],
               ),

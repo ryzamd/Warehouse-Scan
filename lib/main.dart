@@ -151,6 +151,7 @@ class _MyAppState extends State<MyApp> {
                   );
 
                 case AppRoutes.inventoryCheck:
+                  NavigationService().setLastWarehouseRoute(AppRoutes.inventoryCheck);
                   return MaterialPageRoute(
                     settings: settings,
                     builder: (context) => BlocProvider(

@@ -2,7 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:warehouse_scan/core/constants/key_code_constants.dart';
 import 'package:warehouse_scan/features/auth/login/domain/entities/user_entity.dart';
+import '../../../../../core/services/get_translate_key.dart';
 import '../../../domain/usecases/process_warehouse_in.dart';
 import 'warehouse_in_event.dart';
 import 'warehouse_in_state.dart';
@@ -81,11 +83,22 @@ class WarehouseInBloc extends Bloc<WarehouseInEvent, WarehouseInState> {
       
       result.fold(
         (failure) {
-          debugPrint('Warehouse in processing failed: ${failure.message}');
-          emit(WarehouseInError(
-            message: failure.message,
-            previousState: state,
-          ));
+          if (failure.message.contains(KeyMessageResponse.NO_DATA)) {
+            emit(WarehouseInError(
+              message: StringKey.materialNotFound,
+              previousState: state,
+            ));
+          } else if (failure.message.contains(KeyMessageResponse.DATA_HAS_BEEN_STORED)) {
+            emit(WarehouseInError(
+              message: StringKey.storageFailedMessage,
+              previousState: state,
+            ));
+          } else {
+            emit(WarehouseInError(
+              message: failure.message,
+              previousState: state,
+            ));
+          }
         },
         (data) {
           debugPrint('Warehouse in processing successful');
@@ -93,8 +106,6 @@ class WarehouseInBloc extends Bloc<WarehouseInEvent, WarehouseInState> {
         },
       );
     } catch (e) {
-      
-      debugPrint('Error processing warehouse in: $e');
       emit(WarehouseInError(
         message: e.toString(),
         previousState: state,

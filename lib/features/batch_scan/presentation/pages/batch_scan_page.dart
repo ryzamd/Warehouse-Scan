@@ -156,8 +156,25 @@ class _BatchScanPageState extends State<BatchScanPage> with WidgetsBindingObserv
   }
 
   void _processBatch() {
+    String oldAddress = '';
+    final items = _getBatchItems(context.read<BatchScanBloc>().state);
+
+    if (items.isEmpty) {
+      ErrorDialog.show(
+        context,
+        title: context.multiLanguage.errorUPCASE,
+        message: context.multiLanguage.batchIsEmptyMessage,
+      );
+      return;
+    }
+
+    if (items.isNotEmpty && items[0].oldAddress.isNotEmpty) {
+      oldAddress = items[0].oldAddress;
+    }
+
     BatchScanWarehouseDialog.show(
       context,
+      oldAddress: oldAddress,
       onProcessBatch: (address, quantity, operationMode) {
         context.read<BatchScanBloc>().add(
           ProcessBatchEvent(

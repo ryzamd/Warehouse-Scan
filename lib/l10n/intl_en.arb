@@ -111,5 +111,13 @@
   "processingFetchDataFailedMessage": "Processing to fetch data has been failed",
   "getAddressListFailedMessage": "Get Address List failed",
   "somethingWentWrongMessage": "An error occurred, please check the data.",
-  "cannotGetProcessingItemsMessage": "Get Items for Home List has been failed."
+  "cannotGetProcessingItemsMessage": "Get Items for Home List has been failed.",
+  "withdrawLabel": "Withdraw",
+  "exitDialogLabel": "EXIT",
+  "exitDialogMessage": "Are you sure you want to exit the app?",
+  "exitDialogConfirmButton": "Exit",
+  "processPageTitleUPCASE": "PROCESS",
+  "searchHintLabel": "Search",
+  "storageFailedMessage": "Storage failed: Please check if qualityinspection has been done, or contact IT for clarification.",
+  "noDataAvailableMessage": "No data available for recall."
 }

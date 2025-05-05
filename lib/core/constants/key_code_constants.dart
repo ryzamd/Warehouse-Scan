@@ -11,3 +11,13 @@ class KeycodeConstants {
   static const int keyEvent2 = 294;
   static const int keyEventFromLogs = 73014444552;
 }
+
+class KeyMessageResponse {
+  static const String DATA_HAS_BEEN_STORED = "All data after deduction is stored in the warehouse";
+  static const String NO_DATA = "No data";
+}
+
+class KeyFunction {
+  static const String EXPORT_FUNCTION = "Export";
+  static const String WITHDRAW_FUNCTION = "Withdraw";
+}

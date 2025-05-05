@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:warehouse_scan/core/localization/context_extension.dart';
 
 class ExitConfirmationDialog extends StatelessWidget {
   static bool _isShowing = false;
@@ -33,19 +34,19 @@ class ExitConfirmationDialog extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
-      title: const Text(
-        'EXIT',
+      title: Text(
+        context.multiLanguage.exitDialogLabel,
         style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 18),
       ),
-      content: const Text('Are you sure to exit the application?'),
+      content: Text(context.multiLanguage.exitDialogMessage),
       actions: [
         TextButton(
           onPressed: onCancel ?? () => Navigator.of(context).pop(),
-          child: const Text('Cancel', style: TextStyle(fontSize: 14)),
+          child: Text(context.multiLanguage.cancelButton, style: TextStyle(fontSize: 14)),
         ),
         TextButton(
           onPressed: () => SystemNavigator.pop(),
-          child: const Text('OK', style: TextStyle(fontSize: 14)),
+          child: Text(context.multiLanguage.exitDialogConfirmButton, style: TextStyle(fontSize: 14)),
         ),
       ],
     );

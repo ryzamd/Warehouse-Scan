@@ -25,8 +25,8 @@ class WarehouseInRepositoryImpl implements WarehouseInRepository {
         final result = await dataSource.processWarehouseIn(code, userName);
         return Right(result);
 
-      } on WarehouseInException catch (_) {
-        return Left(ServerFailure(StringKey.materialNotFound));
+      } on WarehouseInException catch (e) {
+        return Left(ServerFailure(e.message));
       }
     } else {
       return Left(ConnectionFailure(StringKey.networkErrorMessage));

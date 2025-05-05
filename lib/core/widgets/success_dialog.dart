@@ -1,4 +1,3 @@
-// lib/core/widgets/success_dialog.dart
 import 'package:flutter/material.dart';
 
 class SuccessDialog extends StatelessWidget {

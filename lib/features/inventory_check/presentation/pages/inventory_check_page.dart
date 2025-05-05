@@ -223,6 +223,7 @@ class _InventoryCheckPageState extends State<InventoryCheckPage>
           title: context.multiLanguage.inventoryPageTitle,
           user: widget.user,
           showHomeIcon: true,
+          
           currentIndex: 1,
           actions: [
             IconButton(

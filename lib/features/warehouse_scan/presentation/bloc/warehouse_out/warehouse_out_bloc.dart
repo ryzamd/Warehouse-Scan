@@ -66,12 +66,7 @@ class WarehouseOutBloc extends Bloc<WarehouseOutEvent, WarehouseOutState> {
     add(GetMaterialInfoEvent(event.barcode));
   }
   
-  Future<void> _onGetMaterialInfo(
-    GetMaterialInfoEvent event,
-    Emitter<WarehouseOutState> emit,
-  ) async {
-    debugPrint('Getting material info for code: ${event.code}');
-    
+  Future<void> _onGetMaterialInfo(GetMaterialInfoEvent event, Emitter<WarehouseOutState> emit) async {
     if (!(await connectionChecker.hasConnection)) {
       emit(WarehouseOutError(
         message: StringKey.networkErrorMessage,
@@ -90,7 +85,6 @@ class WarehouseOutBloc extends Bloc<WarehouseOutEvent, WarehouseOutState> {
       
       result.fold(
         (failure) {
-          debugPrint('Failed to get material info: ${failure.message}');
           emit(WarehouseOutError(
             message: StringKey.materialWithCodeNotFoundMessage,
             args: {"code": event.code.toString()},
@@ -98,12 +92,13 @@ class WarehouseOutBloc extends Bloc<WarehouseOutEvent, WarehouseOutState> {
           ));
         },
         (material) {
-          debugPrint('Material info loaded successfully');
-          emit(MaterialInfoLoaded(material: material));
+          emit(MaterialInfoLoaded(
+            material: material,
+            originalAddress: material.address
+          ));
         },
       );
     } catch (e) {
-      debugPrint('Error getting material info: $e');
       emit(WarehouseOutError(
         message: StringKey.failedToGetMaterialInformation,
         previousState: state,
@@ -117,7 +112,6 @@ class WarehouseOutBloc extends Bloc<WarehouseOutEvent, WarehouseOutState> {
   ) async {
     debugPrint('Processing warehouse out: ${event.code}, ${event.address}, ${event.quantity}');
     
-    // Show processing state
     emit(WarehouseOutProcessingRequest(
       code: event.code,
       address: event.address,
@@ -137,19 +131,16 @@ class WarehouseOutBloc extends Bloc<WarehouseOutEvent, WarehouseOutState> {
       
       result.fold(
         (failure) {
-          debugPrint('Warehouse out processing failed: ${failure.message}');
           emit(WarehouseOutError(
             message: failure.message,
             previousState: state is MaterialInfoLoaded ? state : WarehouseOutInitial(),
           ));
         },
         (success) {
-          debugPrint('Warehouse out processing successful');
           emit(WarehouseOutSuccess());
         },
       );
     } catch (e) {
-      debugPrint('Error processing warehouse out: $e');
       emit(WarehouseOutError(
         message: StringKey.failedToProcessExportingWarehouse,
         previousState: state is MaterialInfoLoaded ? state : WarehouseOutInitial(),
@@ -161,8 +152,6 @@ class WarehouseOutBloc extends Bloc<WarehouseOutEvent, WarehouseOutState> {
     HardwareScanEvent event,
     Emitter<WarehouseOutState> emit,
   ) {
-    debugPrint('Hardware scan detected: ${event.scannedData}');
-    
     emit(WarehouseOutProcessing(event.scannedData));
     
     add(GetMaterialInfoEvent(event.scannedData));

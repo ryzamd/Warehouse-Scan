@@ -5,6 +5,7 @@ import 'package:warehouse_scan/core/widgets/scafford_custom.dart';
 import 'package:warehouse_scan/features/auth/login/domain/entities/user_entity.dart';
 import 'package:warehouse_scan/features/auth/logout/presentation/widgets/logout_button.dart';
 import '../../../../../core/di/dependencies.dart' as di;
+import '../../../../../core/widgets/language_selector.dart';
 import '../bloc/logout_bloc.dart';
 
 class ProfilePage extends StatelessWidget {
@@ -22,6 +23,9 @@ class ProfilePage extends StatelessWidget {
         showHomeIcon: false,
         currentIndex: 2,
         user: user,
+        actions: [
+          const LanguageSelector(),
+        ],
         body: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(

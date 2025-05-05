@@ -43,12 +43,12 @@ class WarehouseMenuPage extends StatelessWidget {
                 icon: Icons.input,
                 route: AppRoutes.warehouseIn,
               ),
-              _buildFunctionTile(
-                context,
-                title: context.multiLanguage.exportMaterialMenuTitle,
-                icon: Icons.output,
-                route: AppRoutes.warehouseOut,
-              ),
+              // _buildFunctionTile(
+              //   context,
+              //   title: context.multiLanguage.exportMaterialMenuTitle,
+              //   icon: Icons.output,
+              //   route: AppRoutes.warehouseOut,
+              // ),
               _buildFunctionTile(
                 context,
                 title: context.multiLanguage.batchScanMenuTitle,

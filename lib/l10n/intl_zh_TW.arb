@@ -111,5 +111,13 @@
   "processingFetchDataFailedMessage": "取得資料處理失敗",
   "getAddressListFailedMessage": "取得地址清單失敗",
   "somethingWentWrongMessage": "發生錯誤，請檢查資料。",
-  "cannotGetProcessingItemsMessage": "取得主頁清單的項目失敗。"
+  "cannotGetProcessingItemsMessage": "取得主頁清單的項目失敗。",
+  "withdrawLabel": "提取",
+  "exitDialogLabel": "退出",
+  "exitDialogMessage": "您確定要退出應用程式嗎？",
+  "exitDialogConfirmButton": "退出",
+  "processPageTitleUPCASE": "處理",
+  "searchHintLabel": "搜索",
+  "storageFailedMessage": "存儲失敗: 請檢查質量檢查是否已完成，或聯繫IT部門以獲取說明。",
+  "noDataAvailableMessage": "沒有可供回憶的數據。"
 }

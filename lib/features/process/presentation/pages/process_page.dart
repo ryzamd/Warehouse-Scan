@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:warehouse_scan/core/auth/auth_repository.dart';
 import 'package:warehouse_scan/core/di/dependencies.dart' as di;
+import 'package:warehouse_scan/core/localization/context_extension.dart';
 import 'package:warehouse_scan/core/widgets/scafford_custom.dart';
 import 'package:warehouse_scan/features/auth/login/domain/entities/user_entity.dart';
 import 'package:warehouse_scan/features/process/presentation/bloc/processing_bloc.dart';
@@ -65,7 +66,7 @@ class _ProcessingPageState extends State<ProcessingPage> {
   @override
   Widget build(BuildContext context) {
     return CustomScaffold(
-      title: 'PROCESSING',
+      title: context.multiLanguage.processPageTitleUPCASE,
       user: widget.user,
       showHomeIcon: true,
       currentIndex: 0,
@@ -129,7 +130,7 @@ class _ProcessingPageState extends State<ProcessingPage> {
       child: TextField(
         controller: _searchController,
         decoration: InputDecoration(
-          hintText: 'Search',
+          hintText: context.multiLanguage.searchHintLabel,
           prefixIcon: const Icon(Icons.search),
           suffixIcon: IconButton(
             icon: const Icon(Icons.clear),

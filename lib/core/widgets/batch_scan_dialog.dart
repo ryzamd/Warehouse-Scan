@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:warehouse_scan/core/constants/app_colors.dart';
+import 'package:warehouse_scan/core/constants/key_code_constants.dart';
+import 'package:warehouse_scan/core/localization/context_extension.dart';
 
 import '../../features/address/presentation/bloc/address_bloc.dart';
 import '../../features/address/presentation/widgets/address_selector.dart';
@@ -9,21 +11,25 @@ import '../di/dependencies.dart' as di;
 
 class BatchScanWarehouseDialog extends StatefulWidget {
   final Function(String address, double quantity, int operationMode) onProcessBatch;
+  final String oldAddress;
   
   const BatchScanWarehouseDialog({
     super.key,
     required this.onProcessBatch,
+    this.oldAddress = '',
   });
   
   static Future<void> show(
     BuildContext context, {
     required Function(String address, double quantity, int operationMode) onProcessBatch,
+    String oldAddress = '',
   }) async {
     return showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => BatchScanWarehouseDialog(
         onProcessBatch: onProcessBatch,
+        oldAddress: oldAddress,
       ),
     );
   }
@@ -33,10 +39,19 @@ class BatchScanWarehouseDialog extends StatefulWidget {
 }
 
 class _BatchScanWarehouseDialogState extends State<BatchScanWarehouseDialog> {
+  final GlobalKey<AddressSelectorState> _addressSelectorKey = GlobalKey<AddressSelectorState>();
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _quantityController = TextEditingController();
   int _operationMode = 3;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.oldAddress.isNotEmpty) {
+      _addressController.text = '';
+    }
+  }
   
   @override
   void dispose() {
@@ -48,9 +63,9 @@ class _BatchScanWarehouseDialogState extends State<BatchScanWarehouseDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text(
-        'CONFIRM',
-        style: TextStyle(
+      title: Text(
+        context.multiLanguage.confirmationUPCASE,
+        style: const TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.bold,
           color: AppColors.error
@@ -68,26 +83,28 @@ class _BatchScanWarehouseDialogState extends State<BatchScanWarehouseDialog> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Address:',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                Text(
+                  context.multiLanguage.addressLabel,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
                 AddressSelector(
+                  key: _addressSelectorKey,
                   currentAddress: _addressController.text,
                   onAddressSelected: (address) {
                     setState(() {
                       _addressController.text = address;
                     });
                   },
-                  enabled: true,
+                  enabled: _operationMode == 3,
+                  mode: _operationMode == 4 ? KeyFunction.WITHDRAW_FUNCTION : KeyFunction.EXPORT_FUNCTION,
                 ),
 
-                const SizedBox(height: 8),
+                const SizedBox(height: 16),
                 
-                const Text(
-                  'Quantity:',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                Text(
+                  context.multiLanguage.inputQuantityLabel,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
                 ValueListenableBuilder(
@@ -104,7 +121,7 @@ class _BatchScanWarehouseDialogState extends State<BatchScanWarehouseDialog> {
                         fontWeight: FontWeight.w500,
                       ),
                       decoration: InputDecoration(
-                        hintText: 'Enter Quantity',
+                        hintText: context.multiLanguage.inputQuantityHint,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -122,14 +139,14 @@ class _BatchScanWarehouseDialogState extends State<BatchScanWarehouseDialog> {
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter a quantity';
+                          return context.multiLanguage.inputQuantityEmptyValidationMessage;
                         }
                         final quantity = double.tryParse(value);
                         if (quantity == null) {
-                          return 'Please enter a valid number';
+                          return context.multiLanguage.inputQuantityInvalidNumberValidationMessage;
                         }
                         if (quantity <= 0) {
-                          return 'Quantity must be greater than 0';
+                          return context.multiLanguage.inputQuantityGreaterThanZeroValidationMessage;
                         }
                         return null;
                       },
@@ -147,12 +164,16 @@ class _BatchScanWarehouseDialogState extends State<BatchScanWarehouseDialog> {
                   children: [
                     Expanded(
                       child: RadioListTile<int>(
-                        title: const Text('Export', style: TextStyle(fontSize: 14)),
+                        title: Text(
+                          context.multiLanguage.warehouseOutLabel,
+                          style: const TextStyle(fontSize: 14)
+                        ),
                         value: 3,
                         groupValue: _operationMode,
                         onChanged: (value) {
                           setState(() {
                             _operationMode = value!;
+                            _addressController.text = '';
                           });
                         },
                         activeColor: AppColors.error,
@@ -161,12 +182,18 @@ class _BatchScanWarehouseDialogState extends State<BatchScanWarehouseDialog> {
                     ),
                     Expanded(
                       child: RadioListTile<int>(
-                        title: const Text('Recall', style: TextStyle(fontSize: 14)),
+                        title: Text(
+                          context.multiLanguage.withdrawLabel,
+                          style: const TextStyle(fontSize: 14)
+                        ),
                         value: 4,
                         groupValue: _operationMode,
                         onChanged: (value) {
                           setState(() {
                             _operationMode = value!;
+                            if (widget.oldAddress.isNotEmpty) {
+                              _addressController.text = widget.oldAddress;
+                            }
                           });
                         },
                         activeColor: AppColors.error,
@@ -186,23 +213,27 @@ class _BatchScanWarehouseDialogState extends State<BatchScanWarehouseDialog> {
           children: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel', style: TextStyle(color: AppColors.error)),
+              child: Text(
+                context.multiLanguage.cancelButton,
+                style: const TextStyle(color: AppColors.error)
+              ),
             ),
             ElevatedButton(
               onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  final address = _addressController.text;
-                  final quantity = double.parse(_quantityController.text);
-                  
-                  Navigator.of(context).pop();
-                  widget.onProcessBatch(address, quantity, _operationMode);
+                if (_addressSelectorKey.currentState?.handleSave() ?? false) {
+                  if (_formKey.currentState!.validate()) {
+                    final address = _addressController.text;
+                    final quantity = double.parse(_quantityController.text);
+                    Navigator.of(context).pop();
+                    widget.onProcessBatch(address, quantity, _operationMode);
+                  }
                 }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.success,
                 foregroundColor: Colors.white,
               ),
-              child: const Text('Save'),
+              child: Text(context.multiLanguage.saveButton),
             ),
           ],
         )

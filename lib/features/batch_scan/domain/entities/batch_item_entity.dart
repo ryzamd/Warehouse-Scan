@@ -8,6 +8,7 @@ class BatchItemEntity extends Equatable {
   final bool isProcessed;
   final bool isError;
   final String errorMessage;
+  final String oldAddress;
 
   const BatchItemEntity({
     required this.code,
@@ -17,10 +18,11 @@ class BatchItemEntity extends Equatable {
     this.isProcessed = false,
     this.isError = false,
     this.errorMessage = '',
+    this.oldAddress = '',
   });
 
   @override
-  List<Object?> get props => [code, name, quantity, unit, isProcessed, isError, errorMessage];
+  List<Object?> get props => [code, name, quantity, unit, isProcessed, isError, errorMessage, oldAddress];
 
   BatchItemEntity copyWith({
     String? code,
@@ -30,6 +32,7 @@ class BatchItemEntity extends Equatable {
     bool? isProcessed,
     bool? isError,
     String? errorMessage,
+    String? oldAddress,
   }) {
     return BatchItemEntity(
       code: code ?? this.code,
@@ -39,6 +42,7 @@ class BatchItemEntity extends Equatable {
       isProcessed: isProcessed ?? this.isProcessed,
       isError: isError ?? this.isError,
       errorMessage: errorMessage ?? this.errorMessage,
+      oldAddress: oldAddress ?? this.oldAddress,
     );
   }
 }

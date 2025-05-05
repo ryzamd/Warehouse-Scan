@@ -27,14 +27,14 @@ class LanguageBloc extends Bloc<LanguageEvent, LanguageState> {
   
   final SharedPreferences sharedPreferences;
 
-  LanguageBloc({required this.sharedPreferences}) : super(LanguageState(const Locale('en'))) {
+  LanguageBloc({required this.sharedPreferences}) : super(LanguageState(const Locale('zh', 'TW'))) {
     on<LanguageEvent>(_onLanguageEvent);
     _initLanguage();
   }
 
   void _initLanguage() {
-    final languageCode = sharedPreferences.getString(LANGUAGE_CODE) ?? 'en';
-    final countryCode = sharedPreferences.getString(COUNTRY_CODE) ?? '';
+    final languageCode = sharedPreferences.getString(LANGUAGE_CODE) ?? 'zh';
+    final countryCode = sharedPreferences.getString(COUNTRY_CODE) ?? 'TW';
     
     if (languageCode == 'zh') {
       if (countryCode == 'CN') {
@@ -42,6 +42,8 @@ class LanguageBloc extends Bloc<LanguageEvent, LanguageState> {
       } else if (countryCode == 'TW') {
         add(LanguageEvent.toChineseTraditional);
       }
+    } else if (languageCode == 'en') {
+      add(LanguageEvent.toEnglish);
     }
   }
 

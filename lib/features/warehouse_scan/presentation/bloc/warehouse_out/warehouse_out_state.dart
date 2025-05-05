@@ -51,25 +51,29 @@ class MaterialInfoLoaded extends WarehouseOutState {
   final WarehouseOutEntity material;
   final bool quantityExceeded;
   final String? quantityError;
+  final String originalAddress;
 
   const MaterialInfoLoaded({
     required this.material,
     this.quantityExceeded = false,
     this.quantityError,
+    this.originalAddress = '',
   });
 
   @override
-  List<Object?> get props => [material, quantityExceeded, quantityError];
+  List<Object?> get props => [material, quantityExceeded, quantityError, originalAddress];
 
   MaterialInfoLoaded copyWith({
     WarehouseOutEntity? material,
     bool? quantityExceeded,
     String? quantityError,
+    String? originalAddress,
   }) {
     return MaterialInfoLoaded(
       material: material ?? this.material,
       quantityExceeded: quantityExceeded ?? this.quantityExceeded,
       quantityError: quantityError ?? this.quantityError,
+      originalAddress: originalAddress ?? this.originalAddress,
     );
   }
 }

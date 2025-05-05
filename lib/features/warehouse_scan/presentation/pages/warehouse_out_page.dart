@@ -247,6 +247,29 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
     }
   }
 
+  void _switchMode() {
+    if (_currentCode.isNotEmpty) {
+      if (_optionFunction == 2) {
+        setState(() {
+          _optionFunction = 1;
+          _addressController.clear();
+        });
+      } else {
+        setState(() {
+          _optionFunction = 2;
+          if (context.read<WarehouseOutBloc>().state is MaterialInfoLoaded) {
+            final material = (context.read<WarehouseOutBloc>().state as MaterialInfoLoaded).material;
+            _addressController.text = material.address;
+          }
+        });
+      }
+    } else {
+      setState(() {
+        _optionFunction = _optionFunction == 2 ? 1 : 2;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<WarehouseOutBloc, WarehouseOutState>(
@@ -415,21 +438,7 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
 
                             ElevatedButton(
                               onPressed: () {
-                                if(_currentCode.isNotEmpty && _optionFunction == 1){
-                                  setState(() {
-                                    _optionFunction = 1;
-                                  });
-                                  
-                                  ErrorDialog.show(
-                                    context,
-                                    title: context.multiLanguage.errorUPCASE,
-                                    message: context.multiLanguage.switchFunctionErrorMessage,
-                                  );
-                                }else{
-                                  setState(() {
-                                    _optionFunction = _optionFunction == 2 ? 1 : 2;
-                                  });
-                                }
+                                _switchMode();
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: _optionFunction == 2 ? Colors.red : Colors.green.shade600,
