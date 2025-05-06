@@ -94,6 +94,13 @@ class BatchItemList extends StatelessWidget {
                 style: const TextStyle(fontSize: 12, color: Colors.red),
               ),
             ],
+            if (item.isError && item.quantity > (item.quantiyImport - item.quantityExport)) ...[
+              const SizedBox(height: 2),
+              Text(
+                context.multiLanguage.batchListErrorWithValue(context.multiLanguage.quantityNotEnoughMessage),
+                style: const TextStyle(fontSize: 12, color: Colors.red),
+              ),
+            ],
           ],
         ),
         trailing: IconButton(

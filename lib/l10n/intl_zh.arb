@@ -121,5 +121,6 @@
   "storageFailedMessage": "存储失败: 请检查质量检查是否已完成，或联系IT部门以获取说明。",
   "noDataAvailableMessage": "沒有可撤回數據。",
   "operationModeLabel": "操作模式",
-  "alreadyShippedMessage": "已全部出库"
+  "alreadyShippedMessage": "已全部出库",
+  "quantityNotEnoughMessage": "数量不足"
 }
