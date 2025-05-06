@@ -119,5 +119,7 @@
   "processPageTitleUPCASE": "处理",
   "searchHintLabel": "搜索",
   "storageFailedMessage": "存储失败: 请检查质量检查是否已完成，或联系IT部门以获取说明。",
-  "noDataAvailableMessage": "沒有可撤回數據。"
+  "noDataAvailableMessage": "沒有可撤回數據。",
+  "operationModeLabel": "操作模式",
+    "alreadyShippedMessage": "已全部出库"
 }

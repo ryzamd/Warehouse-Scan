@@ -10,6 +10,8 @@ class BatchItemModel extends BatchItemEntity {
     super.isError,
     super.errorMessage,
     super.oldAddress,
+    super.quantiyImport,
+    super.quantityExport,
   });
 
   factory BatchItemModel.fromJson(Map<String, dynamic> json) {
@@ -22,6 +24,8 @@ class BatchItemModel extends BatchItemEntity {
       isError: false,
       errorMessage: '',
       oldAddress: json['zc_out_Warehouse_unit'] ?? '',
+      quantiyImport: json['zc_warehouse_qty_int'] != null ? (json['zc_warehouse_qty_int'] is num ? (json['zc_warehouse_qty_int'] as num).toDouble() : 0.0) : 0.0,
+      quantityExport: json['zc_warehouse_qty_out'] != null ? (json['zc_warehouse_qty_out'] is num ? (json['zc_warehouse_qty_out'] as num).toDouble() : 0.0) : 0.0,
     );
   }
 
@@ -32,6 +36,8 @@ class BatchItemModel extends BatchItemEntity {
       'm_qty': quantity,
       'm_unit': unit,
       'zc_out_Warehouse_unit': oldAddress,
+      'zc_warehouse_qty_int': quantiyImport,
+      'zc_warehouse_qty_out': quantityExport,
     };
   }
 }

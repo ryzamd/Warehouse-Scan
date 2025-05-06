@@ -71,6 +71,9 @@ class AddressSelectorState extends State<AddressSelector> {
   Widget build(BuildContext context) {
     return BlocBuilder<AddressBloc, AddressState>(
       builder: (context, state) {
+        if (state is AddressLoaded) {
+          _addresses = state.addresses.addresses;
+        }
         return Row(
           children: [
             Expanded(

@@ -87,10 +87,10 @@ class BatchItemList extends StatelessWidget {
               context.multiLanguage.batchListQuantityWithValue(item.quantity, item.unit),
               style: const TextStyle(fontSize: 13),
             ),
-            if (item.isError && item.errorMessage.isNotEmpty) ...[
+            if (item.isError && item.quantiyImport == item.quantityExport) ...[
               const SizedBox(height: 2),
               Text(
-                context.multiLanguage.batchListErrorWithValue(item.errorMessage),
+                context.multiLanguage.batchListErrorWithValue(context.multiLanguage.alreadyShippedMessage),
                 style: const TextStyle(fontSize: 12, color: Colors.red),
               ),
             ],

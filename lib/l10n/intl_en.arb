@@ -119,5 +119,7 @@
   "processPageTitleUPCASE": "PROCESS",
   "searchHintLabel": "Search",
   "storageFailedMessage": "Storage failed: Please check if qualityinspection has been done, or contact IT for clarification.",
-  "noDataAvailableMessage": "No data available for recall."
+  "noDataAvailableMessage": "No data available for recall.",
+  "operationModeLabel": "Operation Mode",
+  "alreadyShippedMessage": "Already shipped"
 }

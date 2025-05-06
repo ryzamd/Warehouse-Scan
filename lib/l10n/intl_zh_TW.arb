@@ -119,5 +119,7 @@
   "processPageTitleUPCASE": "處理",
   "searchHintLabel": "搜索",
   "storageFailedMessage": "存儲失敗: 請檢查質量檢查是否已完成，或聯繫IT部門以獲取說明。",
-  "noDataAvailableMessage": "沒有可供回憶的數據。"
+  "noDataAvailableMessage": "沒有可供回憶的數據。",
+  "operationModeLabel": "操作模式",
+  "alreadyShippedMessage": "已發貨"
 }

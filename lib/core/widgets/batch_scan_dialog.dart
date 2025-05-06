@@ -155,8 +155,8 @@ class _BatchScanWarehouseDialogState extends State<BatchScanWarehouseDialog> {
                 ),
                 const SizedBox(height: 16),
                 
-                const Text(
-                  'Operation Mode:',
+                Text(
+                  context.multiLanguage.operationModeLabel,
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
