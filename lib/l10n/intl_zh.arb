@@ -122,5 +122,7 @@
   "noDataAvailableMessage": "沒有可撤回數據。",
   "operationModeLabel": "操作模式",
   "alreadyShippedMessage": "已全部出库",
-  "quantityNotEnoughMessage": "数量不足"
+  "quantityNotEnoughMessage": "数量不足",
+  "shippedLabel": "已发货: {quantity}",
+  "quantityLeftLabel": "剩余: {quantity}"
 }

@@ -122,5 +122,7 @@
   "noDataAvailableMessage": "Không có dữ liệu thu hồi.",
   "operationModeLabel": "Chế độ",
   "alreadyShippedMessage": "Đã xuất",
-  "quantityNotEnoughMessage": "Số lượng không đủ"
+  "quantityNotEnoughMessage": "Số lượng không đủ",
+  "shippedLabel": "Đã xuất: {quantity}",
+  "quantityLeftLabel": "Còn lại: {quantity}"
 }

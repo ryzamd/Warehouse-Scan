@@ -83,8 +83,21 @@ class BatchItemList extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 2),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  context.multiLanguage.batchListQuantityWithValue(item.quantity, item.unit),
+                  style: const TextStyle(fontSize: 13),
+                ),
+                Text(
+                  context.multiLanguage.shippedLabel(item.quantityExport),
+                  style: const TextStyle(fontSize: 13),
+                ),
+              ]
+            ),
             Text(
-              context.multiLanguage.batchListQuantityWithValue(item.quantity, item.unit),
+              context.multiLanguage.quantityLeftLabel((item.quantity - item.quantityExport)),
               style: const TextStyle(fontSize: 13),
             ),
             if (item.isError && item.quantiyImport == item.quantityExport) ...[

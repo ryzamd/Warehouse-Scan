@@ -122,5 +122,7 @@
   "noDataAvailableMessage": "No data available for recall.",
   "operationModeLabel": "Operation Mode",
   "alreadyShippedMessage": "Already shipped",
-  "quantityNotEnoughMessage": "Quantity not enough"
+  "quantityNotEnoughMessage": "Quantity not enough",
+  "shippedLabel": "Shipped: {quantity}",
+  "quantityLeftLabel": "Quantity left: {quantity}"
 }

@@ -122,5 +122,7 @@
   "noDataAvailableMessage": "沒有可供回憶的數據。",
   "operationModeLabel": "操作模式",
   "alreadyShippedMessage": "已發貨",
-  "quantityNotEnoughMessage": "數量不足"
+  "quantityNotEnoughMessage": "數量不足",
+  "shippedLabel": "已發貨: {quantity}",
+  "quantityLeftLabel": "剩餘: {quantity}"
 }
