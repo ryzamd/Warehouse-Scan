@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
+import '../constants/enum.dart';
+import '../utils/dialog_utils.dart';
+
 class NotificationDialog extends StatelessWidget {
-  static bool _isShowing = false;
+  static bool isShowing = false;
   
   final String title;
   final String message;
@@ -30,26 +33,28 @@ class NotificationDialog extends StatelessWidget {
     Color iconColor = Colors.blue,
   }) {
 
-    if (!_isShowing && context.mounted) {
-      _isShowing = true;
+    if (!context.mounted) return;
+
+    if (DialogUtils.prepareForDialog(context, DialogTypes.notification)) {
       
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => NotificationDialog(
-          title: title,
-          message: message,
-          buttonText: buttonText,
-          onDismiss: onDismiss,
-          icon: icon,
-          iconColor: iconColor,
-        ),
-      ).then((_) {
-
-        _isShowing = false;
-
-      });
-    }
+    isShowing = true;
+    
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => NotificationDialog(
+        title: title,
+        message: message,
+        buttonText: buttonText,
+        onDismiss: onDismiss,
+        icon: icon,
+        iconColor: iconColor,
+      ),
+    ).then((_) {
+      isShowing = false;
+      DialogUtils.dialogDismissed(DialogTypes.notification);
+    });
+  }
   }
 
   @override
@@ -84,7 +89,7 @@ class NotificationDialog extends StatelessWidget {
       actions: [
         TextButton(
           onPressed: () {
-            _isShowing = false;
+            isShowing = false;
             Navigator.pop(context);
             if (onDismiss != null && context.mounted) {
               onDismiss!();

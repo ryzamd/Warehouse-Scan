@@ -124,5 +124,6 @@
   "alreadyShippedMessage": "Already shipped",
   "quantityNotEnoughMessage": "Quantity not enough",
   "shippedLabel": "Shipped: {quantity}",
-  "quantityLeftLabel": "Quantity left: {quantity}"
+  "quantityLeftLabel": "Quantity left: {quantity}",
+  "notInspectByQCMessage": "Not inspected by QC"
 }

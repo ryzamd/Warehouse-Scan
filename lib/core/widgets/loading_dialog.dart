@@ -1,30 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:warehouse_scan/core/constants/enum.dart';
+
+import '../utils/dialog_utils.dart';
 
 class LoadingDialog extends StatelessWidget {
-  static bool isShowing = false;
-  
   const LoadingDialog({
     super.key,
   });
   
   static void show(BuildContext context) {
-    if (!isShowing && context.mounted) {
-      isShowing = true;
+     if (!context.mounted) return;
+    
+    if (DialogUtils.prepareForDialog(context, DialogTypes.loading)) {
       
       showDialog(
         context: context,
         barrierDismissible: false,
         builder: (context) => const LoadingDialog(),
       ).then((_) {
-        isShowing = false;
+        DialogUtils.dialogDismissed(DialogTypes.loading);
       });
     }
   }
   
   static void hide(BuildContext context) {
-    if (isShowing && context.mounted) {
+    if (DialogUtils.isDialogShowing(DialogTypes.loading) && context.mounted) {
       Navigator.of(context).pop();
-      isShowing = false;
+      DialogUtils.dialogDismissed(DialogTypes.loading);
     }
   }
   

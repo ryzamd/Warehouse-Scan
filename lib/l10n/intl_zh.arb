@@ -124,5 +124,6 @@
   "alreadyShippedMessage": "已全部出库",
   "quantityNotEnoughMessage": "数量不足",
   "shippedLabel": "已发货: {quantity}",
-  "quantityLeftLabel": "剩余: {quantity}"
+  "quantityLeftLabel": "剩余: {quantity}",
+  "notInspectByQCMessage": "未经过QC检查"
 }

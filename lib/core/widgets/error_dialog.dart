@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../constants/enum.dart';
+import '../utils/dialog_utils.dart';
+
 class ErrorDialog extends StatelessWidget {
-  static bool _isShowing = false;
-  
   final String title;
   final String message;
   final VoidCallback? onDismiss;
@@ -20,9 +21,9 @@ class ErrorDialog extends StatelessWidget {
     String message = 'An error occurred.',
     VoidCallback? onDismiss,
   }) {
-    // Only show if no dialog is currently showing and context is valid
-    if (!_isShowing && context.mounted) {
-      _isShowing = true;
+     if (!context.mounted) return;
+    
+    if (DialogUtils.prepareForDialog(context, DialogTypes.error)) {
       
       showDialog(
         context: context,
@@ -33,8 +34,7 @@ class ErrorDialog extends StatelessWidget {
           onDismiss: onDismiss,
         ),
       ).then((_) {
-
-        _isShowing = false;
+        DialogUtils.dialogDismissed(DialogTypes.error);
       });
     }
   }
@@ -65,7 +65,6 @@ class ErrorDialog extends StatelessWidget {
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
-              _isShowing = false;
               if (onDismiss != null) {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   onDismiss!();

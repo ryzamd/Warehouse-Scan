@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:warehouse_scan/core/constants/enum.dart';
+
+import '../utils/dialog_utils.dart';
 
 class SuccessDialog extends StatelessWidget {
   final String title;
@@ -18,17 +21,23 @@ class SuccessDialog extends StatelessWidget {
     String message = 'Operation completed successfully.',
     VoidCallback? onDismiss,
   }) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => SuccessDialog(
-        title: title,
-        message: message,
-        onDismiss: onDismiss ?? () {
-          Navigator.of(context).pop();
-        },
-      ),
-    );
+    if (!context.mounted) return;
+    
+    if (DialogUtils.prepareForDialog(context, DialogTypes.success)) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (dialogContext) => SuccessDialog(
+          title: title,
+          message: message,
+          onDismiss: onDismiss ?? () {
+            Navigator.of(context).pop();
+          },
+        ),
+      ).then((_) {
+        DialogUtils.dialogDismissed(DialogTypes.success);
+      });
+    }
   }
   
   @override

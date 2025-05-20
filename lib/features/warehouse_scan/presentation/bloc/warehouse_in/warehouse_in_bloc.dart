@@ -93,6 +93,11 @@ class WarehouseInBloc extends Bloc<WarehouseInEvent, WarehouseInState> {
               message: StringKey.storageFailedMessage,
               previousState: state,
             ));
+          } else if (failure.message.contains(KeyMessageResponse.NOT_CHECKED_BY_QC)) {
+            emit(WarehouseInError(
+              message: StringKey.notInspectByQC,
+              previousState: state,
+            ));
           } else {
             emit(WarehouseInError(
               message: failure.message,

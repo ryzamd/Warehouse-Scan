@@ -24,6 +24,7 @@ class StringKey {
   static const String somethingWentWrongMessage = "somethingWentWrongMessage";
   static const String cannotGetProcessingItemsMessage = "cannotGetProcessingItemsMessage";
   static const String storageFailedMessage = "storageFailedMessage";
+  static const String notInspectByQC = "notInspectByQC";
 }
 
 class TranslateKey {
@@ -97,6 +98,9 @@ class TranslateKey {
 
       case StringKey.storageFailedMessage:
         return l10n.storageFailedMessage;
+
+      case StringKey.notInspectByQC:
+        return l10n.notInspectByQCMessage;
         
       default:
         return 'Cannot find String key';

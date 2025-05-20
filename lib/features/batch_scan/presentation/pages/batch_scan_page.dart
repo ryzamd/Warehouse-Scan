@@ -12,7 +12,9 @@ import 'package:warehouse_scan/core/widgets/scafford_custom.dart';
 import 'package:warehouse_scan/features/auth/login/domain/entities/user_entity.dart';
 import 'package:warehouse_scan/features/warehouse_scan/data/datasources/scan_service_impl.dart';
 import 'package:warehouse_scan/features/warehouse_scan/presentation/widgets/qr_scanner_widget.dart';
+import '../../../../core/constants/enum.dart';
 import '../../../../core/services/get_translate_key.dart';
+import '../../../../core/utils/dialog_utils.dart';
 import '../../../../core/widgets/batch_scan_dialog.dart';
 import '../../domain/entities/batch_item_entity.dart';
 import '../bloc/batch_scan_bloc.dart';
@@ -227,7 +229,7 @@ class _BatchScanPageState extends State<BatchScanPage> with WidgetsBindingObserv
           break;
 
           case BatchProcessSuccess():
-            if (LoadingDialog.isShowing) {
+            if (DialogUtils.isDialogShowing(DialogTypes.loading)) {
               Navigator.of(context).pop();
             }
             
@@ -248,7 +250,7 @@ class _BatchScanPageState extends State<BatchScanPage> with WidgetsBindingObserv
           break;
 
           case BatchScanError():
-            if (LoadingDialog.isShowing) {
+            if (DialogUtils.isDialogShowing(DialogTypes.loading)) {
               Navigator.of(context).pop();
             }
             

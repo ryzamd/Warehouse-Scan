@@ -9,8 +9,10 @@ import 'package:warehouse_scan/core/widgets/loading_dialog.dart';
 import 'package:warehouse_scan/core/widgets/scafford_custom.dart';
 import 'package:warehouse_scan/features/auth/login/domain/entities/user_entity.dart';
 import 'package:warehouse_scan/features/warehouse_scan/data/datasources/scan_service_impl.dart';
+import '../../../../core/constants/enum.dart';
 import '../../../../core/di/dependencies.dart' as di;
 import '../../../../core/services/get_translate_key.dart';
+import '../../../../core/utils/dialog_utils.dart';
 import '../../../../core/widgets/confirmation_dialog.dart';
 import '../../../../core/widgets/notification_dialog.dart';
 import '../../../address/presentation/bloc/address_bloc.dart';
@@ -283,7 +285,7 @@ class _WarehouseOutPageState extends State<WarehouseOutPage> with WidgetsBinding
             break;
             
           case MaterialInfoLoaded():
-            if (LoadingDialog.isShowing && navigatorContext.canPop()) {
+            if (DialogUtils.isDialogShowing(DialogTypes.loading) && navigatorContext.canPop()) {
               navigatorContext.pop();
             }
             

@@ -15,6 +15,7 @@ class KeycodeConstants {
 class KeyMessageResponse {
   static const String DATA_HAS_BEEN_STORED = "All data after deduction is stored in the warehouse";
   static const String NO_DATA = "No data";
+  static const String NOT_CHECKED_BY_QC = "No check";
 }
 
 class KeyFunction {

@@ -12,6 +12,8 @@ import 'package:warehouse_scan/core/widgets/scafford_custom.dart';
 import 'package:warehouse_scan/features/auth/login/domain/entities/user_entity.dart';
 import 'package:warehouse_scan/features/warehouse_scan/data/datasources/scan_service_impl.dart';
 import 'package:warehouse_scan/features/warehouse_scan/presentation/widgets/qr_scanner_widget.dart';
+import '../../../../core/constants/enum.dart';
+import '../../../../core/utils/dialog_utils.dart';
 import '../../../../core/widgets/confirmation_dialog.dart';
 import '../../domain/entities/inventory_item_entity.dart';
 import '../bloc/inventory_check_bloc.dart';
@@ -188,7 +190,7 @@ class _InventoryCheckPageState extends State<InventoryCheckPage>
             break;
 
            case InventorySaveSuccess(:final inventoriedCount, :final failedCount):
-            if (LoadingDialog.isShowing) {
+            if (DialogUtils.isDialogShowing(DialogTypes.loading)) {
               Navigator.of(context).pop();
             }
             
@@ -207,7 +209,7 @@ class _InventoryCheckPageState extends State<InventoryCheckPage>
             break;
 
           case InventoryCheckError(:final message):
-            if (LoadingDialog.isShowing) {
+            if (DialogUtils.isDialogShowing(DialogTypes.loading)) {
               Navigator.of(context).pop();
             }
             ErrorDialog.show(

@@ -124,5 +124,6 @@
   "alreadyShippedMessage": "Đã xuất",
   "quantityNotEnoughMessage": "Số lượng không đủ",
   "shippedLabel": "Đã xuất: {quantity}",
-  "quantityLeftLabel": "Còn lại: {quantity}"
+  "quantityLeftLabel": "Còn lại: {quantity}",
+  "notInspectByQCMessage": "Chưa kiểm tra QC"
 }

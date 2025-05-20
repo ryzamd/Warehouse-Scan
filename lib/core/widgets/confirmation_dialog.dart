@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../constants/enum.dart';
+import '../utils/dialog_utils.dart';
+
 class ConfirmationDialog extends StatelessWidget {
-  static bool _isShowing = false;
-  
   final String title;
   final String message;
   final String confirmText;
@@ -32,8 +33,9 @@ class ConfirmationDialog extends StatelessWidget {
     required VoidCallback onCancel,
     Color confirmColor = Colors.green,
   }) {
-    if (!_isShowing && context.mounted) {
-      _isShowing = true;
+     if (!context.mounted) return;
+    
+    if (DialogUtils.prepareForDialog(context, DialogTypes.confirmation)) {
       
       showDialog(
         context: context,
@@ -44,19 +46,17 @@ class ConfirmationDialog extends StatelessWidget {
           confirmText: confirmText,
           cancelText: cancelText,
           onConfirm: () {
-            _isShowing = false;
             Navigator.pop(context);
             onConfirm();
           },
           onCancel: () {
-            _isShowing = false;
             Navigator.pop(context);
             onCancel();
           },
           confirmColor: confirmColor,
         ),
       ).then((_) {
-        _isShowing = false;
+        DialogUtils.dialogDismissed(DialogTypes.confirmation);
       });
     }
   }
