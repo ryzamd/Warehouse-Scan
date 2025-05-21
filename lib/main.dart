@@ -12,6 +12,8 @@ import 'features/auth/login/presentation/pages/login_page.dart';
 import 'features/auth/logout/presentation/pages/profile_page.dart';
 import 'features/batch_scan/presentation/bloc/batch_scan_bloc.dart';
 import 'features/batch_scan/presentation/pages/batch_scan_page.dart';
+import 'features/import_unchecked/presentation/bloc/import_unchecked_bloc.dart';
+import 'features/import_unchecked/presentation/pages/import_unchecked_page.dart';
 import 'features/inventory_check/presentation/bloc/inventory_check_bloc.dart';
 import 'features/inventory_check/presentation/pages/inventory_check_page.dart';
 import 'features/process/presentation/bloc/processing_bloc.dart';
@@ -170,6 +172,16 @@ class _MyAppState extends State<MyApp> {
                       child: BatchScanPage(user: args!),
                     ),
                   );
+
+                case AppRoutes.importUnchecked:
+                NavigationService().setLastWarehouseRoute(AppRoutes.importUnchecked);
+                return MaterialPageRoute(
+                  settings: settings,
+                  builder: (context) => BlocProvider(
+                    create: (context) => di.sl<ImportUncheckedBloc>(param1: args),
+                    child: ImportUncheckedPage(user: args!),
+                  ),
+                );
                           
                 default:
                   return MaterialPageRoute(

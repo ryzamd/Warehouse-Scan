@@ -10,4 +10,5 @@ class AppRoutes {
   static const String processingwarehouseOut = '/warehouse_menu/export/processing';
   static const String inventoryCheck = '/warehouse_menu/inventory_check';
   static const String batchScan = '/warehouse_menu/batch_scan';
+  static const String importUnchecked = '/warehouse_menu/import_unchecked';
 }

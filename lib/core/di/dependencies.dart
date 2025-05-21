@@ -32,6 +32,12 @@ import '../../features/batch_scan/domain/repositories/batch_scan_repository.dart
 import '../../features/batch_scan/domain/usecases/check_batch_code.dart';
 import '../../features/batch_scan/domain/usecases/process_batch.dart';
 import '../../features/batch_scan/presentation/bloc/batch_scan_bloc.dart';
+import '../../features/import_unchecked/data/datasources/import_unchecked_datasource.dart';
+import '../../features/import_unchecked/data/repositories/import_unchecked_repository_impl.dart';
+import '../../features/import_unchecked/domain/repositories/import_unchecked_repository.dart';
+import '../../features/import_unchecked/domain/usecases/check_import_unchecked_code.dart';
+import '../../features/import_unchecked/domain/usecases/import_unchecked_data.dart';
+import '../../features/import_unchecked/presentation/bloc/import_unchecked_bloc.dart';
 import '../../features/inventory_check/data/datasources/inventory_check_datasource.dart';
 import '../../features/inventory_check/data/repositories/inventory_check_repository_impl.dart';
 import '../../features/inventory_check/domain/repositories/inventory_check_repository.dart';
@@ -70,6 +76,7 @@ Future<void> init() async {
   await _initLogoutFeature();
   await _initBatchScanFeature();
   await _initAddressFeature();
+  await _initImportUncheckedFeature();
 }
 
 Future<void> _initSystemCore() async {
@@ -281,4 +288,29 @@ Future<void> _initAddressFeature() async {
   sl.registerLazySingleton(() => GetAddressListUseCase(sl()));
   
   sl.registerFactory(() => AddressBloc(getAddressListUseCase: sl()));
+}
+
+Future<void> _initImportUncheckedFeature() async {
+  sl.registerLazySingleton<ImportUncheckedDataSource>(
+    () => ImportUncheckedDataSourceImpl(dio: sl()),
+  );
+  
+  sl.registerLazySingleton<ImportUncheckedRepository>(
+    () => ImportUncheckedRepositoryImpl(
+      dataSource: sl(),
+      networkInfo: sl(),
+    ),
+  );
+  
+  sl.registerLazySingleton(() => CheckImportUncheckedCode(sl()));
+  sl.registerLazySingleton(() => ImportUncheckedData(sl()));
+  
+  sl.registerFactoryParam<ImportUncheckedBloc, UserEntity, void>(
+    (user, _) => ImportUncheckedBloc(
+      checkImportUncheckedCode: sl(),
+      importUncheckedData: sl(),
+      connectionChecker: sl(),
+      currentUser: user,
+    ),
+  );
 }

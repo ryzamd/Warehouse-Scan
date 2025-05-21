@@ -125,5 +125,10 @@
   "quantityNotEnoughMessage": "數量不足",
   "shippedLabel": "已發貨: {quantity}",
   "quantityLeftLabel": "剩餘: {quantity}",
-  "notInspectByQCMessage": "未經QC檢查"
+  "notInspectByQCMessage": "未經QC檢查",
+  "qcStatusMessage": "QC狀態: {status}",
+  "inspectByQCMessage": "已檢查QC",
+  "performActionImportUncheckedMessage": "確定執行此操作？物料: {items}",
+  "importUncheckedTitleUpcase": "導入未檢查",
+  "importUncheckedMenuTitle": "導入未檢查"
 }

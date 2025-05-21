@@ -125,5 +125,10 @@
   "quantityNotEnoughMessage": "Số lượng không đủ",
   "shippedLabel": "Đã xuất: {quantity}",
   "quantityLeftLabel": "Còn lại: {quantity}",
-  "notInspectByQCMessage": "Chưa kiểm tra QC"
+  "notInspectByQCMessage": "Chưa kiểm tra QC",
+  "qcStatusMessage": "Trạng thái QC: {status}",
+  "inspectByQCMessage": "Đã kiểm tra QC",
+  "performActionImportUncheckedMessage": "Thực hiện hành động này? Vật liệu: {items}",
+  "importUncheckedTitleUpcase": "NHẬP CHƯA KIỂM TRA",
+  "importUncheckedMenuTitle": "Nhập chưa kiểm tra"
 }

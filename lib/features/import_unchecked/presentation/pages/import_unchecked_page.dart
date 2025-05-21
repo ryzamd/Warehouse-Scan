@@ -5,6 +5,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:warehouse_scan/core/constants/key_code_constants.dart';
 import 'package:warehouse_scan/core/localization/context_extension.dart';
 import 'package:warehouse_scan/core/services/get_translate_key.dart';
+import 'package:warehouse_scan/core/widgets/confirmation_dialog.dart';
 import 'package:warehouse_scan/core/widgets/error_dialog.dart';
 import 'package:warehouse_scan/core/widgets/loading_dialog.dart';
 import 'package:warehouse_scan/core/widgets/notification_dialog.dart';
@@ -12,23 +13,22 @@ import 'package:warehouse_scan/core/widgets/scafford_custom.dart';
 import 'package:warehouse_scan/features/auth/login/domain/entities/user_entity.dart';
 import 'package:warehouse_scan/features/warehouse_scan/data/datasources/scan_service_impl.dart';
 import 'package:warehouse_scan/features/warehouse_scan/presentation/widgets/qr_scanner_widget.dart';
-import '../../../../core/widgets/confirmation_dialog.dart';
-import '../../domain/entities/inventory_item_entity.dart';
-import '../bloc/inventory_check_bloc.dart';
-import '../bloc/inventory_check_event.dart';
-import '../bloc/inventory_check_state.dart';
-import '../widgets/inventory_item_list.dart';
+import '../../domain/entities/import_unchecked_item_entity.dart';
+import '../bloc/import_unchecked_bloc.dart';
+import '../bloc/import_unchecked_event.dart';
+import '../bloc/import_unchecked_state.dart';
+import '../widgets/import_unchecked_item_list.dart';
 
-class InventoryCheckPage extends StatefulWidget {
+class ImportUncheckedPage extends StatefulWidget {
   final UserEntity user;
 
-  const InventoryCheckPage({super.key, required this.user});
+  const ImportUncheckedPage({super.key, required this.user});
 
   @override
-  State<InventoryCheckPage> createState() => _InventoryCheckPageState();
+  State<ImportUncheckedPage> createState() => _ImportUncheckedPageState();
 }
 
-class _InventoryCheckPageState extends State<InventoryCheckPage>
+class _ImportUncheckedPageState extends State<ImportUncheckedPage>
     with WidgetsBindingObserver {
   MobileScannerController? _controller;
   final FocusNode _focusNode = FocusNode();
@@ -44,7 +44,7 @@ class _InventoryCheckPageState extends State<InventoryCheckPage>
 
     ScanService.initializeScannerListener((scannedData) {
       if (mounted) {
-        context.read<InventoryCheckBloc>().add(HardwareScanEvent(scannedData));
+        context.read<ImportUncheckedBloc>().add(HardwareScanEvent(scannedData));
       }
     });
 
@@ -83,7 +83,7 @@ class _InventoryCheckPageState extends State<InventoryCheckPage>
         torchEnabled: _torchEnabled,
       );
 
-      context.read<InventoryCheckBloc>().add(InitializeScanner(_controller!));
+      context.read<ImportUncheckedBloc>().add(InitializeScanner(_controller!));
 
       if (!_cameraActive && _controller != null) {
         _controller!.stop();
@@ -131,7 +131,7 @@ class _InventoryCheckPageState extends State<InventoryCheckPage>
 
         ScanService.initializeScannerListener((scannedData) {
           if (mounted) {
-            context.read<InventoryCheckBloc>().add(
+            context.read<ImportUncheckedBloc>().add(
               HardwareScanEvent(scannedData),
             );
           }
@@ -155,12 +155,34 @@ class _InventoryCheckPageState extends State<InventoryCheckPage>
     }
   }
 
-  void _saveInventory() {
-    context.read<InventoryCheckBloc>().add(const SaveInventoryListEvent());
+  void _pullQcData(int itemCount) {
+    ConfirmationDialog.show(
+      context,
+      title: context.multiLanguage.confirmationUPCASE,
+      message: context.multiLanguage.performActionImportUncheckedMessage(itemCount),
+      confirmText: context.multiLanguage.confirmButtonDialog,
+      cancelText: context.multiLanguage.cancelButton,
+      confirmColor: Colors.green,
+      onConfirm: () {
+        context.read<ImportUncheckedBloc>().add(const ImportUncheckedDataEvent());
+      },
+      onCancel: () {},
+    );
   }
 
-  void _clearInventory() {
-    context.read<InventoryCheckBloc>().add(ClearInventoryListEvent());
+  void _clearList() {
+    ConfirmationDialog.show(
+      context,
+      title: context.multiLanguage.clearDataTitleUPCASE,
+      message: context.multiLanguage.clearDataMessage,
+      confirmText: context.multiLanguage.clearButton,
+      cancelText: context.multiLanguage.cancelButton,
+      confirmColor: Colors.red,
+      onConfirm: () {
+        context.read<ImportUncheckedBloc>().add(ClearImportUncheckedListEvent());
+      },
+      onCancel: () {},
+    );
   }
 
   void _onDetect(BarcodeCapture capture) {
@@ -172,7 +194,7 @@ class _InventoryCheckPageState extends State<InventoryCheckPage>
       if (rawValue == null || rawValue.isEmpty) continue;
 
       if (mounted) {
-        context.read<InventoryCheckBloc>().add(ScanInventoryItem(rawValue));
+        context.read<ImportUncheckedBloc>().add(ScanImportUncheckedItem(rawValue));
       }
       break;
     }
@@ -180,19 +202,19 @@ class _InventoryCheckPageState extends State<InventoryCheckPage>
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<InventoryCheckBloc, InventoryCheckState>(
+    return BlocConsumer<ImportUncheckedBloc, ImportUncheckedState>(
       listener: (context, state) {
         switch (state) {
-          case InventorySaving():
+          case ImportUncheckedPulling():
             LoadingDialog.show(context);
             break;
 
-           case InventorySaveSuccess(:final inventoriedCount, :final failedCount):
+          case ImportUncheckedPullSuccess(:final successCount, :final failedCount):
             LoadingDialog.hide(context);
             
             final messages = [
-              if (inventoriedCount > 0) context.multiLanguage.successfullyProcessed(inventoriedCount),
-              if (failedCount > 0) context.multiLanguage.failedToProcess(failedCount),
+              if (successCount > 0) context.multiLanguage.successfullyProcessed(successCount),
+              if (failedCount > 0) '\n${context.multiLanguage.failedToProcess(failedCount)}',
             ];
             
             NotificationDialog.show(
@@ -204,23 +226,28 @@ class _InventoryCheckPageState extends State<InventoryCheckPage>
             );
             break;
 
-          case InventoryCheckError(:final message):
+          case ImportUncheckedError(:final message, :final args):
             LoadingDialog.hide(context);
-
+            
             ErrorDialog.show(
               context,
               title: context.multiLanguage.errorUPCASE,
-              message: TranslateKey.getStringKey(context.multiLanguage, message)
+              message: TranslateKey.getStringKey(
+                context.multiLanguage,
+                message,
+                args: args,
+              ),
             );
             break;
         }
       },
       builder: (context, state) {
+        final items = _getScannedItems(state);
+        
         return CustomScaffold(
-          title: context.multiLanguage.inventoryPageTitle,
+          title: context.multiLanguage.importUncheckedTitleUpcase,
           user: widget.user,
           showHomeIcon: true,
-          
           currentIndex: 1,
           actions: [
             IconButton(
@@ -240,19 +267,6 @@ class _InventoryCheckPageState extends State<InventoryCheckPage>
                 color: _cameraActive ? Colors.red : Colors.white,
               ),
               onPressed: _toggleCamera,
-            ),
-            IconButton(
-              icon: const Icon(Icons.delete, color: Colors.white),
-              onPressed: () {
-                  ConfirmationDialog.show(
-                  context,
-                  title: context.multiLanguage.clearDataUPCASE,
-                  message: context.multiLanguage.clearDataMessageInventoryCheck,
-                  confirmColor: Colors.redAccent,
-                  onConfirm: _clearInventory,
-                  onCancel: () {},
-                );
-              }
             ),
           ],
           body: KeyboardListener(
@@ -289,7 +303,7 @@ class _InventoryCheckPageState extends State<InventoryCheckPage>
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        context.multiLanguage.scannedItemsInventoryCheckLabel(_getScannedItemsCount(state)),
+                        context.multiLanguage.scannedItemsInventoryCheckLabel(items.length),
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -298,14 +312,14 @@ class _InventoryCheckPageState extends State<InventoryCheckPage>
                       ),
                       IconButton(
                         icon: const Icon(Icons.refresh),
-                        onPressed: _clearInventory,
+                        onPressed: _clearList,
                       ),
                     ],
                   ),
                 ),
 
                 Expanded(
-                  child: InventoryItemList(items: _getScannedItems(state)),
+                  child: ImportUncheckedItemList(items: items),
                 ),
 
                 Container(
@@ -315,7 +329,7 @@ class _InventoryCheckPageState extends State<InventoryCheckPage>
                     vertical: 8,
                   ),
                   child: ElevatedButton(
-                    onPressed: _getScannedItemsCount(state) > 0 ? _saveInventory : null,
+                    onPressed: items.isEmpty ? null : () => _pullQcData(items.length),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
                       padding: const EdgeInsets.symmetric(vertical: 16),
@@ -341,26 +355,13 @@ class _InventoryCheckPageState extends State<InventoryCheckPage>
     );
   }
 
-  int _getScannedItemsCount(InventoryCheckState state) {
+  List<ImportUncheckedItemEntity> _getScannedItems(ImportUncheckedState state) {
     switch (state) {
-      case InventoryCheckScanning(:final scannedItems):
-      case InventoryCheckProcessing(:final scannedItems):
-      case InventoryItemChecked(:final scannedItems):
-      case InventoryListUpdated(:final scannedItems):
-      case InventorySaving(:final scannedItems):
-        return scannedItems.length;
-      default:
-        return 0;
-    }
-  }
-
-  List<InventoryItemEntity> _getScannedItems(InventoryCheckState state) {
-    switch (state) {
-      case InventoryCheckScanning(:final scannedItems):
-      case InventoryCheckProcessing(:final scannedItems):
-      case InventoryItemChecked(:final scannedItems):
-      case InventoryListUpdated(:final scannedItems):
-      case InventorySaving(:final scannedItems):
+      case ImportUncheckedScanning(:final scannedItems):
+      case ImportUncheckedProcessing(:final scannedItems):
+      case ImportUncheckedItemChecked(:final scannedItems):
+      case ImportUncheckedListUpdated(:final scannedItems):
+      case ImportUncheckedPulling(:final scannedItems):
         return scannedItems;
       default:
         return [];

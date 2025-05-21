@@ -22,3 +22,7 @@ class KeyFunction {
   static const String EXPORT_FUNCTION = "Export";
   static const String WITHDRAW_FUNCTION = "Withdraw";
 }
+
+class KeyModalServerResponse{
+  static const String STATUS_QC = "未質檢";
+}

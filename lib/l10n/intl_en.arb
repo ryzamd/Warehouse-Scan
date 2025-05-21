@@ -125,5 +125,10 @@
   "quantityNotEnoughMessage": "Quantity not enough",
   "shippedLabel": "Shipped: {quantity}",
   "quantityLeftLabel": "Quantity left: {quantity}",
-  "notInspectByQCMessage": "Not inspected by QC"
+  "notInspectByQCMessage": "Not inspected by QC",
+  "inspectByQCMessage": "Inspected by QC",
+  "qcStatusMessage": "QC Status: {status}",
+  "performActionImportUncheckedMessage": "Are you sure to perform this action? Items: {items}",
+  "importUncheckedTitleUpcase": "IMPORT UNCHECKED",
+  "importUncheckedMenuTitle": "Import Unchecked"
 }

@@ -11,6 +11,7 @@ class ApiConstants {
   static const String warehouseInEndpoint = 'warehouse_in/qc_int/warehouse_save';
   static const String warehouseOutEndpoint = 'warehouse_out/qc_int/warehouse_out_data';
   static const String batchWarehouseOutEndpoint = 'warehouse_out/qc_int/warehouse_out_batch';
+  static const String warehouseImportUncheckedEndpoint = 'warehouse/pull/zc_in_qc_qty';
 
   static const String getListEndpoint = 'login/GetList';
   static String getListUrl(String date) => '$baseUrl$getListEndpoint?date=$date';
@@ -23,4 +24,5 @@ class ApiConstants {
   static String get getAddressListUrl => baseUrl + getAddressListEndpoint;
   static String get saveInventoryUrl => baseUrl + saveInventoryEndpoint;
   static String get batchWarehouseOutUrl => baseUrl + batchWarehouseOutEndpoint;
+  static String get warehouseImportUncheckedUrl => baseUrl + warehouseImportUncheckedEndpoint;
 }

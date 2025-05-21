@@ -17,6 +17,7 @@ class LoadingDialog extends StatelessWidget {
         context: context,
         barrierDismissible: false,
         builder: (context) => const LoadingDialog(),
+        useRootNavigator: true
       ).then((_) {
         DialogUtils.dialogDismissed(DialogTypes.loading);
       });
@@ -25,7 +26,7 @@ class LoadingDialog extends StatelessWidget {
   
   static void hide(BuildContext context) {
     if (DialogUtils.isDialogShowing(DialogTypes.loading) && context.mounted) {
-      Navigator.of(context).pop();
+      Navigator.of(context, rootNavigator: true).pop();
       DialogUtils.dialogDismissed(DialogTypes.loading);
     }
   }

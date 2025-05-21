@@ -125,5 +125,10 @@
   "quantityNotEnoughMessage": "数量不足",
   "shippedLabel": "已发货: {quantity}",
   "quantityLeftLabel": "剩余: {quantity}",
-  "notInspectByQCMessage": "未经过QC检查"
+  "notInspectByQCMessage": "未经过QC检查",
+  "qcStatusMessage": "QC状态: {status}",
+  "inspectByQCMessage": "已检查QC",
+  "performActionImportUncheckedMessage": "执行此操作？物料: {items}",
+  "importUncheckedTitleUpcase": "导入未检查",
+  "importUncheckedMenuTitle": "导入未检查"
 }
