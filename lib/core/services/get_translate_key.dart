@@ -25,6 +25,8 @@ class StringKey {
   static const String cannotGetProcessingItemsMessage = "cannotGetProcessingItemsMessage";
   static const String storageFailedMessage = "storageFailedMessage";
   static const String notInspectByQC = "notInspectByQC";
+  static const String cannotClearItemMessage = "cannotClearItemMessage";
+  static const String errorClearingWarehouseQuantity = "errorClearingWarehouseQuantity";
 }
 
 class TranslateKey {
@@ -101,6 +103,12 @@ class TranslateKey {
 
       case StringKey.notInspectByQC:
         return l10n.notInspectByQCMessage;
+
+      case StringKey.cannotClearItemMessage:
+        return l10n.cannotClearItemMessage;
+
+      case StringKey.errorClearingWarehouseQuantity:
+        return l10n.errorClearingWarehouseQuantityMessage;
         
       default:
         return 'Cannot find String key';

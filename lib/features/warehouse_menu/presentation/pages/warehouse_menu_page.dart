@@ -67,6 +67,12 @@ class WarehouseMenuPage extends StatelessWidget {
                 icon: Icons.playlist_add_check,
                 route: AppRoutes.importUnchecked,
               ),
+              _buildFunctionTile(
+                context,
+                title: context.multiLanguage.clearWarehouseMenuTitle,
+                icon: Icons.delete_forever,
+                route: AppRoutes.clearWarehouse,
+              ),
             ],
           ),
         ),

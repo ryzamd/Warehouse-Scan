@@ -32,6 +32,12 @@ import '../../features/batch_scan/domain/repositories/batch_scan_repository.dart
 import '../../features/batch_scan/domain/usecases/check_batch_code.dart';
 import '../../features/batch_scan/domain/usecases/process_batch.dart';
 import '../../features/batch_scan/presentation/bloc/batch_scan_bloc.dart';
+import '../../features/clear_warehouse/data/datasources/clear_warehouse_datasource.dart';
+import '../../features/clear_warehouse/data/repositories/clear_warehouse_repository_impl.dart';
+import '../../features/clear_warehouse/domain/repositories/clear_warehouse_repository.dart';
+import '../../features/clear_warehouse/domain/usecases/check_warehouse_item.dart';
+import '../../features/clear_warehouse/domain/usecases/clear_warehouse_quantity.dart';
+import '../../features/clear_warehouse/presentation/bloc/clear_warehouse_bloc.dart';
 import '../../features/import_unchecked/data/datasources/import_unchecked_datasource.dart';
 import '../../features/import_unchecked/data/repositories/import_unchecked_repository_impl.dart';
 import '../../features/import_unchecked/domain/repositories/import_unchecked_repository.dart';
@@ -51,16 +57,10 @@ import '../../features/process/domain/usecases/get_processing_items.dart';
 import '../../features/process/presentation/bloc/processing_bloc.dart';
 
 import 'package:warehouse_scan/features/warehouse_scan/data/datasources/warehouse_in_datasource.dart';
-import 'package:warehouse_scan/features/warehouse_scan/data/datasources/warehouse_out_datasource.dart';
 import 'package:warehouse_scan/features/warehouse_scan/data/repositories/warehouse_in_repository_impl.dart';
-import 'package:warehouse_scan/features/warehouse_scan/data/repositories/warehouse_out_repository_impl.dart';
 import 'package:warehouse_scan/features/warehouse_scan/domain/repositories/warehouse_in_repository.dart';
-import 'package:warehouse_scan/features/warehouse_scan/domain/repositories/warehouse_out_repository.dart';
-import 'package:warehouse_scan/features/warehouse_scan/domain/usecases/get_material_info.dart';
 import 'package:warehouse_scan/features/warehouse_scan/domain/usecases/process_warehouse_in.dart';
-import 'package:warehouse_scan/features/warehouse_scan/domain/usecases/process_warehouse_out.dart';
 import 'package:warehouse_scan/features/warehouse_scan/presentation/bloc/warehouse_in/warehouse_in_bloc.dart';
-import 'package:warehouse_scan/features/warehouse_scan/presentation/bloc/warehouse_out/warehouse_out_bloc.dart';
 
 import '../localization/language_bloc.dart';
 
@@ -71,12 +71,12 @@ Future<void> init() async {
   await _initLoginFeature();
   await _initProcessFeature();
   await _initWarehousImportFeature();
-  await _initWarehouseExportFeature();
   await _initCheckMaterialToImportInventory();
   await _initLogoutFeature();
   await _initBatchScanFeature();
   await _initAddressFeature();
   await _initImportUncheckedFeature();
+  await _initClearWarehouseFeature();
 }
 
 Future<void> _initSystemCore() async {
@@ -175,32 +175,6 @@ Future<void> _initWarehousImportFeature() async {
   sl.registerFactoryParam<WarehouseInBloc, UserEntity, void>(
     (user, _) => WarehouseInBloc(
       processWarehouseIn: sl(),
-      connectionChecker: sl(),
-      currentUser: user,
-    ),
-  );
-}
-
-Future<void> _initWarehouseExportFeature() async {
-  
-  sl.registerLazySingleton<WarehouseOutDataSource>(
-    () => WarehouseOutDataSourceImpl(dio: sl()),
-  );
-  
-  sl.registerLazySingleton<WarehouseOutRepository>(
-    () => WarehouseOutRepositoryImpl(
-      dataSource: sl(),
-      networkInfo: sl(),
-    ),
-  );
-  
-  sl.registerLazySingleton(() => GetMaterialInfo(sl()));
-  sl.registerLazySingleton(() => ProcessWarehouseOut(sl()));
-  
-  sl.registerFactoryParam<WarehouseOutBloc, UserEntity, void>(
-    (user, _) => WarehouseOutBloc(
-      getMaterialInfo: sl(),
-      processWarehouseOut: sl(),
       connectionChecker: sl(),
       currentUser: user,
     ),
@@ -309,6 +283,31 @@ Future<void> _initImportUncheckedFeature() async {
     (user, _) => ImportUncheckedBloc(
       checkImportUncheckedCode: sl(),
       importUncheckedData: sl(),
+      connectionChecker: sl(),
+      currentUser: user,
+    ),
+  );
+}
+
+Future<void> _initClearWarehouseFeature() async {
+  sl.registerLazySingleton<ClearWarehouseDataSource>(
+    () => ClearWarehouseDataSourceImpl(dio: sl()),
+  );
+  
+  sl.registerLazySingleton<ClearWarehouseRepository>(
+    () => ClearWarehouseRepositoryImpl(
+      dataSource: sl(),
+      networkInfo: sl(),
+    ),
+  );
+  
+  sl.registerLazySingleton(() => CheckWarehouseItem(sl()));
+  sl.registerLazySingleton(() => ClearWarehouseQuantity(sl()));
+  
+  sl.registerFactoryParam<ClearWarehouseBloc, UserEntity, void>(
+    (user, _) => ClearWarehouseBloc(
+      checkWarehouseItem: sl(),
+      clearWarehouseQuantity: sl(),
       connectionChecker: sl(),
       currentUser: user,
     ),

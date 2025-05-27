@@ -11,4 +11,5 @@ class AppRoutes {
   static const String inventoryCheck = '/warehouse_menu/inventory_check';
   static const String batchScan = '/warehouse_menu/batch_scan';
   static const String importUnchecked = '/warehouse_menu/import_unchecked';
+  static const String clearWarehouse = '/warehouse_menu/clear_warehouse';
 }

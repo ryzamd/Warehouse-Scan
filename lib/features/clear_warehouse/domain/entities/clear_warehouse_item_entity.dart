@@ -1,7 +1,6 @@
-// lib/features/warehouse_scan/domain/entities/warehouse_out_entity.dart
 import 'package:equatable/equatable.dart';
 
-class WarehouseOutEntity extends Equatable {
+class ClearWarehouseItemEntity extends Equatable {
   final int mwhId;
   final String mName;
   final String mDate;
@@ -17,9 +16,9 @@ class WarehouseOutEntity extends Equatable {
   final String qtyState;
   final double zcWarehouseQtyImport;
   final double zcWarehouseQtyExport;
-  final String address;
+  final String zcWarehouseTimeOut;
 
-  const WarehouseOutEntity({
+  const ClearWarehouseItemEntity({
     required this.mwhId,
     required this.mName,
     required this.mDate,
@@ -35,26 +34,13 @@ class WarehouseOutEntity extends Equatable {
     required this.qtyState,
     required this.zcWarehouseQtyImport,
     required this.zcWarehouseQtyExport,
-    required this.address,
+    required this.zcWarehouseTimeOut,
   });
 
   @override
   List<Object?> get props => [
-        mwhId,
-        mName,
-        mDate,
-        mVendor,
-        mPrjcode,
-        mQty,
-        mUnit,
-        mDocnum,
-        mItemcode,
-        cDate,
-        code,
-        staff,
-        qtyState,
-        zcWarehouseQtyImport,
-        zcWarehouseQtyExport,
-        address,
+        mwhId, mName, mDate, mVendor, mPrjcode, mQty, mUnit, mDocnum,
+        mItemcode, cDate, code, staff, qtyState, zcWarehouseQtyImport,
+        zcWarehouseQtyExport, zcWarehouseTimeOut,
       ];
 }

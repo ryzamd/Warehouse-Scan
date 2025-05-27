@@ -118,7 +118,7 @@
   "exitDialogConfirmButton": "Thoát",
   "processPageTitleUPCASE": "XỬ LÝ",
   "searchHintLabel": "Tìm",
-  "storageFailedMessage": "Lưu thất bại: Kiểm tra QC hoặc liên hệ IT.",
+  "storageFailedMessage": "Vật liệu đã nhập kho.",
   "noDataAvailableMessage": "Không có dữ liệu thu hồi.",
   "operationModeLabel": "Chế độ",
   "alreadyShippedMessage": "Đã xuất",
@@ -130,5 +130,15 @@
   "inspectByQCMessage": "Đã kiểm tra QC",
   "performActionImportUncheckedMessage": "Thực hiện hành động này? Vật liệu: {items}",
   "importUncheckedTitleUpcase": "NHẬP CHƯA KIỂM TRA",
-  "importUncheckedMenuTitle": "Nhập chưa kiểm tra"
+  "importUncheckedMenuTitle": "Nhập chưa kiểm tra",
+  "cannotClearItemMessage": "Không có dữ liệu. Không thể xóa!",
+  "errorClearingWarehouseQuantityMessage": "Lỗi! không thể xóa",
+  "clearWarehouseMenuTitle": "Xóa kho",
+  "clearWarehousePageTitle": "XÓA KHO",
+  "clearWarehouseQuantityMessage": "Xóa số lượng kho?",
+  "clearWarehouseSuccessMessage": "Đã xóa kho thành công",
+  "materialProjectCode": "Mã dự án",
+  "materialImport": "Nhập vật liệu",
+  "materialExport": "Xuất vật liệu",
+  "materialExportTime": "Thời gian xuất"
 }

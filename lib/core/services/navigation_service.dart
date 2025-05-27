@@ -51,6 +51,7 @@ class NavigationService {
       case AppRoutes.inventoryCheck:
       case AppRoutes.batchScan:
       case AppRoutes.importUnchecked:
+      case AppRoutes.clearWarehouse:
         return lastWarehouseRoute ?? AppRoutes.warehouseMenu;
     }
     
@@ -86,6 +87,7 @@ class NavigationService {
       case AppRoutes.inventoryCheck:
       case AppRoutes.batchScan:
       case AppRoutes.importUnchecked:
+      case AppRoutes.clearWarehouse:
         Navigator.pop(context);
       break;
     }

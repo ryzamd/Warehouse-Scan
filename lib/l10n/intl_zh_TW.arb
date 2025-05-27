@@ -118,7 +118,7 @@
   "exitDialogConfirmButton": "退出",
   "processPageTitleUPCASE": "處理",
   "searchHintLabel": "搜索",
-  "storageFailedMessage": "存儲失敗: 請檢查質量檢查是否已完成，或聯繫IT部門以獲取說明。",
+  "storageFailedMessage": "物料已存儲。",
   "noDataAvailableMessage": "沒有可供回憶的數據。",
   "operationModeLabel": "操作模式",
   "alreadyShippedMessage": "已發貨",
@@ -130,5 +130,15 @@
   "inspectByQCMessage": "已檢查QC",
   "performActionImportUncheckedMessage": "確定執行此操作？物料: {items}",
   "importUncheckedTitleUpcase": "導入未檢查",
-  "importUncheckedMenuTitle": "導入未檢查"
+  "importUncheckedMenuTitle": "導入未檢查",
+  "cannotClearItemMessage": "沒有可撤回的資料",
+  "errorClearingWarehouseQuantityMessage": "清除倉庫數量時發生錯誤",
+  "clearWarehouseMenuTitle": "清除倉庫",
+  "clearWarehousePageTitle": "清除倉庫頁面",
+  "clearWarehouseQuantityMessage": "清除倉庫數量",
+  "clearWarehouseSuccessMessage": "倉庫數量已成功清除",
+  "materialProjectCode": "專案代碼",
+  "materialImport": "物料入庫",
+  "materialExport": "物料出庫",
+  "materialExportTime": "出庫時間"
 }

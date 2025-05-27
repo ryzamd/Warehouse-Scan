@@ -12,6 +12,8 @@ import 'features/auth/login/presentation/pages/login_page.dart';
 import 'features/auth/logout/presentation/pages/profile_page.dart';
 import 'features/batch_scan/presentation/bloc/batch_scan_bloc.dart';
 import 'features/batch_scan/presentation/pages/batch_scan_page.dart';
+import 'features/clear_warehouse/presentation/bloc/clear_warehouse_bloc.dart';
+import 'features/clear_warehouse/presentation/pages/clear_warehouse_page.dart';
 import 'features/import_unchecked/presentation/bloc/import_unchecked_bloc.dart';
 import 'features/import_unchecked/presentation/pages/import_unchecked_page.dart';
 import 'features/inventory_check/presentation/bloc/inventory_check_bloc.dart';
@@ -20,9 +22,7 @@ import 'features/process/presentation/bloc/processing_bloc.dart';
 import 'features/process/presentation/pages/process_page.dart';
 import 'features/warehouse_menu/presentation/pages/warehouse_menu_page.dart';
 import 'features/warehouse_scan/presentation/bloc/warehouse_in/warehouse_in_bloc.dart';
-import 'features/warehouse_scan/presentation/bloc/warehouse_out/warehouse_out_bloc.dart';
 import 'features/warehouse_scan/presentation/pages/warehouse_in_page.dart';
-import 'features/warehouse_scan/presentation/pages/warehouse_out_page.dart';
 import 'core/widgets/splash_screen.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -127,16 +127,6 @@ class _MyAppState extends State<MyApp> {
                     ),
                   );
                   
-                case AppRoutes.warehouseOut:
-                  NavigationService().setLastWarehouseRoute(AppRoutes.warehouseOut);
-                  return MaterialPageRoute(
-                    settings: settings,
-                    builder: (context) => BlocProvider(
-                      create: (context) => di.sl<WarehouseOutBloc>(param1: args),
-                      child: WarehouseOutPage(user: args!),
-                    ),
-                  );
-                  
                 case AppRoutes.processingwarehouseIn:
                 case AppRoutes.processingwarehouseOut:
                   return MaterialPageRoute(
@@ -174,14 +164,24 @@ class _MyAppState extends State<MyApp> {
                   );
 
                 case AppRoutes.importUnchecked:
-                NavigationService().setLastWarehouseRoute(AppRoutes.importUnchecked);
-                return MaterialPageRoute(
-                  settings: settings,
-                  builder: (context) => BlocProvider(
-                    create: (context) => di.sl<ImportUncheckedBloc>(param1: args),
-                    child: ImportUncheckedPage(user: args!),
-                  ),
-                );
+                  NavigationService().setLastWarehouseRoute(AppRoutes.importUnchecked);
+                  return MaterialPageRoute(
+                    settings: settings,
+                    builder: (context) => BlocProvider(
+                      create: (context) => di.sl<ImportUncheckedBloc>(param1: args),
+                      child: ImportUncheckedPage(user: args!),
+                    ),
+                  );
+
+                case AppRoutes.clearWarehouse:
+                  NavigationService().setLastWarehouseRoute(AppRoutes.clearWarehouse);
+                  return MaterialPageRoute(
+                    settings: settings,
+                    builder: (context) => BlocProvider(
+                      create: (context) => di.sl<ClearWarehouseBloc>(param1: args),
+                      child: ClearWarehousePage(user: args!),
+                    ),
+                  );
                           
                 default:
                   return MaterialPageRoute(

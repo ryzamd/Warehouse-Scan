@@ -75,6 +75,13 @@ class InventoryCheckBloc extends Bloc<InventoryCheckEvent, InventoryCheckState> 
   }
   
   Future<void> _onCheckInventoryItem(CheckInventoryItem event, Emitter<InventoryCheckState> emit) async {
+    if (!await connectionChecker.hasConnection) {
+      emit(InventoryCheckError(
+        message: StringKey.networkErrorMessage,
+        previousState: state,
+      ));
+      return;
+    }
     try {
 
       final result = await checkItemCode(

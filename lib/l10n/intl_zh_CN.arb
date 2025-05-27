@@ -118,7 +118,7 @@
   "exitDialogConfirmButton": "退出",
   "processPageTitleUPCASE": "处理",
   "searchHintLabel": "搜索",
-  "storageFailedMessage": "存储失败: 请检查质量检查是否已完成，或联系IT部门以获取说明。",
+  "storageFailedMessage": "物料已存储。",
   "noDataAvailableMessage": "沒有可撤回數據。",
   "operationModeLabel": "操作模式",
   "alreadyShippedMessage": "已全部出库",
@@ -130,5 +130,15 @@
   "inspectByQCMessage": "已检查QC",
   "performActionImportUncheckedMessage": "执行此操作？物料: {items}",
   "importUncheckedTitleUpcase": "导入未检查",
-  "importUncheckedMenuTitle": "导入未检查"
+  "importUncheckedMenuTitle": "导入未检查",
+  "cannotClearItemMessage": "没有可撤回的数据",
+  "errorClearingWarehouseQuantityMessage": "清除仓库数量时出错",
+  "clearWarehouseMenuTitle": "清除仓库菜单",
+  "clearWarehousePageTitle": "清除仓库页面",
+  "clearWarehouseQuantityMessage": "清除仓库数量",
+  "clearWarehouseSuccessMessage": "仓库清除成功",
+  "materialProjectCode": "项目代码",
+  "materialImport": "物料导入",
+  "materialExport": "物料导出",
+  "materialExportTime": "导出时间"
 }

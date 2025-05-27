@@ -118,7 +118,7 @@
   "exitDialogConfirmButton": "Exit",
   "processPageTitleUPCASE": "PROCESS",
   "searchHintLabel": "Search",
-  "storageFailedMessage": "Storage failed: Please check if qualityinspection has been done, or contact IT for clarification.",
+  "storageFailedMessage": "Material has been stored.",
   "noDataAvailableMessage": "No data available for recall.",
   "operationModeLabel": "Operation Mode",
   "alreadyShippedMessage": "Already shipped",
@@ -130,5 +130,15 @@
   "qcStatusMessage": "QC Status: {status}",
   "performActionImportUncheckedMessage": "Are you sure to perform this action? Items: {items}",
   "importUncheckedTitleUpcase": "IMPORT UNCHECKED",
-  "importUncheckedMenuTitle": "Import Unchecked"
+  "importUncheckedMenuTitle": "Import Unchecked",
+  "cannotClearItemMessage": "No data. Cannot clear!",
+  "errorClearingWarehouseQuantityMessage": "Error clearing warehouse quantity",
+  "clearWarehouseMenuTitle": "Clear Warehouse",
+  "clearWarehousePageTitle": "CLEAR WAREHOUSE",
+  "clearWarehouseQuantityMessage": "Are you sure you want to clear the warehouse quantity?",
+  "clearWarehouseSuccessMessage": "Warehouse quantity cleared successfully.",
+  "materialProjectCode": "Project Code",
+  "materialImport": "Import",
+  "materialExport": "Export",
+  "materialExportTime": "Export Time"
 }
